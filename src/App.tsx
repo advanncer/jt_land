@@ -18,8 +18,8 @@ const App: React.FC = () => {
   };
 
   return (
-    // Compact Layout: pt-14 (mobile) to accommodate top bar but stay high
-    <div className="min-h-screen flex flex-col justify-start items-center pt-14 pb-6 px-4 md:px-0 relative overflow-hidden font-sans selection:bg-brand-orange/30">
+    // allow scrolling on body, remove fixed heights
+    <div className="min-h-screen flex flex-col justify-start items-center relative font-sans selection:bg-brand-orange/30">
       
       {/* --- BACKGROUNDS --- */}
       <div className="fixed inset-0 bg-black -z-50"></div>
@@ -27,9 +27,9 @@ const App: React.FC = () => {
       <div className="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-900/20 blur-[100px] rounded-full -z-40 pointer-events-none mix-blend-screen"></div>
       <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 -z-30 pointer-events-none"></div>
 
-      {/* Fixed Progress Bar */}
+      {/* Fixed Progress Bar (Always on top) */}
       {step > 1 && (
-        <div className="fixed top-0 left-0 w-full h-[4px] bg-white/5 backdrop-blur-md z-50 border-b border-white/5">
+        <div className="fixed top-0 left-0 w-full h-[4px] bg-white/5 backdrop-blur-md z-[60] border-b border-white/5">
           <div 
             className="h-full bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-500 ease-out shadow-[0_0_15px_rgba(241,102,0,0.8)]"
             style={{ width: `${progress}%` }}
@@ -37,8 +37,8 @@ const App: React.FC = () => {
         </div>
       )}
       
-      {/* Main Container */}
-      <div className="w-full max-w-[500px] mx-auto z-10 animate-fade-in-up">
+      {/* Main Container - Width Constraint only, no height constraint */}
+      <div className="w-full max-w-[550px] mx-auto z-10 animate-fade-in-up">
         <Quiz step={step} onNextStep={handleNextStep} />
       </div>
     </div>
