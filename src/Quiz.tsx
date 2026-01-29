@@ -8,35 +8,22 @@ interface QuizProps {
 
 /* --- Components --- */
 
-const EvenStepIllustration: React.FC = () => {
+const IllustrationPlaceholder: React.FC = () => {
   return (
-    <div className="w-full flex justify-center mb-8 animate-fade-in-up">
-      <svg className="h-32 w-auto opacity-90" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Abstract Background Elements */}
-        <circle cx="200" cy="30" r="12" fill="#222" />
-        <circle cx="40" cy="90" r="8" fill="#222" />
-        <path d="M180 90 L220 90" stroke="#222" strokeWidth="2" strokeLinecap="round" />
-        
-        {/* Main Dynamics - Orange Accents */}
-        <path d="M40 40 C60 20, 100 20, 120 40 S 180 60, 200 40" stroke="#f16600" strokeWidth="3" strokeLinecap="round" strokeDasharray="4 4" />
-        <path d="M120 60 L140 30 L160 60" fill="none" stroke="#f16600" strokeWidth="2" strokeLinejoin="round" />
-        
-        {/* Symbols: Flag / Book / Lightning */}
-        <rect x="60" y="60" width="30" height="40" rx="4" fill="#111" stroke="#333" strokeWidth="2" />
-        <path d="M60 70 H90" stroke="#333" strokeWidth="2" />
-        <path d="M60 80 H90" stroke="#333" strokeWidth="2" />
-        
-        <circle cx="140" cy="80" r="20" stroke="#f16600" strokeWidth="2" fill="#0a0a0a" />
-        <path d="M135 80 L140 85 L150 75" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+    <div className="w-full h-48 bg-white/[0.03] border border-white/10 rounded-2xl flex flex-col items-center justify-center my-8 backdrop-blur-sm group hover:bg-white/[0.05] transition-colors duration-300">
+      <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+        <svg className="w-8 h-8 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+      </div>
+      <span className="text-white/30 text-xs font-medium uppercase tracking-widest">Тут буде ілюстрація</span>
     </div>
   );
 };
 
 const WelcomeBox: React.FC = () => {
   return (
-    <div className="mb-6 p-5 rounded-xl border border-brand-orange/40 bg-brand-orange/5 flex items-center gap-4 animate-fade-in-up relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-24 h-24 bg-brand-orange/10 blur-2xl rounded-full pointer-events-none"></div>
+    <div className="mb-6 p-5 rounded-xl border border-brand-orange/40 bg-brand-orange/10 flex items-center gap-4 animate-fade-in-up relative overflow-hidden mx-auto w-full">
         <div className="w-12 h-12 flex flex-shrink-0 items-center justify-center bg-brand-orange text-white rounded-full text-2xl shadow-[0_0_15px_rgba(241,102,0,0.5)]">
             🎁
         </div>
@@ -94,7 +81,7 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
 
   if (!currentStepData) {
     return (
-      <div className="text-left py-10 animate-fade-in-up">
+      <div className="text-center py-10 animate-fade-in-up">
         <h1 className="text-3xl font-bold mb-4 text-white leading-tight font-sans">Вітаємо!</h1>
         <p className="text-white/70 text-lg font-sans">Ваш персональний план готовий. Менеджер звʼяжеться з вами найближчим часом.</p>
       </div>
@@ -128,7 +115,6 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
   };
 
   const isFirstStep = step === 1;
-  const isEvenStep = step % 2 === 0;
   
   let isButtonDisabled = false;
   if (currentStepData.form) {
@@ -138,45 +124,47 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
   }
 
   return (
-    <div className="w-full flex flex-col items-start font-sans">
+    <div className="w-full flex flex-col items-center font-sans text-center">
       
-      {/* 1. HEADER (Left aligned, Sans-serif) */}
-      <h1 className="text-[28px] md:text-4xl font-bold text-white mb-4 leading-[1.15] text-left w-full font-sans">
+      {/* 1. HEADER (Centered) */}
+      <h1 className="text-[26px] md:text-3xl font-bold text-white mb-3 leading-[1.2] w-full font-sans">
         {currentStepData.question}
       </h1>
       
-      {/* Description */}
+      {/* Description (Centered) */}
       {currentStepData.description && (
-        <p className="text-base md:text-lg text-white/70 mb-8 w-full text-left leading-relaxed font-sans">
+        <p className="text-base text-white/60 mb-2 w-full max-w-[400px] leading-relaxed font-sans mx-auto">
           {currentStepData.description}
         </p>
       )}
 
-      {/* 2. GRAPHICS (For even steps) - Centered */}
-      {isEvenStep && !currentStepData.form && <EvenStepIllustration />}
-
-      {/* First Step Stats */}
-      {isFirstStep && (
-        <div className="flex flex-col gap-3 mb-10 w-full">
-          <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+      {/* 2. PLACEHOLDER / GRAPHICS AREA */}
+      
+      {/* Special Stats for Step 1 */}
+      {isFirstStep ? (
+        <div className="flex flex-col gap-3 my-8 w-full">
+          <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] text-left">
             <div className="w-10 h-10 flex flex-shrink-0 items-center justify-center bg-brand-orange/10 rounded-lg text-brand-orange">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
             </div>
             <span className="font-medium text-white/90 text-sm font-sans">Навчаємо більше 8 років</span>
           </div>
-          <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+          <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] text-left">
             <div className="w-10 h-10 flex flex-shrink-0 items-center justify-center bg-brand-orange/10 rounded-lg text-brand-orange">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
             </div>
             <span className="font-medium text-white/90 text-sm font-sans">15 000 активних студентів щомісяця</span>
           </div>
-          <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+          <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] text-left">
             <div className="w-10 h-10 flex flex-shrink-0 items-center justify-center bg-brand-orange/10 rounded-lg text-brand-orange">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
             </div>
             <span className="font-medium text-white/90 text-sm font-sans">Більше 100 000 студентів успішно закінчили навчання</span>
           </div>
         </div>
+      ) : (
+        /* The requested Placeholder for other steps */
+        !currentStepData.form && <IllustrationPlaceholder />
       )}
 
       {/* 3. ANSWERS / BUTTONS */}
@@ -185,21 +173,14 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
           {currentStepData.answers.map((answer) => (
             <button
               key={answer.text}
-              className={`p-5 text-left rounded-xl border-2 transition-all duration-200 font-bold w-full font-sans ${
+              className={`p-4 text-center rounded-xl border-2 transition-all duration-200 font-bold w-full font-sans ${
                 selectedAnswers.includes(answer.text)
-                  ? "bg-brand-orange border-brand-orange text-black shadow-lg translate-x-1"
-                  : "bg-[#111] border-white/5 text-white/80 hover:bg-[#181818] hover:text-white"
+                  ? "bg-brand-orange border-brand-orange text-black shadow-lg scale-[1.02]"
+                  : "bg-white/[0.03] border-white/10 text-white/90 hover:bg-white/[0.08] hover:border-white/20"
               }`}
               onClick={() => handleAnswerClick(answer.text)}
             >
-              <div className="flex justify-between items-center w-full">
-                <span className="text-base">{answer.text}</span>
-                {selectedAnswers.includes(answer.text) && (
-                    <span className="bg-black/20 rounded-full p-1">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    </span>
-                )}
-              </div>
+              <span className="text-base">{answer.text}</span>
             </button>
           ))}
         </div>
@@ -207,10 +188,10 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
 
       {/* Form Step */}
       {currentStepData.form && (
-        <div className="flex flex-col gap-5 w-full mb-8">
+        <div className="flex flex-col gap-5 w-full mb-8 mt-6">
           <WelcomeBox />
           
-          <div className="space-y-4">
+          <div className="space-y-4 text-left">
               <div className="flex flex-col gap-2">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-brand-orange ml-1 font-sans">Імʼя</label>
                   <input 
