@@ -8,7 +8,8 @@ const App: React.FC = () => {
   const [_answers, setAnswers] = useState<Record<number, string[]>>({});
 
   const totalSteps = quizData.length;
-  const progress = (step / totalSteps) * 100;
+  // Progress starts counting from step 2 for the UI
+  const progress = step === 1 ? 0 : ((step - 1) / (totalSteps - 1)) * 100;
 
   const handleNextStep = (stepAnswers?: string[]) => {
     if (stepAnswers) {
@@ -19,10 +20,12 @@ const App: React.FC = () => {
 
   return (
     <div className="quiz-container">
-      <div className="progress-bar-container">
-        <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
-        <div className="progress-text">Крок {step} з {totalSteps}</div>
-      </div>
+      {step > 1 && (
+        <div className="progress-bar-container">
+          <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+          <div className="progress-text">Крок {step - 1} з {totalSteps - 1}</div>
+        </div>
+      )}
       <Quiz step={step} onNextStep={handleNextStep} />
     </div>
   );
