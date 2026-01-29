@@ -4,7 +4,7 @@ import "./App.css";
 
 const App: React.FC = () => {
   const [step, setStep] = useState(1);
-  const [answers, setAnswers] = useState<Record<number, string[]>>({});
+  const [_answers, setAnswers] = useState<Record<number, string[]>>({});
 
   const handleNextStep = (stepAnswers?: string[]) => {
     if (stepAnswers) {
