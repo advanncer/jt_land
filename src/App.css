@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -7,11 +8,11 @@
   --color-brand-card: #111111;
   --color-brand-input: #1a1a1a;
   
-  --animate-fade-in-up: fadeInUp 0.6s ease-out forwards;
+  --animate-fade-in-up: fadeInUp 0.5s ease-out forwards;
   --animate-pulse-slow: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 
   @keyframes fadeInUp {
-    0% { opacity: 0; transform: translateY(20px); }
+    0% { opacity: 0; transform: translateY(10px); }
     100% { opacity: 1; transform: translateY(0); }
   }
 }
@@ -19,31 +20,25 @@
 @layer base {
   body {
     @apply bg-brand-black text-white antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply w-full h-[56px] bg-brand-orange text-white font-bold rounded-xl transition-all duration-300 
+    @apply w-full h-[56px] bg-brand-orange text-white font-bold rounded-xl transition-all duration-200 
            hover:bg-[#ff7a1a] hover:shadow-[0_0_20px_rgba(241,102,0,0.4)] active:scale-[0.98]
-           disabled:bg-gray-700 disabled:cursor-not-allowed disabled:shadow-none;
+           disabled:bg-neutral-800 disabled:text-white/20 disabled:border-white/5 disabled:cursor-not-allowed disabled:shadow-none;
   }
   
   .input-field {
-    @apply w-full p-4 bg-brand-input border border-transparent rounded-xl text-white outline-none
-           focus:border-white transition-all duration-300;
-  }
-
-  .glass-card {
-    @apply bg-brand-card border border-white/5 rounded-2xl backdrop-blur-sm;
+    @apply w-full p-4 bg-brand-input border border-white/10 rounded-xl text-white outline-none font-sans
+           focus:border-brand-orange focus:shadow-[0_0_15px_rgba(241,102,0,0.2)] transition-all duration-300;
   }
 }
 
-/* Background gradient abstraction */
 .bg-abstraction {
   @apply fixed inset-0 pointer-events-none -z-10;
   background: 
-    radial-gradient(circle at 10% 20%, rgba(241, 102, 0, 0.03) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(241, 102, 0, 0.05) 0%, transparent 40%);
+    radial-gradient(circle at 50% -20%, rgba(241, 102, 0, 0.08) 0%, transparent 50%);
 }
