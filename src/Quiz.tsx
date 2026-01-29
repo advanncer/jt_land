@@ -9,7 +9,6 @@ interface QuizProps {
 /* --- UI COMPONENTS --- */
 
 const Logo: React.FC = () => (
-  // Fixed size logo
   <div className="w-full flex justify-center mb-6 pt-2">
       <img 
         src="https://placehold.co/200x60/transparent/ffffff?text=JustSchool" 
@@ -43,16 +42,28 @@ const ShimmerButton: React.FC<{ onClick: () => void; disabled: boolean; children
   );
 };
 
-// Hidden on small screens to save space for larger text
-const IllustrationPlaceholder: React.FC = () => {
+// Re-inserted Illustration (Visible on Mobile)
+const IllustrationAbstraction: React.FC = () => {
   return (
-    <div className="hidden sm:flex w-full h-32 bg-black/20 border border-white/5 rounded-2xl flex-col items-center justify-center my-6 backdrop-blur-sm group hover:bg-black/30 transition-colors duration-300 shrink-0">
-      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center mb-2 shadow-lg group-hover:scale-110 transition-transform duration-300">
-        <svg className="w-6 h-6 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-        </svg>
-      </div>
-      <span className="text-white/30 text-[10px] font-bold uppercase tracking-widest">Ілюстрація</span>
+    <div className="w-full flex justify-center my-4 shrink-0 animate-fade-in-up">
+      <svg className="h-32 w-auto opacity-90" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Abstract Background Elements */}
+        <circle cx="200" cy="30" r="12" fill="#222" />
+        <circle cx="40" cy="90" r="8" fill="#222" />
+        <path d="M180 90 L220 90" stroke="#222" strokeWidth="2" strokeLinecap="round" />
+        
+        {/* Main Dynamics - Orange Accents */}
+        <path d="M40 40 C60 20, 100 20, 120 40 S 180 60, 200 40" stroke="#f16600" strokeWidth="3" strokeLinecap="round" strokeDasharray="4 4" />
+        <path d="M120 60 L140 30 L160 60" fill="none" stroke="#f16600" strokeWidth="2" strokeLinejoin="round" />
+        
+        {/* Symbols: Flag / Book / Lightning */}
+        <rect x="60" y="60" width="30" height="40" rx="4" fill="#111" stroke="#333" strokeWidth="2" />
+        <path d="M60 70 H90" stroke="#333" strokeWidth="2" />
+        <path d="M60 80 H90" stroke="#333" strokeWidth="2" />
+        
+        <circle cx="140" cy="80" r="20" stroke="#f16600" strokeWidth="2" fill="#0a0a0a" />
+        <path d="M135 80 L140 85 L150 75" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
     </div>
   );
 };
@@ -157,20 +168,22 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
   };
 
   const isFirstStep = step === 1;
+  
   let isButtonDisabled = false;
   if (currentStepData.form) { isButtonDisabled = !isFormValid; } 
   else if (currentStepData.multiselect) { isButtonDisabled = selectedAnswers.length === 0; }
 
   return (
     <>
-      {/* 1. SCROLLABLE CONTENT (Z-0) */}
-      <div className="w-full px-5 pt-16 pb-40 flex flex-col">
+      {/* 1. SCROLLABLE CONTENT */}
+      {/* pb-56 is HUGE padding at the bottom to ensure content clears the sticky footer */}
+      <div className="w-full px-5 pt-16 pb-56 flex flex-col">
         
         {/* LOGO */}
         <Logo />
 
-        {/* HEADER - Increased typography */}
-        <div className="text-center mb-6">
+        {/* HEADER */}
+        <div className="text-center mb-4">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight font-sans tracking-tight">
             {highlightText(currentStepData.question)}
           </h1>
@@ -199,11 +212,11 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
               ))}
             </div>
           ) : (
-             /* Hidden on mobile, visible on desktop */
-             !currentStepData.form && <IllustrationPlaceholder />
+             /* ILLUSTRATION (Visible on all other steps except form) */
+             !currentStepData.form && <IllustrationAbstraction />
           )}
 
-          {/* ANSWERS - Large text for readability */}
+          {/* ANSWERS */}
           {currentStepData.answers && (
             <div className="flex flex-col gap-3 w-full mt-2">
               {currentStepData.answers.map((answer) => (
@@ -237,8 +250,9 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
       </div>
 
       {/* 2. STICKY FOOTER (Z-50) */}
+      {/* pb-12 handles the iOS Safe Area (Home Indicator) */}
       {currentStepData.cta && (
-        <div className="fixed bottom-0 left-0 w-full z-50 bg-gradient-to-t from-black via-black/95 to-transparent pt-12 pb-8 px-6 backdrop-blur-[2px]">
+        <div className="fixed bottom-0 left-0 w-full z-50 bg-gradient-to-t from-black via-black/95 to-transparent pt-6 px-6 pb-12 backdrop-blur-[2px]">
           <div className="max-w-[550px] mx-auto w-full">
             <ShimmerButton onClick={handleNextClick} disabled={isButtonDisabled}>
               {currentStepData.cta}
