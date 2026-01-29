@@ -173,3 +173,37 @@ button:disabled {
         max-width: 100%;
     }
 }
+
+/* Progress Bar Styles */
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: #333;
+  border-radius: 4px;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: visible;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--primary-color);
+  border-radius: 4px;
+  transition: width 0.4s ease-out;
+  box-shadow: 0 0 10px rgba(241, 102, 0, 0.5);
+}
+
+.progress-text {
+  position: absolute;
+  top: -25px;
+  right: 0;
+  font-size: 0.85rem;
+  color: #888;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .progress-bar-container {
+    margin-bottom: 1.5rem;
+  }
+}
