@@ -20,6 +20,11 @@ const stepImages: { [key: number]: string } = {
   7: var7,
   8: var8,
   9: var9,
+  10: var1,
+  11: var2,
+  12: var3,
+  13: var4,
+  14: var5,
 };
 
 interface QuizProps {
@@ -196,7 +201,7 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
             {highlightText(currentStepData.question)}
           </h1>
           {currentStepData.description && (
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-sans max-w-sm mx-auto">
+            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-sans max-w-sm mx-auto whitespace-pre-line">
               {highlightText(currentStepData.description)}
             </p>
           )}
