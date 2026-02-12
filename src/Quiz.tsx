@@ -137,6 +137,14 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
   const [formData, setFormData] = useState({ name: "", phone: "", email: "" });
   const [isFormValid, setIsFormValid] = useState(false);
 
+  // Preload all images on mount
+  useEffect(() => {
+    Object.values(stepImages).forEach((src) => {
+        const img = new Image();
+        img.src = src;
+    });
+  }, []);
+
   useEffect(() => {
     if (!currentStepData?.form) return;
     const phoneDigits = formData.phone.replace(/\D/g, '');
@@ -195,74 +203,78 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
         {/* LOGO */}
         <Logo />
 
-        {/* HEADER - Fluid Typography */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight font-sans tracking-tight">
-            {highlightText(currentStepData.question)}
-          </h1>
-          {currentStepData.description && (
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-sans max-w-sm mx-auto whitespace-pre-line">
-              {highlightText(currentStepData.description)}
-            </p>
-          )}
-        </div>
+        {/* WRAPPER FOR ANIMATION KEYED BY STEP */}
+        <div key={step} className="w-full flex flex-col items-center animate-fade-in-up">
+            
+            {/* HEADER - Fluid Typography */}
+            <div className="text-center mb-6 w-full">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight font-sans tracking-tight">
+                {highlightText(currentStepData.question)}
+              </h1>
+              {currentStepData.description && (
+                <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-sans max-w-sm mx-auto whitespace-pre-line">
+                  {highlightText(currentStepData.description)}
+                </p>
+              )}
+            </div>
 
-        {/* CONTENT */}
-        <div className="w-full">
-          {currentImage ? (
-             <div className="mb-6 rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                <img src={currentImage} alt="Quiz illustration" className="w-full h-auto object-cover" />
-             </div>
-          ) : isFirstStep ? (
-            <div className="flex flex-col gap-3 mb-4 w-full">
-              {[
-                {icon: "award", text: "Навчаємо більше 8 років"},
-                {icon: "users", text: "15 000 активних студентів"},
-                {icon: "academic-cap", text: "100 000+ випускників"}
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
-                  <div className="w-10 h-10 flex flex-shrink-0 items-center justify-center bg-brand-orange/10 rounded-xl text-brand-orange">
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                  </div>
-                  <span className="font-bold text-white/90 text-sm sm:text-base font-sans">{item.text}</span>
+            {/* CONTENT */}
+            <div className="w-full">
+              {currentImage ? (
+                 <div className="mb-6 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-white/5 relative min-h-[160px] flex items-center justify-center">
+                    <img src={currentImage} alt="Quiz illustration" className="w-full h-auto object-cover" />
+                 </div>
+              ) : isFirstStep ? (
+                <div className="flex flex-col gap-3 mb-4 w-full">
+                  {[
+                    {icon: "award", text: "Навчаємо більше 8 років"},
+                    {icon: "users", text: "15 000 активних студентів"},
+                    {icon: "academic-cap", text: "100 000+ випускників"}
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
+                      <div className="w-10 h-10 flex flex-shrink-0 items-center justify-center bg-brand-orange/10 rounded-xl text-brand-orange">
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                      </div>
+                      <span className="font-bold text-white/90 text-sm sm:text-base font-sans">{item.text}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          ) : (
-             /* SKELETON BLOCK (Replaces Illustration) */
-             !currentStepData.form && <SkeletonBlock />
-          )}
+              ) : (
+                 /* SKELETON BLOCK (Replaces Illustration) */
+                 !currentStepData.form && <SkeletonBlock />
+              )}
 
-          {/* ANSWERS - Larger touch targets */}
-          {currentStepData.answers && (
-            <div className="flex flex-col gap-3 w-full mt-2">
-              {currentStepData.answers.map((answer) => (
-                <button
-                  key={answer.text}
-                  className={`p-5 text-center rounded-2xl border transition-all duration-200 font-bold w-full font-sans text-base sm:text-lg ${
-                    selectedAnswers.includes(answer.text)
-                      ? "bg-white/10 border-brand-orange text-white shadow-[0_0_15px_rgba(241,102,0,0.3)]"
-                      : "bg-white/[0.03] border-white/5 text-gray-300 active:bg-white/10"
-                  }`}
-                  onClick={() => handleAnswerClick(answer.text)}
-                >
-                  {answer.text}
-                </button>
-              ))}
-            </div>
-          )}
+              {/* ANSWERS - Larger touch targets */}
+              {currentStepData.answers && (
+                <div className="flex flex-col gap-3 w-full mt-2">
+                  {currentStepData.answers.map((answer) => (
+                    <button
+                      key={answer.text}
+                      className={`p-5 text-center rounded-2xl border transition-all duration-200 font-bold w-full font-sans text-base sm:text-lg ${
+                        selectedAnswers.includes(answer.text)
+                          ? "bg-white/10 border-brand-orange text-white shadow-[0_0_15px_rgba(241,102,0,0.3)]"
+                          : "bg-white/[0.03] border-white/5 text-gray-300 active:bg-white/10"
+                      }`}
+                      onClick={() => handleAnswerClick(answer.text)}
+                    >
+                      {answer.text}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-          {/* FORM */}
-          {currentStepData.form && (
-            <div className="flex flex-col gap-4 w-full mt-4">
-              <WelcomeBox />
-              <div className="space-y-4">
-                <input type="text" placeholder="Імʼя" className="input-glass py-4 text-lg" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
-                <input type="tel" placeholder="+380 (XX) XXX-XX-XX" className="input-glass py-4 text-lg" value={formData.phone} onChange={handlePhoneChange} maxLength={19} />
-                <input type="email" placeholder="Email" className="input-glass py-4 text-lg" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
-              </div>
+              {/* FORM */}
+              {currentStepData.form && (
+                <div className="flex flex-col gap-4 w-full mt-4">
+                  <WelcomeBox />
+                  <div className="space-y-4">
+                    <input type="text" placeholder="Імʼя" className="input-glass py-4 text-lg" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                    <input type="tel" placeholder="+380 (XX) XXX-XX-XX" className="input-glass py-4 text-lg" value={formData.phone} onChange={handlePhoneChange} maxLength={19} />
+                    <input type="email" placeholder="Email" className="input-glass py-4 text-lg" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                  </div>
+                </div>
+              )}
             </div>
-          )}
         </div>
       </div>
 
