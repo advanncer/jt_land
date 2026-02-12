@@ -1,5 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { quizData } from "./data";
+import var1 from "../img/Y26_W5_Static_Quiz_var1.png";
+import var2 from "../img/Y26_W5_Static_Quiz_var2.png";
+import var3 from "../img/Y26_W5_Static_Quiz_var3.png";
+import var4 from "../img/Y26_W5_Static_Quiz_var4.png";
+import var5 from "../img/Y26_W5_Static_Quiz_var5.png";
+import var6 from "../img/Y26_W5_Static_Quiz_var6.png";
+import var7 from "../img/Y26_W5_Static_Quiz_var7.png";
+import var8 from "../img/Y26_W5_Static_Quiz_var8.png";
+import var9 from "../img/Y26_W5_Static_Quiz_var9.png";
+
+const stepImages: { [key: number]: string } = {
+  1: var1,
+  2: var2,
+  3: var3,
+  4: var4,
+  5: var5,
+  6: var6,
+  7: var7,
+  8: var8,
+  9: var9,
+};
 
 interface QuizProps {
   step: number;
@@ -27,8 +48,8 @@ const ShimmerButton: React.FC<{ onClick: () => void; disabled: boolean; children
       className={`
         relative w-full h-14 rounded-2xl font-bold text-lg tracking-wide text-white overflow-hidden transition-all duration-300
         group shadow-xl transform active:scale-[0.98]
-        ${disabled 
-          ? 'bg-white/10 text-white/20 border border-white/5 cursor-not-allowed' 
+        ${disabled
+          ? 'bg-white/10 text-white/20 border border-white/5 cursor-not-allowed'
           : 'bg-gradient-to-r from-orange-600 to-orange-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_4px_20px_rgba(241,102,0,0.3)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_30px_rgba(241,102,0,0.6)] border border-orange-400/20'
         }
       `}
@@ -76,9 +97,9 @@ const WelcomeBox: React.FC = () => {
 const highlightText = (text: string) => {
   if (!text) return "";
   const parts = text.split(/(JustSchool)/gi);
-  return parts.map((part, i) => 
-    part.toLowerCase() === 'justschool' 
-      ? <span key={i} className="text-[#f16600] font-bold">JustSchool</span> 
+  return parts.map((part, i) =>
+    part.toLowerCase() === 'justschool'
+      ? <span key={i} className="text-[#f16600] font-bold">JustSchool</span>
       : part
   );
 };
@@ -86,7 +107,7 @@ const highlightText = (text: string) => {
 const formatPhoneNumber = (value: string) => {
     const input = value.replace(/\D/g, '').substring(0, 12);
     let numbers = input;
-    if (numbers.startsWith("380")) {} 
+    if (numbers.startsWith("380")) {}
     else if (numbers.length > 0) {
         if (numbers.startsWith("0")) numbers = "380" + numbers.substring(1);
         else numbers = "380" + numbers;
@@ -107,7 +128,7 @@ const formatPhoneNumber = (value: string) => {
 const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
   const currentStepData = quizData.find((item) => item.step === step);
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
-  
+
   const [formData, setFormData] = useState({ name: "", phone: "", email: "" });
   const [isFormValid, setIsFormValid] = useState(false);
 
@@ -155,15 +176,17 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
 
   const isFirstStep = step === 1;
   let isButtonDisabled = false;
-  if (currentStepData.form) { isButtonDisabled = !isFormValid; } 
+  if (currentStepData.form) { isButtonDisabled = !isFormValid; }
   else if (currentStepData.multiselect) { isButtonDisabled = selectedAnswers.length === 0; }
+
+  const currentImage = stepImages[step];
 
   return (
     <>
       {/* 1. SCROLLABLE CONTENT AREA */}
       {/* pb-48 ensures content clears the sticky footer */}
       <div className="w-full px-5 pt-16 pb-48 flex flex-col flex-grow overflow-y-auto no-scrollbar">
-        
+
         {/* LOGO */}
         <Logo />
 
@@ -181,7 +204,11 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
 
         {/* CONTENT */}
         <div className="w-full">
-          {isFirstStep ? (
+          {currentImage ? (
+             <div className="mb-6 rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                <img src={currentImage} alt="Quiz illustration" className="w-full h-auto object-cover" />
+             </div>
+          ) : isFirstStep ? (
             <div className="flex flex-col gap-3 mb-4 w-full">
               {[
                 {icon: "award", text: "Навчаємо більше 8 років"},
@@ -235,7 +262,7 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
       </div>
 
       {/* 2. UNIVERSAL STICKY FOOTER */}
-      {/* 
+      {/*
           Positioning Strategy:
           - fixed bottom-0: Sticks to viewport bottom.
           - left-1/2 -translate-x-1/2: Centers it horizontally relative to viewport.
