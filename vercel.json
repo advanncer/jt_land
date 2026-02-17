@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/eng_adult",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/eng_adult/:path*",
+      "destination": "/:path*"
+    }
+  ]
+}
