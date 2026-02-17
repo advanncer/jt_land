@@ -99,7 +99,16 @@ const App: React.FC = () => {
 
     if (step === 15) {
       if (window.fbq) {
-        window.fbq('track', 'Lead');
+        // Use 'Purchase' for the main funnel, 'Lead' for the TG funnel (or keep Lead for both if desired, but request was specifically for main funnel)
+        // Request: "для воронки /eng_adult замени ивент Lead на ивент Purchase"
+        // Implicitly: Keep 'Lead' for /eng_adult_tg or change both? Usually these requests mean specific change.
+        // Assuming: /eng_adult -> Purchase, /eng_adult_tg -> Lead (since it's a bot flow)
+        
+        if (isTgVersion) {
+            window.fbq('track', 'Lead');
+        } else {
+            window.fbq('track', 'Purchase', { currency: "UAH", value: 0 }); 
+        }
       }
       submitToCRM(newAnswers);
     }
