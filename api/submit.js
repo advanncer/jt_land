@@ -8,7 +8,7 @@ export default async function handler(request, response) {
     // 1. Prepare data for NocoDB
     // We try to map the incoming data to likely column names.
     // The columns in your "Landing_FB" table should be:
-    // Name, Phone, Email, QA, IP, Country, DialogueUrl
+    // Name, Phone, Email, QA, IP, Country, DialogueUrl, Title
     
     // Parse IP and Country from the QA string for cleaner database entry
     let ip = '';
@@ -25,6 +25,7 @@ export default async function handler(request, response) {
     }
 
     const nocoPayload = {
+        "Title": data.name, // Map Name to Title (Primary Value)
         "Name": data.name,
         "Phone": data.phone,
         "Email": data.email,
@@ -35,12 +36,10 @@ export default async function handler(request, response) {
     };
 
     const nocoToken = 'xKYg5pA_NAjvwAtnl9IGkJd---0F5BN8MFm992xO';
-    // Table ID extracted from your URL: .../mwyhw2a79xopbef/...
     const tableId = 'mwyhw2a79xopbef';
 
     try {
         // Send to NocoDB and n8n in parallel
-        // Using native fetch (available in Node 18+)
         const results = await Promise.allSettled([
             fetch(`https://app.nocodb.com/api/v2/tables/${tableId}/records`, {
                 method: 'POST',
