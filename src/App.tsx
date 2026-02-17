@@ -59,17 +59,23 @@ const App: React.FC = () => {
     };
 
     try {
-      const response = await fetch("https://n8n.justschool.me/webhook/19be50df-0410-4330-8dcb-3797fa703c56", {
+      // CHANGED: We now send to our internal API endpoint which handles both NocoDB and n8n
+      // The base path is configured in vite.config.ts as /eng_adult/, but the API function is at root /api/submit
+      // When deployed on Vercel, /api/submit works globally.
+      // However, since we are under /eng_adult/, let's try absolute path.
+      
+      const response = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
+      
       const result = await response.json();
       if (result.redirectUri) {
         window.location.href = result.redirectUri;
       }
     } catch (err) {
-      console.error("CRM submission failed:", err);
+      console.error("Submission failed:", err);
     }
   };
 
