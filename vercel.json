@@ -5,7 +5,15 @@
       "destination": "/index.html"
     },
     {
+      "source": "/eng_adult_tg",
+      "destination": "/index.html"
+    },
+    {
       "source": "/eng_adult/:path*",
+      "destination": "/:path*"
+    },
+    {
+      "source": "/eng_adult_tg/:path*",
       "destination": "/:path*"
     }
   ]
