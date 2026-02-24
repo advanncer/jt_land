@@ -90,7 +90,7 @@ const WelcomeBox: React.FC = () => {
             </div>
             <div className="text-left z-10">
                 <p className="font-bold text-white text-base leading-tight font-sans">Welcome Box + Подарунок</p>
-                <p className="text-xs text-gray-400 mt-1 font-medium font-sans">Гарантовано залиш заявку</p>
+                <p className="text-xs text-gray-400 mt-1 font-medium font-sans">Гарантуємо після отримання заявки</p>
             </div>
         </div>
     </div>
