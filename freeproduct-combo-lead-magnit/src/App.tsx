@@ -86,7 +86,7 @@ const App: React.FC = () => {
     // 4. Формуємо JSON-payload
     const payload = {
       Name: formData.name,
-      Phone: formData.phone,
+      Phone: formData.phone ? `'${formData.phone}` : "",
       Email: formData.email,
       Answear: Answear,
       Geo: geo,
