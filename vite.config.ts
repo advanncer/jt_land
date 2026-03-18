@@ -8,7 +8,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, "index.html"),
+        engAdult: resolve(__dirname, "eng-adult/index.html"),
         comboLeadMagnit: resolve(__dirname, "free-products/combo-lead-magnit/index.html"),
       },
     },
