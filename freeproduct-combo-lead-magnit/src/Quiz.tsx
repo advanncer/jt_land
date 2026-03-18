@@ -268,29 +268,17 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep, isSubmitting = false }) =
           {/* STANDARD QUESTION SCREENS */}
           {currentStepData.answers && (
             <div className="w-full">
-              <div className="text-center mb-6 w-full">
+              <div className="text-center mb-4 w-full">
                 <h1 className="text-xl sm:text-2xl font-bold text-white leading-tight">
                   {currentStepData.question}
                 </h1>
               </div>
 
-              {currentImage ? (
-                 <div className="mb-6 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-white/5 relative min-h-[160px] flex items-center justify-center">
-                    <img src={currentImage} alt="Quiz illustration" className="w-full h-auto object-cover" />
-                 </div>
-              ) : (
-                <div className="w-full h-32 sm:h-48 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center mb-6">
-                  <svg className="w-10 h-10 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                  </svg>
-                </div>
-              )}
-
-              <div className="flex flex-col gap-3 w-full mt-2">
+              <div className="flex flex-col gap-2.5 w-full mb-6">
                 {currentStepData.answers.map((answer) => (
                   <button
                     key={answer.text}
-                    className={`p-4 text-left rounded-2xl border transition-all duration-200 font-bold w-full text-[15px] sm:text-base flex items-center ${
+                    className={`p-3.5 text-left rounded-xl border transition-all duration-200 font-bold w-full text-[14px] sm:text-[15px] flex items-center ${
                       selectedAnswers.includes(answer.text)
                         ? "bg-white/10 border-brand-orange text-white shadow-[0_0_15px_rgba(241,102,0,0.3)]"
                         : "bg-white/[0.03] border-white/5 text-gray-300 active:bg-white/10"
@@ -302,10 +290,22 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep, isSubmitting = false }) =
                     }`}>
                        {selectedAnswers.includes(answer.text) && <div className="w-2.5 h-2.5 bg-brand-orange rounded-full"></div>}
                     </div>
-                    {answer.text}
+                    <span className="leading-snug">{answer.text}</span>
                   </button>
                 ))}
               </div>
+              
+              {currentImage ? (
+                 <div className="rounded-2xl overflow-hidden shadow-xl border border-white/10 bg-white/5 relative flex items-center justify-center max-w-[240px] mx-auto h-[100px] sm:h-[130px]">
+                    <img src={currentImage} alt="Quiz illustration" className="w-full h-full object-cover opacity-90" />
+                 </div>
+              ) : (
+                <div className="w-full h-24 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center max-w-[240px] mx-auto">
+                  <svg className="w-8 h-8 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+              )}
             </div>
           )}
         </div>
