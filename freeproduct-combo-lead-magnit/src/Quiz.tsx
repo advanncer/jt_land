@@ -228,8 +228,8 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep, isSubmitting = false }) =
                   
                   <p className="text-white font-bold text-lg mb-2">Доступ до Комбо-міксу</p>
                   <div className="flex items-end gap-3">
-                    <span className="text-gray-500 line-through text-2xl font-bold">7$</span>
-                    <span className="text-brand-orange text-3xl font-black">0$</span>
+                    <span className="text-gray-500 line-through text-2xl font-bold">1430 грн.</span>
+                    <span className="text-brand-orange text-3xl font-black">0 грн.</span>
                     <span className="text-gray-400 text-sm mb-1">для нових студентів</span>
                   </div>
                 </div>
