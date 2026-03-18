@@ -9,7 +9,7 @@ declare global {
   }
 }
 
-const GOOGLE_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyVgq_q3wsnsPZTD0NYHsD1HJTE1db1Lhlq4xaJgV5cP3xIf-glGHjfhlgWWozjrCjgWQ/exec";
+const GOOGLE_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx1nKIeROgLQ8MJbD6hRaBXiWItvxVthXQY3d53vVJ-hFL04fHdXwrh366SFlNTGIxBFg/exec";
 const Lead_type = "Quiz_Adults";
 
 const App: React.FC = () => {
