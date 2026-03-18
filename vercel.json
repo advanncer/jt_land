@@ -15,6 +15,14 @@
     {
       "source": "/eng_adult_tg/:path*",
       "destination": "/:path*"
+    },
+    {
+      "source": "/freeproduct-combo-lead-magnit",
+      "destination": "/freeproduct-combo-lead-magnit/index.html"
+    },
+    {
+      "source": "/freeproduct-combo-lead-magnit/:path*",
+      "destination": "/freeproduct-combo-lead-magnit/:path*"
     }
   ]
 }

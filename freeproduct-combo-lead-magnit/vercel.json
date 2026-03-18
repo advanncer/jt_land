@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/freeproduct-combo-lead-magnit",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/freeproduct-combo-lead-magnit/:path*",
+      "destination": "/:path*"
+    }
+  ]
+}
