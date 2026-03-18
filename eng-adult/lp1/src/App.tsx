@@ -16,7 +16,7 @@ const App: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Check if we are on the Telegram Bot Funnel version
-  const isTgVersion = window.location.pathname.includes('/eng_adult_tg');
+  const isTgVersion = false;
 
   useEffect(() => {
     fetch("https://ipinfo.io/json")

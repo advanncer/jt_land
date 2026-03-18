@@ -2,23 +2,19 @@
   "rewrites": [
     {
       "source": "/eng_adult",
-      "destination": "/eng-adult/index.html"
-    },
-    {
-      "source": "/eng_adult_tg",
-      "destination": "/eng-adult/index.html"
-    },
-    {
-      "source": "/eng-adult/:path*",
-      "destination": "/eng-adult/:path*"
+      "destination": "/eng-adult/lp1/index.html"
     },
     {
       "source": "/eng_adult/:path*",
-      "destination": "/eng-adult/:path*"
+      "destination": "/eng-adult/lp1/:path*"
+    },
+    {
+      "source": "/eng_adult_tg",
+      "destination": "/eng-adult/lp1-tg/index.html"
     },
     {
       "source": "/eng_adult_tg/:path*",
-      "destination": "/eng-adult/:path*"
+      "destination": "/eng-adult/lp1-tg/:path*"
     },
     {
       "source": "/freeproduct-combo-lead-magnit",
