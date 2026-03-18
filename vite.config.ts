@@ -9,7 +9,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
-        freeproduct: resolve(__dirname, "freeproduct-combo-lead-magnit/index.html"),
+        comboLeadMagnit: resolve(__dirname, "free-products/combo-lead-magnit/index.html"),
       },
     },
   },

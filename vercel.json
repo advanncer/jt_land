@@ -18,11 +18,11 @@
     },
     {
       "source": "/freeproduct-combo-lead-magnit",
-      "destination": "/freeproduct-combo-lead-magnit/index.html"
+      "destination": "/free-products/combo-lead-magnit/index.html"
     },
     {
-      "source": "/freeproduct-combo-lead-magnit/:path*",
-      "destination": "/freeproduct-combo-lead-magnit/:path*"
+      "source": "/free-products/combo-lead-magnit/:path*",
+      "destination": "/free-products/combo-lead-magnit/:path*"
     }
   ]
 }
