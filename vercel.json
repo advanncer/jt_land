@@ -1,28 +1,45 @@
 {
   "rewrites": [
     {
-      "source": "/eng_adult",
+      "source": "/eng-adult/lp1",
       "destination": "/eng-adult/lp1/index.html"
     },
     {
-      "source": "/eng_adult/:path*",
+      "source": "/eng-adult/lp1/:path*",
       "destination": "/eng-adult/lp1/:path*"
     },
     {
-      "source": "/eng_adult_tg",
+      "source": "/eng-adult/lp1-tg",
       "destination": "/eng-adult/lp1-tg/index.html"
     },
     {
-      "source": "/eng_adult_tg/:path*",
+      "source": "/eng-adult/lp1-tg/:path*",
       "destination": "/eng-adult/lp1-tg/:path*"
     },
     {
-      "source": "/freeproduct-combo-lead-magnit",
+      "source": "/free-products/combo-lead-magnit",
       "destination": "/free-products/combo-lead-magnit/index.html"
     },
     {
       "source": "/free-products/combo-lead-magnit/:path*",
       "destination": "/free-products/combo-lead-magnit/:path*"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/eng_adult",
+      "destination": "/eng-adult/lp1",
+      "permanent": true
+    },
+    {
+      "source": "/eng_adult_tg",
+      "destination": "/eng-adult/lp1-tg",
+      "permanent": true
+    },
+    {
+      "source": "/freeproduct-combo-lead-magnit",
+      "destination": "/free-products/combo-lead-magnit",
+      "permanent": true
     }
   ]
 }
