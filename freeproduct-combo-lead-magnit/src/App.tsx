@@ -96,12 +96,13 @@ const App: React.FC = () => {
     };
 
     try {
-      // Відправка POST запиту з потрібним заголовком (text/plain)
-      await fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
+      // Відправка GET запиту для обходу CORS і редиректів Google Apps Script
+      const queryParams = new URLSearchParams(payload as Record<string, string>).toString();
+      const urlWithParams = `${GOOGLE_SHEETS_WEBHOOK_URL}?${queryParams}`;
+      
+      await fetch(urlWithParams, {
+        method: "GET",
+        mode: "no-cors"
       });
 
       if (window.fbq) {
