@@ -80,6 +80,8 @@ const App: React.FC = () => {
         // Normal behavior: redirect if n8n returns a URL
         if (result.redirectUri) {
           window.location.href = result.redirectUri;
+        } else {
+          window.location.href = "https://justschool.me/uk/onboarding";
         }
       }
 
@@ -87,6 +89,7 @@ const App: React.FC = () => {
       console.error("Submission failed:", err);
       // Even on failure, if it's TG version, show the thank you screen so user isn't stuck
       if (isTgVersion) setIsSubmitted(true);
+      else window.location.href = "https://justschool.me/uk/onboarding";
     }
   };
 

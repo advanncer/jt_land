@@ -135,8 +135,9 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
   if (!currentStepData) {
     return (
       <div className="w-full h-screen flex flex-col items-center justify-center p-8 text-center animate-fade-in-up">
-        <h1 className="text-4xl font-bold mb-4 text-white font-sans">Вітаємо!</h1>
-        <p className="text-gray-400 text-lg font-sans">Ваш персональний план готовий.</p>
+        <div className="w-16 h-16 border-4 border-white/10 border-t-brand-orange rounded-full animate-spin mb-6"></div>
+        <h1 className="text-2xl font-bold mb-2 text-white font-sans">Зачекайте, будь ласка...</h1>
+        <p className="text-gray-400 text-base font-sans">Відправляємо вас на платформу</p>
       </div>
     );
   }
