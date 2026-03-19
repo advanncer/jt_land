@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/free-products/combo-lead-magnit/index.html"
+    },
+    {
       "source": "/eng-adult/lp1",
       "destination": "/eng-adult/lp1/index.html"
     },
