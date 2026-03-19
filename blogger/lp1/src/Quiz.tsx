@@ -70,15 +70,7 @@ const ShimmerButton: React.FC<{ onClick: () => void; disabled: boolean; children
 };
 
 // 3. SKELETON BLOCK (Replaces Images)
-const SkeletonBlock: React.FC = () => {
-  return (
-    <div className="w-full h-32 sm:h-48 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center mb-6 animate-fade-in-up">
-      <svg className="w-10 h-10 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-      </svg>
-    </div>
-  );
-};
+
 
 
 
@@ -192,56 +184,68 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
         <div key={step} className="w-full flex flex-col items-center animate-fade-in-up">
             
             {/* HEADER - Fluid Typography */}
-            <div className="text-center mb-6 w-full">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight font-sans tracking-tight">
+            <div className="text-center mb-4 w-full">
+              <h1 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-tight font-sans tracking-tight">
                 {highlightText(currentStepData.question)}
               </h1>
-              
             </div>
 
             {/* CONTENT */}
             <div className="w-full">
-              {currentImage ? (
-                 <div className="mb-6 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-white/5 relative min-h-[160px] flex items-center justify-center">
-                    <img src={currentImage} alt="Quiz illustration" className="w-full h-auto object-cover" />
-                 </div>
-              ) : isFirstStep ? (
-                <div className="flex flex-col gap-3 mb-4 w-full">
-                  {[
-                    {icon: "award", text: "Навчаємо більше 8 років"},
-                    {icon: "users", text: "15 000 активних студентів"},
-                    {icon: "academic-cap", text: "100 000+ випускників"}
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
-                      <div className="w-10 h-10 flex flex-shrink-0 items-center justify-center bg-brand-orange/10 rounded-xl text-brand-orange">
-                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                      </div>
-                      <span className="font-bold text-white/90 text-sm sm:text-base font-sans">{item.text}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                 /* SKELETON BLOCK (Replaces Illustration) */
-                 !currentStepData.form && <SkeletonBlock />
-              )}
-
+              
               {/* ANSWERS - Larger touch targets */}
               {currentStepData.answers && (
-                <div className={`w-full mt-2 ${currentStepData.grid ? "grid grid-cols-2 gap-2" : "flex flex-col gap-3"}`}>
+                <div className={`w-full mb-6 ${currentStepData.grid ? "grid grid-cols-2 gap-2" : "flex flex-col gap-2.5"}`}>
                   {currentStepData.answers.map((answer) => (
                     <button
                       key={answer.text}
-                      className={`p-4 text-center rounded-2xl border transition-all duration-200 font-bold w-full font-sans ${currentStepData.grid ? "text-[14px]" : "text-base sm:text-lg"} ${
+                      className={`p-3 text-left rounded-xl border transition-all duration-200 font-bold w-full flex items-center ${currentStepData.grid ? "text-[12px] sm:text-[13px]" : "text-[14px] sm:text-[15px]"} ${
                         selectedAnswers.includes(answer.text)
                           ? "bg-white/10 border-brand-orange text-white shadow-[0_0_15px_rgba(241,102,0,0.3)]"
                           : "bg-white/[0.03] border-white/5 text-gray-300 active:bg-white/10"
                       }`}
                       onClick={() => handleAnswerClick(answer.text)}
                     >
-                      {answer.text}
+                      <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex-shrink-0 mr-2 sm:mr-3 flex items-center justify-center ${
+                          selectedAnswers.includes(answer.text) ? "border-brand-orange" : "border-white/20"
+                      }`}>
+                         {selectedAnswers.includes(answer.text) && <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-brand-orange rounded-full"></div>}
+                      </div>
+                      <span className="leading-snug">{answer.text}</span>
                     </button>
                   ))}
                 </div>
+              )}
+
+              {/* IMAGE OR SKELETON OR FIRST STEP BENEFITS */}
+              {step !== 5 && !currentStepData.form && (
+                currentImage ? (
+                   <div className="rounded-2xl overflow-hidden shadow-xl border border-white/10 bg-white/5 relative flex items-center justify-center max-w-[240px] mx-auto h-[100px] sm:h-[130px] mb-6">
+                      <img src={currentImage} alt="Quiz illustration" className="w-full h-full object-cover opacity-90" />
+                   </div>
+                ) : isFirstStep ? (
+                  <div className="flex flex-col gap-3 mb-6 w-full">
+                    {[
+                      {icon: "award", text: "Навчаємо більше 8 років"},
+                      {icon: "users", text: "15 000 активних студентів"},
+                      {icon: "academic-cap", text: "100 000+ випускників"}
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
+                        <div className="w-10 h-10 flex flex-shrink-0 items-center justify-center bg-brand-orange/10 rounded-xl text-brand-orange">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                        <span className="font-bold text-white/90 text-sm sm:text-base font-sans">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                   /* SKELETON BLOCK (Replaces Illustration) */
+                   <div className="w-full h-24 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center max-w-[240px] mx-auto mb-6">
+                      <svg className="w-8 h-8 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                   </div>
+                )
               )}
 
               {/* FORM */}
