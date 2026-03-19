@@ -120,9 +120,9 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep, isSubmitting = false }) =
         }
         setLoaderProgress(currentProgress);
         
-        if (currentProgress < 30) setLoaderText("Аналізуємо ваші відповіді...");
-        else if (currentProgress < 70) setLoaderText("Підбираємо ідеальну стратегію навчання...");
-        else setLoaderText("Формуємо бонусні матеріали...");
+        if (currentProgress < 30) setLoaderText("Скануємо ваші відповіді...");
+        else if (currentProgress < 70) setLoaderText("Визначаємо ваш поточний рівень...");
+        else setLoaderText("Готуємо PDF-словник та комбо-мікс...");
       }, 100);
       return () => clearInterval(interval);
     }
@@ -185,64 +185,53 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep, isSubmitting = false }) =
             </div>
           )}
           
-          {/* EMAIL CAPTURE SCREEN */}
-          {currentStepData.type === "email_capture" && (
-            <div className="w-full flex flex-col items-center">
-              <div className="w-16 h-16 bg-gradient-to-tr from-orange-500 to-purple-600 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-[0_0_30px_rgba(241,102,0,0.3)]">
-                🎁
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 text-center leading-tight">
-                Готово! Ваш профіль проаналізовано.
-              </h1>
-              <p className="text-gray-300 text-center mb-8">
-                Заберіть безкоштовний PDF-гайд <span className="text-white font-bold">«1000 найуживаніших слів англійською»</span>. Вивчення саме цієї бази дозволить вам розуміти 80% повсякденної мови.
-              </p>
-              
-              <div className="w-full bg-white/5 border border-white/10 p-6 rounded-3xl">
-                <label className="block text-white/70 text-sm mb-2 font-medium">Введіть ваш Email для отримання PDF</label>
-                <input 
-                  type="email" 
-                  placeholder="email@example.com" 
-                  className="w-full bg-black/50 border border-white/10 rounded-xl py-4 px-5 text-white placeholder-white/30 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all"
-                  value={formData.email} 
-                  onChange={(e) => setFormData({...formData, email: e.target.value})} 
-                />
-              </div>
-            </div>
-          )}
-
+          
           {/* REGISTRATION SCREEN */}
           {currentStepData.type === "registration" && (
             <div className="w-full flex flex-col items-center">
               <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 text-center leading-tight">
-                PDF-словник вже летить на вашу пошту! 🚀 Але це ще не все.
+                Готово! Ваш профіль проаналізовано.
               </h1>
-              <p className="text-gray-300 text-center mb-6">
-                Щоб ви реально запамʼятали ці слова, ми відкриваємо доступ до <span className="text-white font-bold">Комбо-міксу</span> (аудіо-озвучка, інтерактивні картки, міні-курс).
+              <p className="text-gray-300 text-center mb-6 text-[15px] sm:text-base leading-relaxed">
+                Залиште свої контакти, щоб наш менеджер відкрив вам безкоштовний доступ до платформи та передав матеріали.
               </p>
               
-              {/* Value Block */}
-              <div className="mb-8 p-[2px] rounded-3xl bg-gradient-to-r from-orange-500 to-purple-600 w-full relative">
-                <div className="bg-[#0f0f0f] rounded-[22px] p-5 flex flex-col items-center relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-[50px] rounded-full pointer-events-none"></div>
-                  
-                  <p className="text-white font-bold text-lg mb-2">Доступ до Комбо-міксу</p>
-                  <div className="flex items-end gap-3">
-                    <span className="text-gray-500 line-through text-2xl font-bold">1430 грн.</span>
-                    <span className="text-brand-orange text-3xl font-black">0 грн.</span>
-                    <span className="text-gray-400 text-sm mb-1">для нових студентів</span>
-                  </div>
-                </div>
+              <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 mb-6 shadow-lg relative overflow-hidden">
+                <div className="absolute top-[-50%] right-[-10%] w-32 h-32 bg-orange-500/10 blur-[40px] rounded-full pointer-events-none"></div>
+                <h3 className="text-white font-bold mb-4 text-lg">Що ви отримаєте:</h3>
+                <ul className="text-gray-300 text-[14px] sm:text-[15px] space-y-4">
+                  <li className="flex items-start gap-3">
+                    <div className="mt-0.5 w-5 h-5 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0">
+                      <span className="text-brand-orange text-xs">✓</span>
+                    </div>
+                    <span className="leading-snug">PDF-гайд «1000 найуживаніших слів»</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="mt-0.5 w-5 h-5 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0">
+                      <span className="text-brand-orange text-xs">✓</span>
+                    </div>
+                    <span className="leading-snug">Бонусний Комбо-мікс: 100 фраз для small talk, перевірка рівня знань часів англійської, фундаментальні слова, 100 колокацій.</span>
+                  </li>
+                </ul>
               </div>
 
-              <div className="w-full text-center mb-4 text-white/90 font-medium">
-                Створіть безкоштовний акаунт на платформі JustSchool, щоб забрати все:
+              {/* Value Block */}
+              <div className="mb-6 p-[2px] rounded-3xl bg-gradient-to-r from-orange-500 to-purple-600 w-full relative transform hover:scale-[1.01] transition-transform">
+                <div className="bg-[#0f0f0f] rounded-[22px] p-5 py-6 flex flex-col items-center relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-[50px] rounded-full pointer-events-none"></div>
+                  
+                  <div className="flex flex-col items-center gap-1 z-10">
+                    <span className="text-gray-500 line-through text-xl font-bold">1430 грн</span>
+                    <span className="text-brand-orange text-2xl sm:text-3xl font-black text-center mt-1">Зараз: <span className="text-white">0 грн</span></span>
+                    <span className="text-gray-400 text-sm mt-1">для нових студентів</span>
+                  </div>
+                </div>
               </div>
 
               <div className="w-full flex flex-col gap-3">
                 <input 
                   type="text" 
-                  placeholder="Ваше імʼя" 
+                  placeholder="Імʼя" 
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-5 text-white placeholder-white/40 focus:outline-none focus:border-brand-orange transition-all"
                   value={formData.name} 
                   onChange={(e) => setFormData({...formData, name: e.target.value})} 
@@ -257,15 +246,15 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep, isSubmitting = false }) =
                 />
                 <input 
                   type="email" 
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-5 text-white/50 cursor-not-allowed"
+                  placeholder="Email"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-5 text-white placeholder-white/40 focus:outline-none focus:border-brand-orange transition-all"
                   value={formData.email} 
-                  readOnly 
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
                 />
               </div>
             </div>
-          )}
-
-          {/* STANDARD QUESTION SCREENS */}
+          )
+{/* STANDARD QUESTION SCREENS */}
           {currentStepData.answers && (
             <div className="w-full">
               <div className="text-center mb-4 w-full">
