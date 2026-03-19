@@ -139,7 +139,7 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
                   ))}
                 </div>
               )}
-              {!currentStepData.form && currentImage && (
+              {!currentStepData.form && currentImage && ![7, 16, 17, 18, 19].includes(step) && (
                  <div className="rounded-2xl overflow-hidden shadow-xl border border-white/10 bg-white/5 relative flex items-center justify-center max-w-[240px] mx-auto h-[100px] sm:h-[130px] mb-6">
                     <img src={currentImage} alt="Quiz illustration" className="w-full h-full object-cover opacity-90" />
                  </div>
