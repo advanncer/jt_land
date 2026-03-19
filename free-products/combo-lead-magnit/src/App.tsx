@@ -106,7 +106,7 @@ const App: React.FC = () => {
       });
 
       if (window.fbq) {
-        window.fbq("track", "Purchase", { currency: "UAH", value: 0 });
+        window.fbq("track", "Lead");
       }
 
       setIsSubmitted(true);
