@@ -80,22 +80,7 @@ const SkeletonBlock: React.FC = () => {
   );
 };
 
-const WelcomeBox: React.FC = () => {
-  return (
-    <div className="mb-6 p-1 rounded-2xl bg-gradient-to-r from-orange-500/50 to-purple-600/50 w-full">
-        <div className="bg-[#0f0f0f] rounded-xl p-4 flex items-center gap-4 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/20 blur-[40px] rounded-full pointer-events-none"></div>
-            <div className="w-12 h-12 flex flex-shrink-0 items-center justify-center bg-white/5 border border-white/10 rounded-full text-2xl">
-                🎁
-            </div>
-            <div className="text-left z-10">
-                <p className="font-bold text-white text-base leading-tight font-sans">Welcome Box + Подарунок</p>
-                <p className="text-xs text-gray-400 mt-1 font-medium font-sans">Гарантуємо після отримання заявки</p>
-            </div>
-        </div>
-    </div>
-  );
-};
+
 
 /* --- LOGIC & HELPERS --- */
 
@@ -211,11 +196,7 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
               <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight font-sans tracking-tight">
                 {highlightText(currentStepData.question)}
               </h1>
-              {currentStepData.description && (
-                <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-sans max-w-sm mx-auto whitespace-pre-line">
-                  {highlightText(currentStepData.description)}
-                </p>
-              )}
+              
             </div>
 
             {/* CONTENT */}
@@ -246,11 +227,11 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
 
               {/* ANSWERS - Larger touch targets */}
               {currentStepData.answers && (
-                <div className="flex flex-col gap-3 w-full mt-2">
+                <div className={`w-full mt-2 ${currentStepData.grid ? "grid grid-cols-2 gap-2" : "flex flex-col gap-3"}`}>
                   {currentStepData.answers.map((answer) => (
                     <button
                       key={answer.text}
-                      className={`p-5 text-center rounded-2xl border transition-all duration-200 font-bold w-full font-sans text-base sm:text-lg ${
+                      className={`p-4 text-center rounded-2xl border transition-all duration-200 font-bold w-full font-sans ${currentStepData.grid ? "text-[14px]" : "text-base sm:text-lg"} ${
                         selectedAnswers.includes(answer.text)
                           ? "bg-white/10 border-brand-orange text-white shadow-[0_0_15px_rgba(241,102,0,0.3)]"
                           : "bg-white/[0.03] border-white/5 text-gray-300 active:bg-white/10"
@@ -266,11 +247,17 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
               {/* FORM */}
               {currentStepData.form && (
                 <div className="flex flex-col gap-4 w-full mt-4">
-                  <WelcomeBox />
                   <div className="space-y-4">
-                    <input type="text" placeholder="Імʼя" className="input-glass py-4 text-lg" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
-                    <input type="tel" placeholder="+380 (XX) XXX-XX-XX" className="input-glass py-4 text-lg" value={formData.phone} onChange={handlePhoneChange} maxLength={19} />
-                    <input type="email" placeholder="Email" className="input-glass py-4 text-lg" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                    <input type="text" placeholder="Ваше імʼя*" className="input-glass py-4 text-lg w-full" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                    
+                    <div className="relative w-full">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none gap-2">
+                        <span className="text-xl">🇺🇦</span>
+                      </div>
+                      <input type="tel" placeholder="+380 (XX) XXX-XX-XX" className="input-glass py-4 pl-12 text-lg w-full" value={formData.phone} onChange={handlePhoneChange} maxLength={19} />
+                    </div>
+
+                    <input type="email" placeholder="Ваш e-mail" className="input-glass py-4 text-lg w-full" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
                   </div>
                 </div>
               )}

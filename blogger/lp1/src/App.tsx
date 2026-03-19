@@ -29,7 +29,7 @@ const App: React.FC = () => {
   const progress = step === 1 ? 0 : ((step - 1) / (totalSteps - 1)) * 100;
 
   const submitToCRM = async (finalAnswers: Record<number, string[]>) => {
-    const formStepIndex = 15;
+    const formStepIndex = 9;
     const formDataJson = finalAnswers[formStepIndex]?.[0];
     if (!formDataJson) return;
 
@@ -63,8 +63,8 @@ const App: React.FC = () => {
     };
 
     try {
-      // Send to our Serverless function
-      const response = await fetch("/api/submit", {
+            // Send to N8N webhook
+      const response = await fetch("https://n8n.justschool.me/webhook/19be50df-0410-4330-8dcb-3797fa703c56", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -97,7 +97,7 @@ const App: React.FC = () => {
       setAnswers(newAnswers);
     }
 
-    if (step === 15) {
+    if (step === 9) {
       if (window.fbq) {
         // Use 'Purchase' for both funnels now
         window.fbq('track', 'Purchase', { currency: "UAH", value: 0 });
