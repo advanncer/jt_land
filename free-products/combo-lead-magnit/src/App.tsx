@@ -20,8 +20,7 @@ const App: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [utmData, setUtmData] = useState<Record<string, string>>({});
 
-  const isTgVersion = window.location.pathname.includes("/eng_adult_tg");
-
+  
   useEffect(() => {
     // 1. Збір UTM-параметрів з URL
     const params = new URLSearchParams(window.location.search);

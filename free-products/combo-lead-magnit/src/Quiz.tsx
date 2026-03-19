@@ -253,8 +253,9 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep, isSubmitting = false }) =
                 />
               </div>
             </div>
-          )
-{/* STANDARD QUESTION SCREENS */}
+          )}
+
+          {/* STANDARD QUESTION SCREENS */}
           {currentStepData.answers && (
             <div className="w-full">
               <div className="text-center mb-4 w-full">
