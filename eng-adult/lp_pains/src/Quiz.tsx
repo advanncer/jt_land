@@ -106,7 +106,6 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
       setFormData({ ...formData, phone: formatPhoneNumber(val) });
   };
 
-  const isFirstStep = step === 1;
   let isButtonDisabled = false;
   if (currentStepData.form) { isButtonDisabled = !isFormValid; }
   else if (currentStepData.multiselect) { isButtonDisabled = selectedAnswers.length === 0; }
