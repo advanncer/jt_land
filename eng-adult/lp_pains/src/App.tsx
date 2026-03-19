@@ -29,7 +29,7 @@ const App: React.FC = () => {
   const progress = step === 1 ? 0 : ((step - 1) / (totalSteps - 1)) * 100;
 
   const submitToCRM = async (finalAnswers: Record<number, string[]>) => {
-    const formStepIndex = 9;
+    const formStepIndex = 22;
     const formDataJson = finalAnswers[formStepIndex]?.[0];
     if (!formDataJson) return;
 
@@ -100,7 +100,7 @@ const App: React.FC = () => {
       setAnswers(newAnswers);
     }
 
-    if (step === 9) {
+    if (step === 22) {
       if (window.fbq) {
         // Use 'Purchase' for both funnels now
         window.fbq('track', 'Purchase', { currency: "UAH", value: 0 });
