@@ -35,6 +35,14 @@
     {
       "source": "/blogger/lp1/:path*",
       "destination": "/blogger/lp1/:path*"
+    },
+    {
+      "source": "/eng-adult/lp_pains",
+      "destination": "/eng-adult/lp_pains/index.html"
+    },
+    {
+      "source": "/eng-adult/lp_pains/:path*",
+      "destination": "/eng-adult/lp_pains/:path*"
     }
   ],
   "redirects": [
@@ -51,6 +59,11 @@
     {
       "source": "/freeproduct-combo-lead-magnit",
       "destination": "/free-products/combo-lead-magnit",
+      "permanent": true
+    },
+    {
+      "source": "/eng_adult_nql_pains",
+      "destination": "/eng-adult/lp_pains",
       "permanent": true
     }
   ]

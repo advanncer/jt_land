@@ -1,0 +1,11 @@
+export const quizData = [
+  { step: 1, question: "Який курс оберете для навчання?", answers: [ { text: "Англійська для дорослих" }, { text: "Англійська для дітей" }, { text: "Програмування для дітей" }, { text: "Математика для дітей" } ] },
+  { step: 2, question: "Який у вас рівень англійської мови?", answers: [ { text: "Beginner - Я знаю кілька простих слів 🐣" }, { text: "Elementary - Я можу говорити про базові теми, наприклад про погоду 🎒" }, { text: "Intermediate - Я можу трохи спілкуватися з іноземцями 🤓" }, { text: "Upper-Intermediate - Я досить вільно говорю, але хочу більше 💪" } ] },
+  { step: 3, question: "Яка ваша мотивація вивчати англійську мову?", answers: [ { text: "Кар'єра 💼" }, { text: "Освіта 📚" }, { text: "Культура 🌍" }, { text: "Подорожі ✈️" }, { text: "Інший 👑" } ] },
+  { step: 4, question: "Які аспекти англійської мови ви хотіли б покращити?", answers: [ { text: "Вимова 🗣️" }, { text: "Словниковий запас 📖" }, { text: "Розділові знаки 🖋️" }, { text: "Часи ⏳" }, { text: "Фразові дієслова ✨" }, { text: "Стилі мови 👔" } ] },
+  { step: 5, question: "Скільки англійських слів ти знаєш?", multiselect: true, grid: true, answers: [ { text: "spoon" }, { text: "honey" }, { text: "gate" }, { text: "pillow" }, { text: "neighbour" }, { text: "anniversary" }, { text: "enjoy" }, { text: "casual" }, { text: "newspaper" }, { text: "price" }, { text: "bench" }, { text: "road" }, { text: "traffic jam" }, { text: "party" }, { text: "wallet" }, { text: "summer" }, { text: "vacancy" }, { text: "emergency" }, { text: "money" }, { text: "sun" } ], cta: "Далі ➔" },
+  { step: 6, question: "Виберіть теми, які вам цікаві", answers: [ { text: "Технології 💻" }, { text: "Повсякденне життя 🚶‍♂️" }, { text: "Подорожі 🏞️" }, { text: "Здоров'я та фітнес 🏃‍♂️" }, { text: "Бізнес 👨‍💼" }, { text: "Харчування 🍗" }, { text: "Інше" } ] },
+  { step: 7, question: "Скільки разів на тиждень ви готові займатись англійською мовою?", answers: [ { text: "1 😴" }, { text: "2 🥰" }, { text: "3 😍" }, { text: ">4 🤯" } ] },
+  { step: 8, question: "В який час вам найкраще вивчати англійську?", answers: [ { text: "Вранці (8.00 - 12.00) 🌅" }, { text: "Вдень (13.00 - 16.00) ☀️" }, { text: "Ввечері (17.00 - 20.00) 🌇" } ] },
+  { step: 9, form: true, question: "Записуйтеся на безкоштовний пробний урок", cta: "Залишити заявку" }
+];
