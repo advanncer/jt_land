@@ -27,6 +27,14 @@
     {
       "source": "/free-products/combo-lead-magnit/:path*",
       "destination": "/free-products/combo-lead-magnit/:path*"
+    },
+    {
+      "source": "/blogger/lp1",
+      "destination": "/blogger/lp1/index.html"
+    },
+    {
+      "source": "/blogger/lp1/:path*",
+      "destination": "/blogger/lp1/:path*"
     }
   ],
   "redirects": [
