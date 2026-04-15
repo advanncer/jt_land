@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
   Sparkles,
   ChevronRight,
@@ -24,11 +23,10 @@ const N8N_WEBHOOK_URL = "https://n8n.justschool.me/webhook/626983b2-94fe-4277-91
 const formatPhoneNumber = (value: string) => {
     const input = value.replace(/\D/g, "").substring(0, 12);
     let numbers = input;
-    if (numbers.startsWith("380")) {}
-    else if (numbers.length > 0) {
+    if (!numbers.startsWith("380") && numbers.length > 0) {
         if (numbers.startsWith("0")) numbers = "380" + numbers.substring(1);
         else numbers = "380" + numbers;
-    } else { return ""; }
+    }
     numbers = numbers.substring(0, 12);
     let char: any = { 0: "+", 3: " (", 5: ") ", 8: "-", 10: "-" };
     let formatted = "";
@@ -69,13 +67,6 @@ export default function App() {
     fetch("https://ipapi.co/json/").then(r => r.json()).then(d => setGeo(`${d.country_name}/${d.city}`)).catch(() => {});
   }, []);
 
-  const handleStart = () => setStep('zodiac');
-
-  const handleZodiacSelect = (zodiac: ZodiacSign) => {
-    setSelectedZodiac(zodiac);
-    setStep('quiz');
-  };
-
   const handleAnswer = (value: string) => {
     const questionId = QUESTIONS[currentQuestionIndex].id;
     setAnswers({ ...answers, [questionId]: value });
@@ -106,10 +97,7 @@ export default function App() {
     }, 1000);
 
     const pInt = setInterval(() => {
-      setLoadingProgress(p => {
-        if (p >= 100) return 100;
-        return p + 1;
-      });
+      setLoadingProgress(p => (p < 100 ? p + 1 : 100));
     }, 50);
 
     try {
@@ -128,19 +116,18 @@ export default function App() {
         Lead_type: "Astro_English_Quiz"
       };
 
-      // Send data as fast as possible
       fetch(N8N_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).catch(() => {});
       const qp = new URLSearchParams(payload as any).toString();
       fetch(`${GOOGLE_SHEETS_WEBHOOK_URL}?${qp}`, { method: "GET", mode: "no-cors" }).catch(() => {});
 
-      if (window.fbq) window.fbq("track", "Lead");
+      if (window.fbq) {
+          try { window.fbq("track", "Lead"); } catch(e) {}
+      }
 
-      // Wait for min 5 seconds animation
       await new Promise(res => setTimeout(res, 5000));
       
       clearInterval(tInt);
       clearInterval(pInt);
-      setLoadingProgress(100);
       setResult(data);
       setStep('result');
       window.scrollTo(0, 0);
@@ -148,15 +135,7 @@ export default function App() {
     } catch (e) {
       clearInterval(tInt);
       clearInterval(pInt);
-      console.error(e);
       setStep('hero');
-    }
-  };
-
-  const handleLeadSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (leadName && leadPhone.replace(/\D/g, "").length === 12) {
-      processResult();
     }
   };
 
@@ -175,31 +154,29 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#050505] text-white flex flex-col items-center overflow-x-hidden font-sans">
+    <div className="min-h-screen w-full bg-[#050505] text-white flex flex-col items-center font-sans">
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-900/10 to-orange-900/10 opacity-50" />
         <div className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] bg-blue-600/5 blur-[150px] rounded-full" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[80%] h-[80%] bg-orange-600/5 blur-[150px] rounded-full" />
       </div>
 
       <main className="relative z-10 w-full max-w-4xl flex-1 flex flex-col p-4 md:p-6">
-        
           {step === 'hero' && (
-            <div className="flex-1 flex flex-col items-center justify-center text-center py-10 px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex-1 flex flex-col items-center justify-center text-center py-10 px-4">
               <span className="text-just-orange font-mono text-[9px] uppercase tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/10 mb-6">Безкоштовний психологічний тест від JustSchool</span>
-              <h1 className="text-4xl md:text-7xl font-bold mb-6 tracking-tight">Хто твоє <span className="text-just-orange">"Мовне Альтер-Его"</span>?</h1>
+              <h1 className="text-4xl md:text-7xl font-bold mb-6 tracking-tight leading-tight">Хто твоє <span className="text-just-orange">"Мовне Альтер-Его"</span>?</h1>
               <p className="text-gray-400 text-lg md:text-xl mb-10 max-w-2xl leading-relaxed">Твій знак зодіаку визначає стиль спілкування. Дізнайся правду та отримай персональний план на 16 тижнів.</p>
-              <button onClick={handleStart} className="bg-just-orange px-10 py-5 rounded-full text-xl font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-orange-600/20 flex items-center gap-3">Оберіть свій знак <ChevronRight /></button>
+              <button onClick={() => setStep('zodiac')} className="bg-just-orange px-10 py-5 rounded-full text-xl font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-orange-600/20 flex items-center gap-3">Оберіть свій знак <ChevronRight /></button>
             </div>
           )}
 
           {step === 'zodiac' && (
-            <div className="py-6 w-full animate-in fade-in duration-500">
+            <div className="py-6 w-full">
               <h2 className="text-3xl font-bold text-center mb-2">Обери свій знак</h2>
               <p className="text-center text-gray-500 mb-8 text-sm">Зірки знають про твій English все</p>
               <div className="grid grid-cols-3 gap-3 md:gap-6">
                 {ZODIAC_SIGNS.map(z => (
-                  <button key={z.id} onClick={() => handleZodiacSelect(z.id)} className="bg-white/5 p-5 md:p-10 rounded-2xl flex flex-col items-center gap-4 border border-white/5 hover:bg-white/10 active:border-orange-500/50 transition-all">
+                  <button key={z.id} onClick={() => { setSelectedZodiac(z.id); setStep('quiz'); }} className="bg-white/5 p-5 md:p-10 rounded-2xl flex flex-col items-center gap-4 border border-white/5 hover:bg-white/10 active:border-orange-500/50 transition-all">
                     <span className="text-5xl md:text-7xl">{z.icon}</span>
                     <span className="font-bold text-xs md:text-base uppercase tracking-widest">{z.label}</span>
                   </button>
@@ -209,13 +186,13 @@ export default function App() {
           )}
 
           {step === 'quiz' && (
-            <div className="flex-1 flex flex-col py-10 max-w-xl mx-auto w-full px-4 animate-in fade-in slide-in-from-right-4 duration-500">
+            <div className="flex-1 flex flex-col py-10 max-w-xl mx-auto w-full px-4">
                <div className="flex justify-between items-center mb-6">
                  <button onClick={() => setStep('zodiac')} className="text-gray-500 flex items-center gap-1"><ArrowLeft size={16}/> Назад</button>
                  <span className="text-just-orange font-mono">{currentQuestionIndex+1}/{QUESTIONS.length}</span>
                </div>
                <div className="bg-white/5 p-6 md:p-10 rounded-3xl border border-white/10 relative overflow-hidden backdrop-blur-xl">
-                 <div className="absolute top-0 left-0 h-1 bg-just-orange transition-all duration-300" style={{width: `${((currentQuestionIndex+1)/QUESTIONS.length)*100}%`}} />
+                 <div className="absolute top-0 left-0 h-1 bg-just-orange" style={{width: `${((currentQuestionIndex+1)/QUESTIONS.length)*100}%`}} />
                  <h3 className="text-2xl font-bold mb-8 leading-tight">{QUESTIONS[currentQuestionIndex].question}</h3>
                  <div className="space-y-3">
                    {QUESTIONS[currentQuestionIndex].options.map(o => (
@@ -229,18 +206,18 @@ export default function App() {
           )}
 
           {step === 'loading' && (
-            <div className="flex-1 flex flex-col items-center justify-center text-center py-20 px-6 animate-in fade-in duration-500">
+            <div className="flex-1 flex flex-col items-center justify-center text-center py-20 px-6">
               <Loader2 className="w-16 h-16 text-just-orange animate-spin mb-8" />
               <h2 className="text-xl md:text-3xl font-bold mb-6 h-20 flex items-center justify-center leading-tight">{loadingText}</h2>
               <div className="w-64 h-2 bg-white/10 rounded-full overflow-hidden mb-2">
-                <div className="h-full bg-just-orange transition-all duration-300" style={{ width: `${loadingProgress}%` }} />
+                <div className="h-full bg-just-orange" style={{ width: `${loadingProgress}%` }} />
               </div>
               <span className="text-just-orange font-mono font-bold">{loadingProgress}%</span>
             </div>
           )}
 
           {step === 'lead' && (
-            <div className="flex-1 flex flex-col items-center justify-center py-10 w-full max-w-md mx-auto px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex-1 flex flex-col items-center justify-center py-10 w-full max-w-md mx-auto px-4">
               <div className="bg-white/5 p-8 md:p-12 rounded-[3rem] border border-white/10 text-center w-full backdrop-blur-3xl shadow-2xl">
                 <Sparkles className="w-12 h-12 text-just-orange mx-auto mb-6"/>
                 <h2 className="text-3xl font-bold mb-2">Майже готово!</h2>
@@ -256,7 +233,7 @@ export default function App() {
           )}
 
           {step === 'result' && result && (
-            <div className="w-full flex flex-col py-8 px-4 pb-40 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            <div className="w-full flex flex-col py-8 px-4 pb-40">
               <div className="text-center mb-10">
                 <span className="text-just-yellow font-mono text-[10px] tracking-[0.4em] uppercase">Astro-English Identity</span>
                 <h2 className="text-4xl md:text-7xl font-bold uppercase mt-2 leading-tight">{result.persona}</h2>
@@ -301,31 +278,24 @@ export default function App() {
                 <div className="w-full max-w-md space-y-6 px-4">
                   <div className="grid grid-cols-3 gap-3">
                     <button onClick={()=>shareToPlatform('telegram')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-[#229ED9]/20 transition-all group">
-                      <Send className="text-[#229ED9] group-hover:scale-110 transition-transform" size={24}/>
+                      <Send className="text-[#229ED9]" size={24}/>
                       <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">TG</span>
                     </button>
                     <button onClick={()=>shareToPlatform('instagram')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-[#E4405F]/20 transition-all group">
-                      <Instagram className="text-[#E4405F] group-hover:scale-110 transition-transform" size={24}/>
-                      <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">Instagram</span>
+                      <Instagram className="text-[#E4405F]" size={24}/>
+                      <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">IG</span>
                     </button>
                     <button onClick={()=>shareToPlatform('tiktok')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-white/10 transition-all group">
-                      <TikTokIcon className="text-white group-hover:scale-110 transition-transform" size={24} />
+                      <TikTokIcon className="text-white w-5 h-5" />
                       <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">TikTok</span>
                     </button>
                   </div>
-                  <button onClick={reset} className="w-full py-5 bg-white/5 border border-white/10 rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 hover:bg-white/10 transition-all"><RefreshCw size={18}/> Пройти тест ще раз</button>
+                  <button onClick={() => { setStep('hero'); setSelectedZodiac(null); setResult(null); }} className="w-full py-5 bg-white/5 border border-white/10 rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 hover:bg-white/10 transition-all"><RefreshCw size={18}/> Пройти тест ще раз</button>
                 </div>
               </div>
             </div>
           )}
-        
       </main>
-
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 107, 0, 0.3); border-radius: 10px; }
-        .font-display { font-family: system-ui, -apple-system, sans-serif; }
-      `}</style>
     </div>
   );
 }
