@@ -21,7 +21,6 @@ import {
 import { ZODIAC_SIGNS, QUESTIONS } from './constants';
 import { ZodiacSign, QuizResult } from './types';
 import { getAstroResult } from './services/resultService';
-import ReactMarkdown from 'react-markdown';
 
 export default function App() {
   const [step, setStep] = useState<'hero' | 'zodiac' | 'quiz' | 'loading' | 'result' | 'lead'>('hero');
@@ -137,10 +136,10 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="flex-1 flex flex-col items-center justify-center max-w-2xl text-center z-10 w-full px-4"
+            className="flex-1 flex flex-col items-center justify-center max-w-2xl text-center z-10 w-full px-6"
           >
-            <div className="mb-4">
-              <span className="text-just-orange font-mono text-[9px] md:text-xs uppercase tracking-wider bg-just-orange/10 px-3 py-1.5 rounded-full border border-just-orange/20 inline-block whitespace-nowrap">
+            <div className="mb-6">
+              <span className="text-just-orange font-mono text-[7px] md:text-[10px] uppercase tracking-[0.15em] bg-just-orange/10 px-3 py-1.5 rounded-full border border-just-orange/20 inline-block whitespace-nowrap">
                 Безкоштовний психологічний тест від JustSchool
               </span>
             </div>
@@ -167,23 +166,23 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.1 }}
-            className="flex-1 flex flex-col w-full max-w-2xl z-10 pt-6 pb-8 px-4"
+            className="flex-1 flex flex-col w-full max-w-2xl z-10 pt-8 pb-8 px-4"
           >
             <div className="text-center mb-6 shrink-0">
               <h2 className="text-2xl md:text-3xl font-display font-bold mb-1">Обери свій знак</h2>
               <p className="text-white/50 text-xs">Зірки знають про твій English все. Готуйся до правди</p>
             </div>
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
-              <div className="grid grid-cols-3 gap-2 md:gap-3 pb-6">
+              <div className="grid grid-cols-4 gap-2 md:gap-3 pb-6">
                 {ZODIAC_SIGNS.map((zodiac) => (
                   <motion.button
                     key={zodiac.id}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleZodiacSelect(zodiac.id)}
-                    className="glass p-3 rounded-xl flex flex-col items-center gap-1.5 transition-all hover:bg-white/10 group relative border border-white/5 active:border-just-orange/50"
+                    className="glass p-2 md:p-3 rounded-xl flex flex-col items-center gap-1 transition-all hover:bg-white/10 group relative border border-white/5 active:border-just-orange/50 aspect-square justify-center"
                   >
-                    <span className="text-2xl md:text-3xl pointer-events-none">{zodiac.icon}</span>
-                    <span className="font-bold text-[9px] md:text-[10px] whitespace-nowrap uppercase tracking-tighter pointer-events-none">{zodiac.label}</span>
+                    <span className="text-xl md:text-3xl pointer-events-none">{zodiac.icon}</span>
+                    <span className="font-bold text-[7px] md:text-[10px] whitespace-nowrap uppercase tracking-tighter pointer-events-none">{zodiac.label}</span>
                   </motion.button>
                 ))}
               </div>
@@ -270,7 +269,7 @@ export default function App() {
             key="result"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex-1 flex flex-col w-full max-w-3xl z-10 overflow-y-auto custom-scrollbar pt-6 px-4 pb-12"
+            className="flex-1 flex flex-col w-full max-w-3xl z-10 overflow-y-auto custom-scrollbar pt-10 px-4 pb-16"
           >
             <div className="text-center mb-6 shrink-0">
               <motion.div
@@ -280,18 +279,19 @@ export default function App() {
               >
                 ASTRO-ENGLISH IDENTITY
               </motion.div>
-              <h2 className="text-3xl md:text-5xl font-display font-bold text-white tracking-tight leading-tight">
+              <h2 className="text-3xl md:text-5xl font-display font-bold text-white tracking-tight leading-tight uppercase">
                 {result.persona}
               </h2>
             </div>
 
-            <div className="glass p-6 md:p-10 rounded-[2.5rem] border-white/5 shadow-2xl relative overflow-hidden mb-8">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-just-orange/5 blur-[100px] -mr-32 -mt-32" />
+            {/* Content Card */}
+            <div className="glass p-6 md:p-10 rounded-[2.5rem] border border-white/5 shadow-2xl relative overflow-hidden mb-8 bg-black/40 backdrop-blur-xl">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-just-orange/10 blur-[100px] -mr-32 -mt-32" />
 
-              <div className="relative space-y-8">
+              <div className="relative flex flex-col gap-8">
                 {/* Zodiac Markers */}
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="glass-dark p-3 rounded-2xl border-white/5 flex items-center gap-3">
+                  <div className="glass-dark p-3 rounded-2xl border border-white/5 flex items-center gap-3 bg-white/5">
                     <div className="w-8 h-8 rounded-xl bg-just-purple/20 flex items-center justify-center text-just-purple shrink-0">
                       <Star className="w-4 h-4" />
                     </div>
@@ -300,7 +300,7 @@ export default function App() {
                       <div className="text-xs font-bold text-white truncate">{selectedZodiac && ZODIAC_SIGNS.find(z => z.id === selectedZodiac)?.ruler}</div>
                     </div>
                   </div>
-                  <div className="glass-dark p-3 rounded-2xl border-white/5 flex items-center gap-3 text-left">
+                  <div className="glass-dark p-3 rounded-2xl border border-white/5 flex items-center gap-3 bg-white/5 text-left">
                     <div className="w-8 h-8 rounded-xl bg-just-orange/20 flex items-center justify-center text-just-orange shrink-0">
                       {selectedZodiac && ZODIAC_SIGNS.find(z => z.id === selectedZodiac)?.element === 'Вогонь' && <Flame className="w-4 h-4" />}
                       {selectedZodiac && ZODIAC_SIGNS.find(z => z.id === selectedZodiac)?.element === 'Земля' && <Mountain className="w-4 h-4" />}
@@ -314,21 +314,21 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Main Content */}
+                {/* Main Body Text */}
                 <div className="space-y-6 text-left">
                   <div className="text-just-orange font-bold italic text-base md:text-lg border-l-4 border-just-orange pl-4 py-1 leading-relaxed">
                     «{result.motto}»
                   </div>
                   
-                  <div className="text-white/90 text-sm md:text-base leading-relaxed space-y-4">
-                    <ReactMarkdown>{result.roast}</ReactMarkdown>
+                  <div className="text-white/90 text-sm md:text-base leading-relaxed whitespace-pre-wrap">
+                    {result.roast}
                   </div>
                 </div>
 
-                {/* Audit Blocks */}
-                <div className="pt-8 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                {/* Audit Section */}
+                <div className="pt-8 border-t border-white/10 grid grid-cols-1 gap-6 text-left">
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-just-blue font-bold text-xs uppercase tracking-widest">
+                    <div className="flex items-center gap-2 text-[#3B82F6] font-bold text-xs uppercase tracking-widest">
                       <CheckCircle2 className="w-4 h-4" />
                       Сильні сторони:
                     </div>
@@ -347,21 +347,21 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Advice Block */}
+                {/* Plan Section */}
                 <div className="pt-8 border-t border-white/10 text-left">
                   <div className="flex items-center gap-2 text-just-yellow font-bold italic mb-4 text-sm md:text-base">
                     <Sparkles className="w-5 h-5" />
                     <span>Твій план навчання на 16 тижнів:</span>
                   </div>
-                  <div className="text-white/80 text-sm space-y-3">
-                    <ReactMarkdown>{result.advice}</ReactMarkdown>
+                  <div className="text-white/80 text-sm space-y-4 whitespace-pre-wrap leading-relaxed">
+                    {result.advice}
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Visual Identity Image */}
-            <div className="flex flex-col items-center gap-8 mb-12">
+            <div className="flex flex-col items-center gap-10 mb-12">
               <div className="relative group">
                 <div className="absolute -inset-4 bg-gradient-to-r from-just-orange via-just-purple to-just-yellow opacity-30 blur-2xl group-hover:opacity-50 transition-opacity" />
                 <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl">
@@ -378,21 +378,21 @@ export default function App() {
                 <div className="grid grid-cols-3 gap-3">
                    <button 
                     onClick={() => shareToPlatform('telegram')}
-                    className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
+                    className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95 bg-white/5"
                    >
                      <Send className="w-6 h-6 text-[#229ED9]" />
                      <span className="text-[10px] uppercase font-bold text-white/50">TG</span>
                    </button>
                    <button 
                     onClick={() => shareToPlatform('instagram')}
-                    className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
+                    className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95 bg-white/5"
                    >
                      <MessageCircle className="w-6 h-6 text-[#E4405F]" />
                      <span className="text-[10px] uppercase font-bold text-white/50">IG</span>
                    </button>
                    <button 
                     onClick={() => shareToPlatform('tiktok')}
-                    className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
+                    className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95 bg-white/5"
                    >
                      <Share2 className="w-6 h-6 text-[#00f2ea]" />
                      <span className="text-[10px] uppercase font-bold text-white/50">TikTok</span>
@@ -401,7 +401,7 @@ export default function App() {
                 
                 <button
                   onClick={reset}
-                  className="w-full py-5 glass border border-white/10 text-white font-bold rounded-[1.5rem] hover:bg-white/5 transition-all flex items-center justify-center gap-2 text-base"
+                  className="w-full py-5 glass border border-white/10 text-white font-bold rounded-[1.5rem] hover:bg-white/10 transition-all flex items-center justify-center gap-2 text-base active:scale-95 bg-white/5"
                 >
                   <RefreshCw className="w-5 h-5" /> Пройти тест ще раз
                 </button>
@@ -418,7 +418,7 @@ export default function App() {
             exit={{ opacity: 0, y: -20 }}
             className="flex-1 flex flex-col justify-center max-w-md w-full z-10 py-4 px-4 overflow-y-auto"
           >
-            <div className="glass p-8 md:p-10 rounded-[2.5rem] border-just-orange/30 relative overflow-hidden">
+            <div className="glass p-8 md:p-10 rounded-[2.5rem] border border-white/10 relative overflow-hidden bg-black/40 backdrop-blur-xl">
               <div className="text-center mb-6">
                 <Sparkles className="w-12 h-12 text-just-orange mx-auto mb-4" />
                 <h2 className="text-2xl md:text-3xl font-display font-bold mb-2">Майже готово! ✨</h2>
@@ -432,7 +432,7 @@ export default function App() {
                   required
                   value={leadName}
                   onChange={(e) => setLeadName(e.target.value)}
-                  className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange outline-none transition-all text-lg"
+                  className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange outline-none transition-all text-base md:text-lg text-white"
                 />
                 <input
                   type="tel"
@@ -440,7 +440,7 @@ export default function App() {
                   required
                   value={leadPhone}
                   onChange={(e) => setLeadPhone(e.target.value)}
-                  className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange outline-none transition-all text-lg"
+                  className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange outline-none transition-all text-base md:text-lg text-white"
                 />
                 <input
                   type="email"
@@ -448,11 +448,11 @@ export default function App() {
                   required
                   value={leadEmail}
                   onChange={(e) => setLeadEmail(e.target.value)}
-                  className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange outline-none transition-all text-lg"
+                  className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange outline-none transition-all text-base md:text-lg text-white"
                 />
                 <button
                   type="submit"
-                  className="w-full py-5 bg-just-orange text-white font-bold rounded-2xl hover:scale-105 active:scale-95 transition-all text-xl neon-glow-orange"
+                  className="w-full py-5 bg-just-orange text-white font-bold rounded-2xl hover:scale-[1.02] active:scale-95 transition-all text-lg md:text-xl neon-glow-orange shadow-lg shadow-just-orange/20"
                 >
                   Дізнатися тип
                 </button>
