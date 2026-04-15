@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ArrowLeft, Loader2, CheckCircle2, Sparkles, Users, Cake, Target, BarChart3, Heart, Frown, Clock, Coffee, Smartphone, UserCheck, TrendingUp, Calendar, Group, Trophy, Gift, Wand2, User, Mail, Globe2, Briefcase, BookOpen, MessageSquare, TrendingDown, Zap, Rocket, Shuffle, ThumbsUp, ThumbsDown, Check, FileText, Globe, Mic, Edit, Headphones, Award, Film, Shield, PlaySquare, HelpCircle, XCircle, LayoutGrid, CalendarDays, Monitor, HeartHandshake, Timer, Plane, Quote, MessageCircle, Battery, BatteryLow, BatteryMedium, BatteryFull, Sunrise, Sun, Sunset, Moon, Smile, Home } from 'lucide-react';
+import { ChevronRight, ArrowLeft, Loader2, CheckCircle2, Sparkles, Users, Cake, Target, BarChart3, Heart, Frown, Clock, Coffee, Smartphone, UserCheck, TrendingUp, Calendar, Group, Trophy, Gift, Wand2, User, Mail, Globe2, Briefcase, BookOpen, MessageSquare, TrendingDown, Zap, Rocket, Shuffle, ThumbsUp, ThumbsDown, Check, FileText, Globe, Mic, Edit, Headphones, Award, Film, Shield, PlaySquare, HelpCircle, XCircle, LayoutGrid, CalendarDays, Monitor, HeartHandshake, Timer, Plane, Quote } from 'lucide-react';
 import { quizData } from './data';
 
 const GOOGLE_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzjHz2H9Am5CfJ6dtrvu82h9Vr0bi_lc6eb6Ljm-jEuqHcz-UIdEXHcx4lhL-uDVjTmZA/exec";
 
 const icons: { [key: string]: React.FC<any> } = {
-  Users, Cake, Target, BarChart3, Heart, Frown, Clock, Coffee, Smartphone, UserCheck, TrendingUp, Calendar, Group, Trophy, Gift, Wand2, User, Mail, Sparkles, Globe2, Briefcase, BookOpen, MessageSquare, TrendingDown, Zap, Rocket, Shuffle, ThumbsUp, ThumbsDown, Check, FileText, Globe, Mic, Edit, Headphones, Award, Film, Shield, PlaySquare, HelpCircle, XCircle, LayoutGrid, CalendarDays, Monitor, HeartHandshake, Timer, Plane, MessageCircle, Battery, BatteryLow, BatteryMedium, BatteryFull, Sunrise, Sun, Sunset, Moon, Smile, Home
+  Users, Cake, Target, BarChart3, Heart, Frown, Clock, Coffee, Smartphone, UserCheck, TrendingUp, Calendar, Group, Trophy, Gift, Wand2, User, Mail, Sparkles, Globe2, Briefcase, BookOpen, MessageSquare, TrendingDown, Zap, Rocket, Shuffle, ThumbsUp, ThumbsDown, Check, FileText, Globe, Mic, Edit, Headphones, Award, Film, Shield, PlaySquare, HelpCircle, XCircle, LayoutGrid, CalendarDays, Monitor, HeartHandshake, Timer, Plane
 };
 
 const formatPhoneNumber = (value: string) => {
@@ -47,7 +47,7 @@ export default function App() {
             setTimeout(() => setStep(step + 1), 600);
             return 100;
           }
-          return prev + 1;
+          return prev + 2;
         });
       }, 40);
       return () => clearInterval(interval);
@@ -64,8 +64,8 @@ export default function App() {
     e.preventDefault();
     const payload = {
       Name: leadName,
-      Email: leadEmail,
       Phone: leadPhone ? `'+${leadPhone.replace(/\D/g, '')}` : "",
+      Email: leadEmail,
       Answear: Object.entries(answers).map(([s, a]) => `Q${s}: ${a}`).join(" | "),
       Lead_type: "LP_Google_Quiz_V8",
       URL: window.location.href
@@ -117,8 +117,8 @@ export default function App() {
           <motion.div key={step} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="w-full h-full flex flex-col pt-2">
             
             {IconComponent && currentStep?.type !== 'hero' && currentStep?.type !== 'loader' && currentStep?.type !== 'program_ready' && currentStep?.type !== 'lead_name' && currentStep?.type !== 'lead_contacts' && (
-                <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-[1.25rem] flex items-center justify-center mx-auto mb-4 shrink-0 shadow-sm border border-orange-200/50">
-                    <IconComponent size={32} strokeWidth={2.5}/>
+                <div className="w-14 h-14 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shrink-0 shadow-sm border border-orange-200/50">
+                    <IconComponent size={28} strokeWidth={2.5}/>
                 </div>
             )}
             
@@ -164,7 +164,7 @@ export default function App() {
 
             {(currentStep?.type === 'choice' || currentStep?.type === 'testimonials_interstitial') && (
               <div className="text-center flex flex-col h-full">
-                <h2 className="text-3xl md:text-4xl font-black mb-3 leading-tight tracking-tight">{currentStep.question || currentStep.title}</h2>
+                <h2 className="text-2xl md:text-3xl font-black mb-2 leading-tight">{currentStep.question || currentStep.title}</h2>
                 {currentStep.subtext && <p className="text-sm md:text-base text-slate-500 mb-6 font-medium leading-relaxed max-w-sm mx-auto px-2">{currentStep.subtext || currentStep.subtitle}</p>}
                 
                 {currentStep.type === 'testimonials_interstitial' && currentStep.reviews && (
@@ -186,11 +186,11 @@ export default function App() {
                   </div>
                 )}
 
-                <div className={`grid gap-2.5 w-full mt-2 pb-4 ${currentStep.type === 'choice' ? '' : 'mt-auto'}`}>
+                <div className={`grid gap-2.5 w-full mt-auto pb-4`}>
                   {currentStep.options?.map(opt => {
                     const OptIcon = opt.icon ? icons[opt.icon] : null;
                     return (
-                        <button key={opt.value} onClick={() => handleChoice(opt.label)} className="w-full text-left p-3.5 rounded-2xl border-2 border-slate-100 bg-white hover:border-orange-500 active:bg-orange-50 transition-all font-bold text-sm flex items-center gap-4 group shadow-sm active:scale-[0.98]">
+                        <button key={opt.value} onClick={() => handleChoice(opt.label)} className="w-full text-left p-3.5 rounded-2xl border-2 border-slate-100 bg-white hover:border-orange-500 active:bg-orange-50 transition-all font-bold text-sm flex items-center gap-3 group shadow-sm active:scale-[0.98]">
                             {OptIcon && (
                                 <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-orange-100 group-hover:text-orange-500 transition-colors shrink-0">
                                     <OptIcon size={20} strokeWidth={2}/>
@@ -215,8 +215,8 @@ export default function App() {
                         <Sparkles size={32} strokeWidth={2.5}/>
                    </div>
 
-                   <h2 className="text-3xl font-black mb-3 leading-tight relative z-10 tracking-tight">{currentStep.title}</h2>
-                   <p className="text-slate-400 text-xs md:text-sm mb-8 relative z-10 font-bold leading-relaxed">{currentStep.subtitle}</p>
+                   <h2 className="text-2xl font-black mb-3 leading-tight relative z-10">{currentStep.question || currentStep.title}</h2>
+                   <p className="text-slate-400 text-xs md:text-sm mb-8 relative z-10 font-bold leading-relaxed">{currentStep.subtext || currentStep.subtitle}</p>
                    
                    <ul className="space-y-3 mb-8 relative z-10 text-left mt-auto">
                      {currentStep.points?.map(p => (
@@ -231,33 +231,54 @@ export default function App() {
             )}
 
             {(currentStep?.type === 'lead_name' || currentStep?.type === 'lead_contacts') && (
-                <div className="text-center flex flex-col h-full py-4 pt-10">
-                    <div className="w-20 h-20 bg-orange-100 text-orange-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 shrink-0 shadow-inner border border-orange-200/50">
-                        {currentStep.type === 'lead_name' ? <User size={40} strokeWidth={2.5}/> : <Mail size={40} strokeWidth={2.5}/>}
+                <div className="text-center flex flex-col h-full py-4 pt-4">
+                    <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-[1.25rem] flex items-center justify-center mx-auto mb-6 shrink-0 shadow-sm border border-orange-200/50">
+                        {currentStep.type === 'lead_name' ? <User size={32} strokeWidth={2.5}/> : <Mail size={32} strokeWidth={2.5}/>}
                     </div>
 
-                    <h2 className="text-3xl font-black mb-4 text-slate-900 leading-tight tracking-tight px-4">{currentStep.question || currentStep.title}</h2>
-                    <p className="text-sm text-slate-500 mb-8 font-medium leading-relaxed max-w-sm mx-auto px-4">{currentStep.subtext || currentStep.subtitle}</p>
+                    <h2 className="text-2xl md:text-3xl font-black mb-3 text-slate-900 leading-tight uppercase tracking-tighter px-2">{currentStep.question || currentStep.title}</h2>
+                    <p className="text-xs md:text-sm text-slate-500 mb-8 font-medium leading-relaxed max-w-sm mx-auto px-4">{currentStep.subtext || currentStep.subtitle}</p>
                     
                     <div className="mt-auto w-full">
                         {currentStep.type === 'lead_contacts' && (
                             <div className="mb-6 p-4 bg-orange-50 rounded-2xl border border-orange-100 flex gap-3 items-center text-left">
-                                <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-white shrink-0 text-lg">🎁</div>
+                                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white shrink-0 text-sm">🎁</div>
                                 <p className="text-orange-700 font-black text-[10px] uppercase tracking-tight leading-tight">Безкоштовне пробне заняття з методистом у подарунок!</p>
                             </div>
                         )}
 
                         {currentStep.type === 'lead_name' ? (
                            <div className="space-y-4 w-full">
-                             <input type="text" placeholder="Ваше ім'я" className="w-full p-5 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-xl font-black text-slate-900 bg-white shadow-sm text-center" value={leadName} onChange={e => setLeadName(e.target.value)} />
-                             <button onClick={() => leadName.trim().length >= 2 && setStep(step + 1)} disabled={leadName.trim().length < 2} className="w-full py-5 bg-orange-500 text-white rounded-2xl font-black text-lg shadow-lg shadow-orange-200 active:scale-95 transition-all disabled:opacity-30 uppercase tracking-widest">{currentStep.cta}</button>
+                             <input 
+                                type="text" 
+                                placeholder={currentStep.form?.name_placeholder || "Ваше ім'я"} 
+                                className="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-xl font-black text-slate-900 bg-white shadow-sm text-center" 
+                                value={leadName} 
+                                onChange={e => setLeadName(e.target.value)} 
+                             />
+                             <button onClick={() => leadName.trim().length >= 2 && setStep(step + 1)} disabled={leadName.trim().length < 2} className="w-full py-4 bg-orange-500 text-white rounded-2xl font-black text-lg shadow-lg shadow-orange-200 active:scale-95 transition-all disabled:opacity-30 uppercase tracking-widest">{currentStep.cta}</button>
                            </div>
                         ) : (
                            <form onSubmit={handleSubmit} className="space-y-4 w-full">
-                             <input type="email" placeholder="Ваш e-mail" required className="w-full p-5 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-lg font-black text-slate-900 bg-white shadow-sm text-center" value={leadEmail} onChange={e => setLeadEmail(e.target.value)} />
-                             <input type="tel" placeholder="+380 (XX) XXX-XX-XX" required className="w-full p-5 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-lg font-black text-slate-900 bg-white shadow-sm text-center" value={leadPhone} onChange={e => setLeadPhone(formatPhoneNumber(e.target.value))} maxLength={19} />
-                             <button type="submit" disabled={leadPhone.replace(/\D/g, "").length !== 12} className="w-full py-5 bg-orange-500 text-white rounded-2xl font-black text-lg shadow-lg shadow-orange-200 active:scale-95 transition-all disabled:opacity-30 uppercase tracking-widest">{currentStep.cta}</button>
-                             {currentStep.guarantee_text && <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-4">{currentStep.guarantee_text}</p>}
+                             <input 
+                                type="email" 
+                                placeholder={currentStep.form?.email_placeholder || "Ваш e-mail"} 
+                                required 
+                                className="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-lg font-black text-slate-900 bg-white shadow-sm text-center" 
+                                value={leadEmail} 
+                                onChange={e => setLeadEmail(e.target.value)} 
+                             />
+                             <input 
+                                type="tel" 
+                                placeholder={currentStep.form?.phone_placeholder || "Твій номер телефону"} 
+                                required 
+                                className="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-lg font-black text-slate-900 bg-white shadow-sm text-center" 
+                                value={leadPhone} 
+                                onChange={e => setLeadPhone(formatPhoneNumber(e.target.value))} 
+                                maxLength={19} 
+                             />
+                             <button type="submit" disabled={leadPhone.replace(/\D/g, "").length !== 12} className="w-full py-4 bg-orange-500 text-white rounded-2xl font-black text-lg shadow-lg shadow-orange-200 active:scale-95 transition-all disabled:opacity-30 uppercase tracking-widest">{currentStep.cta}</button>
+                             {currentStep.guarantee_text && <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-4">{currentStep.guarantee_text}</p>}
                            </form>
                         )}
                     </div>
@@ -265,9 +286,9 @@ export default function App() {
             )}
 
              {currentStep?.type === 'loader' && (
-                <div className="text-center flex flex-col justify-center flex-1 h-full">
-                    <div className="w-20 h-20 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-8 shrink-0 shadow-inner border border-orange-200/50"><Loader2 className="animate-spin" size={40} strokeWidth={3}/></div>
-                    <h2 className="text-3xl font-black mb-10 text-slate-900 leading-tight tracking-tight">{currentStep.question || currentStep.title}</h2>
+                <div className="text-center py-8 px-4 flex flex-col justify-center flex-1 h-full">
+                    <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 shrink-0"><Loader2 className="animate-spin" size={32} strokeWidth={3}/></div>
+                    <h2 className="text-xl font-black mb-8 text-slate-900 leading-tight uppercase tracking-tight">{currentStep.question || currentStep.title}</h2>
                     
                     <div className="w-full max-w-xs mx-auto bg-slate-100 h-2 rounded-full overflow-hidden mb-6">
                         <div className="h-full bg-orange-500" style={{ width: `${loaderProgress}%` }} />
@@ -276,7 +297,7 @@ export default function App() {
                     
                     <div className="grid gap-3 max-w-[280px] mx-auto text-left w-full mt-auto mb-10">
                         {currentStep.points?.map((p, i) => (
-                            <div key={p} className={`flex items-center gap-4 text-[11px] font-black uppercase tracking-wider transition-opacity duration-500 ${loaderProgress > (i * 25) ? 'text-slate-900' : 'text-slate-200'}`}>
+                            <div key={p} className={`flex items-center gap-4 text-[10px] font-black uppercase tracking-wider transition-opacity duration-500 ${loaderProgress > (i * 25) ? 'text-slate-900' : 'text-slate-200'}`}>
                                 <div className={`w-2 h-2 rounded-full shrink-0 ${loaderProgress > (i * 25) ? 'bg-orange-500' : 'bg-slate-200'}`} />
                                 {p}
                             </div>
@@ -287,13 +308,6 @@ export default function App() {
           </motion.div>
         </AnimatePresence>
       </main>
-
-      <style>{`
-        body { overflow-x: hidden; width: 100%; position: relative; background: #f8fafc; }
-        input::placeholder { color: #cbd5e1; font-weight: 700; text-transform: uppercase; font-size: 14px; letter-spacing: 0.05em; text-align: center; }
-        .custom-scrollbar::-webkit-scrollbar { height: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
-      `}</style>
     </div>
   );
 }
