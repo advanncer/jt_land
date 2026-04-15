@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/eng-adult/lp_google",
+      "destination": "/eng-adult/lp_google/index.html"
+    },
+    {
+      "source": "/eng-adult/lp_google/:path*",
+      "destination": "/eng-adult/lp_google/:path*"
+    },
+    {
       "source": "/",
       "destination": "/free-products/combo-lead-magnit/index.html"
     },

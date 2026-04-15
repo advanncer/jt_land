@@ -14,6 +14,7 @@ export default defineConfig({
         comboLeadMagnit: resolve(__dirname, "free-products/combo-lead-magnit/index.html"),
         astroEnglish: resolve(__dirname, "free-products/astro-english/index.html"),
         bloggerLp1: resolve(__dirname, "blogger/lp1/index.html"),
+        engAdultLpGoogle: resolve(__dirname, "eng-adult/lp_google/index.html"),
       },
     },
   },
