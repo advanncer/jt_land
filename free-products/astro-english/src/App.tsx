@@ -36,7 +36,6 @@ export default function App() {
   
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Loading animation logic
   useEffect(() => {
     if (step === 'loading') {
       const interval = setInterval(() => {
@@ -86,8 +85,8 @@ export default function App() {
   const handleLeadSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (leadName && leadPhone && leadEmail) {
-      processResult();
       setStep('loading');
+      processResult();
     }
   };
 
@@ -124,11 +123,11 @@ export default function App() {
   };
 
   return (
-    <div className="h-[100dvh] w-full bg-[#050505] relative overflow-hidden flex flex-col items-center p-4">
+    <div className="h-[100dvh] w-full bg-[#050505] relative overflow-hidden flex flex-col items-center">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-just-blue/20 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-just-orange/20 blur-[120px] rounded-full" />
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-just-blue/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-just-orange/10 blur-[120px] rounded-full" />
       </div>
 
       <AnimatePresence mode="wait">
@@ -138,10 +137,10 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="flex-1 flex flex-col items-center justify-center max-w-2xl text-center z-10 w-full"
+            className="flex-1 flex flex-col items-center justify-center max-w-2xl text-center z-10 w-full px-4"
           >
-            <div className="mb-4 flex justify-center">
-              <span className="text-just-orange font-mono text-[9px] md:text-xs uppercase tracking-[0.1em] md:tracking-[0.2em] bg-just-orange/10 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-just-orange/20 inline-block max-w-[90vw] leading-tight">
+            <div className="mb-4">
+              <span className="text-just-orange font-mono text-[9px] md:text-xs uppercase tracking-wider bg-just-orange/10 px-3 py-1.5 rounded-full border border-just-orange/20 inline-block whitespace-nowrap">
                 Безкоштовний психологічний тест від JustSchool
               </span>
             </div>
@@ -168,30 +167,23 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.1 }}
-            className="flex-1 flex flex-col w-full max-w-4xl z-10 pt-4 pb-8"
+            className="flex-1 flex flex-col w-full max-w-2xl z-10 pt-6 pb-8 px-4"
           >
-            <div className="text-center mb-4 md:mb-6 shrink-0">
+            <div className="text-center mb-6 shrink-0">
               <h2 className="text-2xl md:text-3xl font-display font-bold mb-1">Обери свій знак</h2>
-              <p className="text-white/50 text-xs md:text-sm">Зірки знають про твій English все. Готуйся до правди</p>
+              <p className="text-white/50 text-xs">Зірки знають про твій English все. Готуйся до правди</p>
             </div>
-            <div 
-              ref={scrollRef}
-              className="flex-1 overflow-y-auto pr-2 custom-scrollbar"
-            >
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-3 pb-4">
+            <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
+              <div className="grid grid-cols-3 gap-2 md:gap-3 pb-6">
                 {ZODIAC_SIGNS.map((zodiac) => (
                   <motion.button
                     key={zodiac.id}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => handleZodiacSelect(zodiac.id)}
-                    className="glass p-3 md:p-4 rounded-xl flex flex-col items-center gap-2 transition-all hover:bg-white/20 group relative overflow-hidden border border-white/5 active:bg-just-orange/20"
+                    className="glass p-3 rounded-xl flex flex-col items-center gap-1.5 transition-all hover:bg-white/10 group relative border border-white/5 active:border-just-orange/50"
                   >
-                    <div className="absolute top-0 left-0 w-full h-1 bg-just-orange opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="text-2xl md:text-3xl group-hover:scale-110 transition-transform pointer-events-none">{zodiac.icon}</span>
-                    <div className="text-center pointer-events-none">
-                      <div className="font-bold text-[10px] md:text-xs whitespace-nowrap uppercase tracking-widest">{zodiac.label}</div>
-                    </div>
+                    <span className="text-2xl md:text-3xl pointer-events-none">{zodiac.icon}</span>
+                    <span className="font-bold text-[9px] md:text-[10px] whitespace-nowrap uppercase tracking-tighter pointer-events-none">{zodiac.label}</span>
                   </motion.button>
                 ))}
               </div>
@@ -205,7 +197,7 @@ export default function App() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
-            className="flex-1 flex flex-col justify-center max-w-xl w-full z-10 pt-4"
+            className="flex-1 flex flex-col justify-center max-w-xl w-full z-10 pt-4 px-4"
           >
             <div className="mb-4 flex items-center justify-between shrink-0">
               <button
@@ -219,8 +211,8 @@ export default function App() {
               </div>
             </div>
 
-            <div className="glass p-6 md:p-8 rounded-3xl relative overflow-hidden max-h-[80vh] flex flex-col">
-              <div className="absolute top-0 left-0 w-full h-1 bg-white/10 shrink-0">
+            <div className="glass p-6 md:p-8 rounded-3xl relative overflow-hidden flex flex-col">
+              <div className="absolute top-0 left-0 w-full h-1 bg-white/10">
                 <motion.div
                   className="h-full bg-just-orange"
                   initial={{ width: 0 }}
@@ -232,7 +224,7 @@ export default function App() {
                 {QUESTIONS[currentQuestionIndex].question}
               </h3>
 
-              <div className="space-y-2 md:space-y-3 overflow-y-auto pr-1 custom-scrollbar">
+              <div className="space-y-2 md:space-y-3">
                 {QUESTIONS[currentQuestionIndex].options.map((option) => (
                   <button
                     key={option.value}
@@ -253,24 +245,22 @@ export default function App() {
             key="loading"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex-1 flex flex-col items-center justify-center text-center z-10 max-w-md w-full"
+            className="flex-1 flex flex-col items-center justify-center text-center z-10 max-w-md w-full px-4"
           >
-            <div className="mb-6 md:mb-8 relative inline-block">
+            <div className="mb-6 relative inline-block">
               <Loader2 className="w-16 h-16 md:w-20 md:h-20 text-just-orange animate-spin" />
               <div className="absolute inset-0 blur-xl bg-just-orange/20" />
             </div>
             <h2 className="text-2xl md:text-3xl font-display font-bold mb-4">Аналізуємо твій шлях...</h2>
-            <div className="w-full h-1.5 md:h-2 bg-white/10 rounded-full mb-6 overflow-hidden">
+            <div className="w-full h-1.5 bg-white/10 rounded-full mb-6 overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-just-orange to-just-yellow"
                 initial={{ width: 0 }}
                 animate={{ width: `${loadingProgress}%` }}
               />
             </div>
-            <p className="text-white/60 italic text-sm md:text-base px-4">
-              {loadingProgress < 30 && "Зіставляємо твої Меркурії з рівнем Grammar..."}
-              {loadingProgress >= 30 && loadingProgress < 70 && "Аналізуємо твій мовний потенціал."}
-              {loadingProgress >= 70 && "Фіналізуємо твій мовний діагноз..."}
+            <p className="text-white/60 italic text-sm px-4">
+              Фіналізуємо твій мовний діагноз...
             </p>
           </motion.div>
         )}
@@ -280,36 +270,37 @@ export default function App() {
             key="result"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex-1 flex flex-col w-full max-w-3xl z-10 overflow-y-auto custom-scrollbar pt-4 pb-20"
+            className="flex-1 flex flex-col w-full max-w-3xl z-10 overflow-y-auto custom-scrollbar pt-6 px-4 pb-12"
           >
-            <div className="text-center mb-4 shrink-0">
+            <div className="text-center mb-6 shrink-0">
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-just-yellow font-mono text-[8px] md:text-[9px] uppercase tracking-[0.3em] mb-1"
+                className="text-just-yellow font-mono text-[9px] uppercase tracking-[0.3em] mb-1"
               >
-                Astro-English Identity
+                ASTRO-ENGLISH IDENTITY
               </motion.div>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-white tracking-tight leading-tight">
+              <h2 className="text-3xl md:text-5xl font-display font-bold text-white tracking-tight leading-tight">
                 {result.persona}
               </h2>
             </div>
 
-            <div className="glass p-5 md:p-8 rounded-[2rem] border-white/5 shadow-2xl relative overflow-hidden mb-6">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-just-orange/5 blur-[80px] -mr-24 -mt-24" />
+            <div className="glass p-6 md:p-10 rounded-[2.5rem] border-white/5 shadow-2xl relative overflow-hidden mb-8">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-just-orange/5 blur-[100px] -mr-32 -mt-32" />
 
-              <div className="relative space-y-6">
+              <div className="relative space-y-8">
+                {/* Zodiac Markers */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="glass-dark p-3 rounded-2xl border-white/5 flex items-center gap-3">
                     <div className="w-8 h-8 rounded-xl bg-just-purple/20 flex items-center justify-center text-just-purple shrink-0">
                       <Star className="w-4 h-4" />
                     </div>
-                    <div className="min-w-0">
-                      <div className="text-[8px] md:text-[10px] uppercase tracking-wider text-white/40 truncate">Управитель</div>
-                      <div className="text-xs md:text-sm font-bold text-white truncate">{selectedZodiac && ZODIAC_SIGNS.find(z => z.id === selectedZodiac)?.ruler}</div>
+                    <div className="min-w-0 text-left">
+                      <div className="text-[8px] uppercase tracking-wider text-white/40">Управитель</div>
+                      <div className="text-xs font-bold text-white truncate">{selectedZodiac && ZODIAC_SIGNS.find(z => z.id === selectedZodiac)?.ruler}</div>
                     </div>
                   </div>
-                  <div className="glass-dark p-3 rounded-2xl border-white/5 flex items-center gap-3">
+                  <div className="glass-dark p-3 rounded-2xl border-white/5 flex items-center gap-3 text-left">
                     <div className="w-8 h-8 rounded-xl bg-just-orange/20 flex items-center justify-center text-just-orange shrink-0">
                       {selectedZodiac && ZODIAC_SIGNS.find(z => z.id === selectedZodiac)?.element === 'Вогонь' && <Flame className="w-4 h-4" />}
                       {selectedZodiac && ZODIAC_SIGNS.find(z => z.id === selectedZodiac)?.element === 'Земля' && <Mountain className="w-4 h-4" />}
@@ -317,97 +308,102 @@ export default function App() {
                       {selectedZodiac && ZODIAC_SIGNS.find(z => z.id === selectedZodiac)?.element === 'Вода' && <Droplets className="w-4 h-4" />}
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[8px] md:text-[10px] uppercase tracking-wider text-white/40 truncate">Стихія</div>
-                      <div className="text-xs md:text-sm font-bold text-white truncate">{selectedZodiac && ZODIAC_SIGNS.find(z => z.id === selectedZodiac)?.element}</div>
+                      <div className="text-[8px] uppercase tracking-wider text-white/40">Стихія</div>
+                      <div className="text-xs font-bold text-white truncate">{selectedZodiac && ZODIAC_SIGNS.find(z => z.id === selectedZodiac)?.element}</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="text-just-orange font-bold italic text-sm md:text-base border-l-2 border-just-orange pl-4 py-1 leading-relaxed">
+                {/* Main Content */}
+                <div className="space-y-6 text-left">
+                  <div className="text-just-orange font-bold italic text-base md:text-lg border-l-4 border-just-orange pl-4 py-1 leading-relaxed">
                     «{result.motto}»
                   </div>
                   
-                  <div className="text-white/90 text-sm md:text-base leading-relaxed">
+                  <div className="text-white/90 text-sm md:text-base leading-relaxed space-y-4">
                     <ReactMarkdown>{result.roast}</ReactMarkdown>
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-just-blue font-bold text-xs uppercase tracking-wider">
+                {/* Audit Blocks */}
+                <div className="pt-8 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-just-blue font-bold text-xs uppercase tracking-widest">
                       <CheckCircle2 className="w-4 h-4" />
                       Сильні сторони:
                     </div>
-                    <p className="text-xs md:text-sm text-white/60 leading-relaxed italic">
+                    <p className="text-sm text-white/70 leading-relaxed italic">
                       {result.audit.strengths}
                     </p>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-just-orange font-bold text-xs uppercase tracking-wider">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-just-orange font-bold text-xs uppercase tracking-widest">
                       <AlertCircle className="w-4 h-4" />
                       Слабкі сторони:
                     </div>
-                    <p className="text-xs md:text-sm text-white/60 leading-relaxed italic">
+                    <p className="text-sm text-white/70 leading-relaxed italic">
                       {result.audit.weaknesses}
                     </p>
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-white/10">
-                  <div className="flex items-center gap-2 text-just-yellow font-bold italic mb-3 text-sm md:text-base">
-                    <Sparkles className="w-4 h-4" />
+                {/* Advice Block */}
+                <div className="pt-8 border-t border-white/10 text-left">
+                  <div className="flex items-center gap-2 text-just-yellow font-bold italic mb-4 text-sm md:text-base">
+                    <Sparkles className="w-5 h-5" />
                     <span>Твій план навчання на 16 тижнів:</span>
                   </div>
-                  <div className="prose prose-invert prose-yellow prose-sm max-w-none text-white/80 prose-li:my-2">
+                  <div className="text-white/80 text-sm space-y-3">
                     <ReactMarkdown>{result.advice}</ReactMarkdown>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col items-center gap-6 pb-12">
+            {/* Visual Identity Image */}
+            <div className="flex flex-col items-center gap-8 mb-12">
               <div className="relative group">
-                <div className="absolute -inset-4 bg-gradient-to-r from-just-orange via-just-purple to-just-yellow opacity-20 blur-2xl group-hover:opacity-40 transition-opacity" />
-                <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-[2.5rem] overflow-hidden border border-white/10 shadow-lg">
+                <div className="absolute -inset-4 bg-gradient-to-r from-just-orange via-just-purple to-just-yellow opacity-30 blur-2xl group-hover:opacity-50 transition-opacity" />
+                <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl">
                   <img
                     src={result.imageUrl}
                     alt={result.persona}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transform scale-105"
                   />
                 </div>
               </div>
 
-              <div className="w-full max-w-sm px-4 space-y-4">
+              {/* Action Buttons */}
+              <div className="w-full max-w-md space-y-4">
                 <div className="grid grid-cols-3 gap-3">
                    <button 
                     onClick={() => shareToPlatform('telegram')}
-                    className="p-4 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
+                    className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
                    >
                      <Send className="w-6 h-6 text-[#229ED9]" />
-                     <span className="text-[10px] uppercase font-bold text-white/60">TG</span>
+                     <span className="text-[10px] uppercase font-bold text-white/50">TG</span>
                    </button>
                    <button 
                     onClick={() => shareToPlatform('instagram')}
-                    className="p-4 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
+                    className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
                    >
                      <MessageCircle className="w-6 h-6 text-[#E4405F]" />
-                     <span className="text-[10px] uppercase font-bold text-white/60">IG</span>
+                     <span className="text-[10px] uppercase font-bold text-white/50">IG</span>
                    </button>
                    <button 
                     onClick={() => shareToPlatform('tiktok')}
-                    className="p-4 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
+                    className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
                    >
                      <Share2 className="w-6 h-6 text-[#00f2ea]" />
-                     <span className="text-[10px] uppercase font-bold text-white/60">TikTok</span>
+                     <span className="text-[10px] uppercase font-bold text-white/50">TikTok</span>
                    </button>
                 </div>
                 
                 <button
                   onClick={reset}
-                  className="w-full py-4 glass border border-white/10 text-white/60 font-bold rounded-2xl hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-2 text-sm"
+                  className="w-full py-5 glass border border-white/10 text-white font-bold rounded-[1.5rem] hover:bg-white/5 transition-all flex items-center justify-center gap-2 text-base"
                 >
-                  <RefreshCw className="w-4 h-4" /> Пройти тест ще раз
+                  <RefreshCw className="w-5 h-5" /> Пройти тест ще раз
                 </button>
               </div>
             </div>
@@ -420,68 +416,47 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="flex-1 flex flex-col justify-center max-w-md w-full z-10 py-4"
+            className="flex-1 flex flex-col justify-center max-w-md w-full z-10 py-4 px-4 overflow-y-auto"
           >
-            <div className="glass p-6 md:p-10 rounded-[2.5rem] border-just-orange/30 relative overflow-hidden flex flex-col overflow-y-auto max-h-full custom-scrollbar">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-just-orange/10 blur-3xl rounded-full -mr-16 -mt-16" />
-
-              <div className="text-center mb-6 shrink-0">
-                <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-just-orange/20 rounded-2xl mb-4">
-                  <Sparkles className="w-6 h-6 md:w-8 h-8 text-just-orange" />
-                </div>
+            <div className="glass p-8 md:p-10 rounded-[2.5rem] border-just-orange/30 relative overflow-hidden">
+              <div className="text-center mb-6">
+                <Sparkles className="w-12 h-12 text-just-orange mx-auto mb-4" />
                 <h2 className="text-2xl md:text-3xl font-display font-bold mb-2">Майже готово! ✨</h2>
                 <p className="text-white/60 text-sm">Залиш контакти, щоб отримати свій зірковий розбір</p>
               </div>
 
-              <form onSubmit={handleLeadSubmit} className="space-y-3 md:space-y-4 shrink-0">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Ім'я</label>
-                  <input
-                    type="text"
-                    placeholder="Твоє ім'я"
-                    required
-                    value={leadName}
-                    onChange={(e) => setLeadName(e.target.value)}
-                    className="w-full px-4 py-3 md:px-5 md:py-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange focus:bg-white/10 outline-none transition-all text-base md:text-lg"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Телефон</label>
-                  <input
-                    type="tel"
-                    placeholder="+380..."
-                    required
-                    value={leadPhone}
-                    onChange={(e) => setLeadPhone(e.target.value)}
-                    className="w-full px-4 py-3 md:px-5 md:py-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange focus:bg-white/10 outline-none transition-all text-base md:text-lg"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Email</label>
-                  <input
-                    type="email"
-                    placeholder="example@mail.com"
-                    required
-                    value={leadEmail}
-                    onChange={(e) => setLeadEmail(e.target.value)}
-                    className="w-full px-4 py-3 md:px-5 md:py-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange focus:bg-white/10 outline-none transition-all text-base md:text-lg"
-                  />
-                </div>
-
+              <form onSubmit={handleLeadSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Твоє ім'я"
+                  required
+                  value={leadName}
+                  onChange={(e) => setLeadName(e.target.value)}
+                  className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange outline-none transition-all text-lg"
+                />
+                <input
+                  type="tel"
+                  placeholder="+380..."
+                  required
+                  value={leadPhone}
+                  onChange={(e) => setLeadPhone(e.target.value)}
+                  className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange outline-none transition-all text-lg"
+                />
+                <input
+                  type="email"
+                  placeholder="example@mail.com"
+                  required
+                  value={leadEmail}
+                  onChange={(e) => setLeadEmail(e.target.value)}
+                  className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange outline-none transition-all text-lg"
+                />
                 <button
                   type="submit"
-                  className="w-full mt-2 px-6 py-4 md:px-8 md:py-5 bg-just-orange text-white font-bold rounded-xl md:rounded-2xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 text-lg md:text-xl neon-glow-orange shadow-lg shadow-just-orange/20"
+                  className="w-full py-5 bg-just-orange text-white font-bold rounded-2xl hover:scale-105 active:scale-95 transition-all text-xl neon-glow-orange"
                 >
-                  Дізнатися тип <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+                  Дізнатися тип
                 </button>
               </form>
-
-              <button
-                onClick={() => setStep('quiz')}
-                className="w-full mt-4 text-center text-white/30 hover:text-white transition-colors text-xs flex items-center justify-center gap-2 shrink-0"
-              >
-                <ArrowLeft className="w-3 h-3" /> Назад до тесту
-              </button>
             </div>
           </motion.div>
         )}
@@ -493,17 +468,10 @@ export default function App() {
         }
         .custom-scrollbar::-webkit-scrollbar-track {
           background: rgba(255, 255, 255, 0.05);
-          border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
           background: rgba(255, 107, 0, 0.3);
           border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(255, 107, 0, 0.5);
-        }
-        button:active {
-          transform: scale(0.95);
         }
       `}</style>
     </div>
