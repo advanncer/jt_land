@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
@@ -12,7 +12,9 @@ import {
   Flame,
   Mountain,
   Wind,
-  Droplets
+  Droplets,
+  Send,
+  MessageCircle
 } from 'lucide-react';
 import { ZODIAC_SIGNS, QUESTIONS } from './constants';
 import { ZodiacSign, QuizResult } from './types';
@@ -29,6 +31,8 @@ export default function App() {
   const [leadName, setLeadName] = useState('');
   const [leadPhone, setLeadPhone] = useState('');
   const [leadEmail, setLeadEmail] = useState('');
+  
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   // Loading animation logic
   useEffect(() => {
@@ -80,9 +84,29 @@ export default function App() {
   const handleLeadSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (leadName && leadPhone && leadEmail) {
-      // Don't change step here, just trigger result generation
       processResult();
       setStep('loading');
+    }
+  };
+
+  const shareToPlatform = (platform: 'telegram' | 'instagram' | 'tiktok') => {
+    const text = `Мій мовний тип: ${result?.persona}! Дізнайся свій тип за посиланням: ${window.location.href}`;
+    const url = encodeURIComponent(window.location.href);
+    
+    if (platform === 'telegram') {
+      window.open(`https://t.me/share/url?url=${url}&text=${encodeURIComponent(text)}`, '_blank');
+    } else {
+      // For Instagram and TikTok, direct sharing of generated cards via Web Share API is preferred if available
+      if (navigator.share) {
+        navigator.share({
+          title: 'Моє Мовне Альтер-Его',
+          text: text,
+          url: window.location.href,
+        }).catch(console.error);
+      } else {
+        alert("Скопійовано посилання для шерингу!");
+        navigator.clipboard.writeText(window.location.href);
+      }
     }
   };
 
@@ -115,28 +139,23 @@ export default function App() {
             exit={{ opacity: 0, y: -20 }}
             className="flex-1 flex flex-col items-center justify-center max-w-2xl text-center z-10 w-full"
           >
-            <div className="mb-4 md:mb-6">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="relative inline-block"
-              >
-                <Sparkles className="w-12 h-12 md:w-16 md:h-16 text-just-orange" />
-                <div className="absolute inset-0 blur-lg bg-just-orange/30" />
-              </motion.div>
+            <div className="mb-4">
+              <span className="text-just-orange font-mono text-xs md:text-sm uppercase tracking-[0.2em] bg-just-orange/10 px-4 py-2 rounded-full border border-just-orange/20">
+                Безкоштовний психологічний тест від JustSchool
+              </span>
             </div>
-            <h1 className="text-3xl md:text-7xl font-display font-bold mb-4 md:mb-6 tracking-tight leading-tight">
-              Хто твоє мовне <span className="text-just-orange text-glow-orange">альтер-его</span> за зодіаком?
+            <h1 className="text-4xl md:text-7xl font-display font-bold mb-4 md:mb-6 tracking-tight leading-tight">
+              Хто твоє <span className="text-just-orange text-glow-orange">"Мовне Альтер-Его"</span>?
             </h1>
-            <p className="text-base md:text-xl text-white/60 mb-8 md:mb-10 max-w-lg mx-auto">
-              Дізнайся свій зірковий діагноз та отримай персоналізований рознос від нашого AI-астролога.
+            <p className="text-base md:text-xl text-white/60 mb-8 md:mb-10 max-w-xl mx-auto leading-relaxed">
+              Твій знак зодіаку визначає, як ти насправді розмовляєш англійською. Дізнайся свій прихований стиль спілкування та отримай персональний план навчання на 16 тижнів.
             </p>
             <button
               onClick={handleStart}
-              className="group relative px-6 py-4 md:px-8 md:py-4 bg-just-orange text-white font-bold rounded-full text-lg md:text-xl transition-all hover:scale-105 active:scale-95 neon-glow-orange shadow-lg shadow-just-orange/40"
+              className="group relative px-8 py-4 md:px-10 md:py-5 bg-just-orange text-white font-bold rounded-full text-lg md:text-xl transition-all hover:scale-105 active:scale-95 neon-glow-orange shadow-lg shadow-just-orange/40"
             >
-              <span className="relative z-10 flex items-center gap-2">
-                Запитати у зірок <ChevronRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" />
+              <span className="relative z-10 flex items-center gap-3">
+                Оберіть свій знак <ChevronRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" />
               </span>
             </button>
           </motion.div>
@@ -152,9 +171,12 @@ export default function App() {
           >
             <div className="text-center mb-6 shrink-0">
               <h2 className="text-2xl md:text-3xl font-display font-bold mb-1">Обери свій знак</h2>
-              <p className="text-white/50 text-sm">Зірки вже готові до твого розносу</p>
+              <p className="text-white/50 text-sm">Зірки знають про твій English все. Готуйся до правди</p>
             </div>
-            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+            <div 
+              ref={scrollRef}
+              className="flex-1 overflow-y-auto pr-2 custom-scrollbar"
+            >
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 pb-4">
                 {ZODIAC_SIGNS.map((zodiac) => (
                   <motion.button
@@ -162,12 +184,12 @@ export default function App() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleZodiacSelect(zodiac.id)}
-                    className="glass p-4 md:p-6 rounded-2xl flex flex-col items-center gap-2 md:gap-3 transition-all hover:bg-white/20 group relative overflow-hidden"
+                    className="glass p-5 md:p-8 rounded-2xl flex flex-col items-center gap-3 md:gap-4 transition-all hover:bg-white/20 group relative overflow-hidden border border-white/5 active:bg-just-orange/20"
                   >
                     <div className="absolute top-0 left-0 w-full h-1 bg-just-orange opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="text-3xl md:text-4xl group-hover:scale-110 transition-transform">{zodiac.icon}</span>
-                    <div className="text-center">
-                      <div className="font-bold text-xs md:text-sm whitespace-nowrap uppercase tracking-wider">{zodiac.label}</div>
+                    <span className="text-4xl md:text-5xl group-hover:scale-110 transition-transform pointer-events-none">{zodiac.icon}</span>
+                    <div className="text-center pointer-events-none">
+                      <div className="font-bold text-sm md:text-base whitespace-nowrap uppercase tracking-widest">{zodiac.label}</div>
                     </div>
                   </motion.button>
                 ))}
@@ -321,27 +343,48 @@ export default function App() {
               </div>
             </div>
 
-            <div className="flex flex-col items-center gap-6 pb-8">
+            <div className="flex flex-col items-center gap-6 pb-12">
               <div className="relative group">
                 <div className="absolute -inset-4 bg-gradient-to-r from-just-orange via-just-purple to-just-yellow opacity-20 blur-2xl group-hover:opacity-40 transition-opacity" />
-                <div className="relative w-32 h-32 md:w-48 md:h-48 rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-[2.5rem] overflow-hidden border border-white/10 shadow-lg">
                   <img
                     src={result.imageUrl}
                     alt={result.persona}
-                    className="w-full h-full object-cover scale-110"
+                    className="w-full h-full object-cover"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm px-4">
-                <button className="flex-1 px-6 py-4 glass text-white font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2 text-sm">
-                  <Share2 className="w-4 h-4" /> Поділитися
-                </button>
+              <div className="w-full max-w-sm px-4 space-y-4">
+                <div className="grid grid-cols-3 gap-3">
+                   <button 
+                    onClick={() => shareToPlatform('telegram')}
+                    className="p-4 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
+                   >
+                     <Send className="w-6 h-6 text-[#229ED9]" />
+                     <span className="text-[10px] uppercase font-bold text-white/60">TG</span>
+                   </button>
+                   <button 
+                    onClick={() => shareToPlatform('instagram')}
+                    className="p-4 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
+                   >
+                     <MessageCircle className="w-6 h-6 text-[#E4405F]" />
+                     <span className="text-[10px] uppercase font-bold text-white/60">IG</span>
+                   </button>
+                   <button 
+                    onClick={() => shareToPlatform('tiktok')}
+                    className="p-4 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
+                   >
+                     <Share2 className="w-6 h-6 text-[#00f2ea]" />
+                     <span className="text-[10px] uppercase font-bold text-white/60">TikTok</span>
+                   </button>
+                </div>
+                
                 <button
                   onClick={reset}
-                  className="flex-1 px-6 py-4 border border-white/10 text-white/60 font-bold rounded-2xl hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-2 text-sm"
+                  className="w-full py-4 glass border border-white/10 text-white/60 font-bold rounded-2xl hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-2 text-sm"
                 >
-                  <RefreshCw className="w-4 h-4" /> Ще раз
+                  <RefreshCw className="w-4 h-4" /> Пройти тест ще раз
                 </button>
               </div>
             </div>
@@ -435,6 +478,9 @@ export default function App() {
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 107, 0, 0.5);
+        }
+        button:active {
+          transform: scale(0.95);
         }
       `}</style>
     </div>
