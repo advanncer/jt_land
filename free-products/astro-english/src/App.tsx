@@ -37,9 +37,19 @@ const formatPhoneNumber = (value: string) => {
     return formatted;
 };
 
-const TikTokIcon = ({ className, size = 24 }: { className?: string; size?: number }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className} width={size} height={size}>
-    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47V14.42a6.72 6.72 0 01-1.3 4.2 6.6 6.6 0 01-4.7 2.4c-1.3.12-2.67-.14-3.83-.8a6.53 6.53 0 01-3.23-4.22 6.64 6.64 0 014.24-7.54c.73-.25 1.5-.39 2.27-.42v4.05c-.42.01-.84.1-1.23.28a2.53 2.53 0 00-1.43 2.2c-.01.55.2 1.11.6 1.48.42.39.99.59 1.56.57a2.55 2.55 0 002.5-2.5V0z"/>
+// Simplified and unified TikTok Icon to match Lucide weight
+const TikTokIcon = ({ size = 20 }: { size?: number }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+  >
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
   </svg>
 );
 
@@ -120,7 +130,7 @@ export default function App() {
       setTimeout(() => {
         setStep('result');
         window.scrollTo(0, 0);
-      }, 300);
+      }, 100);
 
     } catch (e) {
       clearInterval(tInt);
@@ -220,7 +230,7 @@ export default function App() {
             <div className="bg-white/5 p-8 md:p-12 rounded-[3rem] border border-white/10 text-center w-full backdrop-blur-3xl shadow-2xl">
               <Sparkles className="w-12 h-12 text-just-orange mx-auto mb-6"/>
               <h2 className="text-3xl font-bold mb-2 uppercase tracking-tight">Майже готово!</h2>
-              <p className="text-gray-400 mb-8 text-sm">Залиш контакти, щоб отримати свій зірковий розбір</p>
+              <p className="text-gray-400 mb-8 text-sm px-4">Залиш контакти, щоб отримати свій зірковий розбір</p>
               <form onSubmit={handleLeadSubmit} className="space-y-4">
                 <input type="text" placeholder="Ім'я" required className="w-full p-4 rounded-2xl bg-black/30 border border-white/10 outline-none focus:border-orange-500 text-white" value={leadName} onChange={e => setLeadName(e.target.value)} />
                 <input type="tel" placeholder="+380 (XX) XXX-XX-XX" required className="w-full p-4 rounded-2xl bg-black/30 border border-white/10 outline-none focus:border-orange-500 text-white" value={leadPhone} onChange={e => setLeadPhone(formatPhoneNumber(e.target.value))} />
@@ -233,7 +243,7 @@ export default function App() {
       case 'result':
         if (!result) return null;
         return (
-          <div className="w-full flex flex-col py-8 px-4 pb-40 items-center animate-in fade-in duration-1000">
+          <div className="w-full flex flex-col py-8 px-4 pb-40 items-center">
             <div className="text-center mb-10 w-full">
               <span className="text-just-yellow font-mono text-[10px] tracking-[0.4em] uppercase">Astro-English Identity</span>
               <h2 className="text-4xl md:text-7xl font-bold uppercase mt-2 leading-tight tracking-tighter">{result.persona}</h2>
@@ -280,22 +290,24 @@ export default function App() {
             </div>
 
             <div className="flex flex-col items-center gap-12 mb-20 w-full px-4">
-              <div className="w-full max-w-lg aspect-square rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl shadow-orange-500/20 bg-gradient-to-br from-white/5 to-white/10">
+              <div className="w-full max-w-lg aspect-square rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl shadow-orange-500/20">
                 <img src={result.imageUrl} alt={result.persona} className="w-full h-full object-cover" />
               </div>
               <div className="w-full max-w-md space-y-6">
                 <div className="grid grid-cols-3 gap-3">
                   <button onClick={()=>shareToPlatform('telegram')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-[#229ED9]/20 transition-all group">
-                    <Send className="text-[#229ED9] group-hover:scale-110 transition-transform" size={24}/>
-                    <span className="text-[10px] font-bold opacity-50 uppercase">TG</span>
+                    <Send className="text-[#229ED9] group-hover:scale-110 transition-transform" size={20}/>
+                    <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">TG</span>
                   </button>
                   <button onClick={()=>shareToPlatform('instagram')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-[#E4405F]/20 transition-all group">
-                    <Instagram className="text-[#E4405F] group-hover:scale-110 transition-transform" size={24}/>
-                    <span className="text-[10px] font-bold opacity-50 uppercase leading-none mt-1">Instagram</span>
+                    <Instagram className="text-[#E4405F] group-hover:scale-110 transition-transform" size={20}/>
+                    <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">IG</span>
                   </button>
                   <button onClick={()=>shareToPlatform('tiktok')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-white/10 transition-all group">
-                    <TikTokIcon className="text-white group-hover:scale-110 transition-transform" size={24} />
-                    <span className="text-[10px] font-bold opacity-50 uppercase leading-none mt-1">TikTok</span>
+                    <div className="text-white group-hover:scale-110 transition-transform flex items-center justify-center">
+                      <TikTokIcon size={20} />
+                    </div>
+                    <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">TikTok</span>
                   </button>
                 </div>
                 <button onClick={() => { setStep('hero'); setSelectedZodiac(null); setResult(null); setCurrentQuestionIndex(0); }} className="w-full py-5 bg-white/5 border border-white/10 rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 hover:bg-white/10 transition-all uppercase tracking-widest">Пройти ще раз</button>
@@ -313,7 +325,7 @@ export default function App() {
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-900/10 to-orange-900/10 opacity-50" />
         <div className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] bg-blue-600/10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[80%] h-[80%] bg-orange-600/10 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[80%] h-[80%] bg-orange-600/5 blur-[150px] rounded-full" />
       </div>
 
       <main className="relative z-10 w-full max-w-4xl flex-1 flex flex-col p-4 md:p-6 items-center">
@@ -321,7 +333,6 @@ export default function App() {
       </main>
 
       <style>{`
-        .text-glow-orange { text-shadow: 0 0 10px rgba(255, 107, 0, 0.4); }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 107, 0, 0.3); border-radius: 10px; }
       `}</style>
