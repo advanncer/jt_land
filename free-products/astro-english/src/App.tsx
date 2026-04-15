@@ -80,8 +80,9 @@ export default function App() {
   const handleLeadSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (leadName && leadPhone && leadEmail) {
-      setStep('loading');
+      // Don't change step here, just trigger result generation
       processResult();
+      setStep('loading');
     }
   };
 
@@ -128,7 +129,7 @@ export default function App() {
               Хто твоє мовне <span className="text-just-orange text-glow-orange">альтер-его</span> за зодіаком?
             </h1>
             <p className="text-base md:text-xl text-white/60 mb-8 md:mb-10 max-w-lg mx-auto">
-              Дізнайся свій зірковий діагноз та отримай персоналізований рознос від AI-астролога JustSchool.
+              Дізнайся свій зірковий діагноз та отримай персоналізований рознос від нашого AI-астролога.
             </p>
             <button
               onClick={handleStart}
@@ -166,8 +167,7 @@ export default function App() {
                     <div className="absolute top-0 left-0 w-full h-1 bg-just-orange opacity-0 group-hover:opacity-100 transition-opacity" />
                     <span className="text-3xl md:text-4xl group-hover:scale-110 transition-transform">{zodiac.icon}</span>
                     <div className="text-center">
-                      <div className="font-bold text-xs md:text-sm whitespace-nowrap">{zodiac.label}</div>
-                      <div className="text-[8px] md:text-[10px] text-just-orange uppercase tracking-wider font-bold leading-tight mt-1">{zodiac.slang}</div>
+                      <div className="font-bold text-xs md:text-sm whitespace-nowrap uppercase tracking-wider">{zodiac.label}</div>
                     </div>
                   </motion.button>
                 ))}
@@ -246,7 +246,7 @@ export default function App() {
             </div>
             <p className="text-white/60 italic text-sm md:text-base px-4">
               {loadingProgress < 30 && "Зіставляємо твої Меркурії з рівнем Grammar..."}
-              {loadingProgress >= 30 && loadingProgress < 70 && "Наші студенти вже вивчили 500 нових фраз."}
+              {loadingProgress >= 30 && loadingProgress < 70 && "Аналізуємо твій мовний потенціал."}
               {loadingProgress >= 70 && "Фіналізуємо твій мовний діагноз..."}
             </p>
           </motion.div>
@@ -420,13 +420,6 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Footer Branding */}
-      <div className="shrink-0 pt-4 pb-4 md:pb-8 text-center z-20">
-        <div className="text-[8px] md:text-[10px] uppercase tracking-[0.3em] text-white/20 font-mono">
-          Powered by <span className="text-just-orange">JustSchool</span> AI Engine
-        </div>
-      </div>
 
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
