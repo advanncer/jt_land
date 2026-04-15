@@ -43,6 +43,14 @@
     {
       "source": "/eng-adult/lp_pains/:path*",
       "destination": "/eng-adult/lp_pains/:path*"
+    },
+    {
+      "source": "/free-product",
+      "destination": "/free-products/free-product/index.html"
+    },
+    {
+      "source": "/free-product/:path*",
+      "destination": "/free-products/free-product/:path*"
     }
   ],
   "redirects": [
@@ -64,6 +72,11 @@
     {
       "source": "/eng_adult_nql_pains",
       "destination": "/eng-adult/lp_pains",
+      "permanent": true
+    },
+    {
+      "source": "/freeproduct",
+      "destination": "/free-product",
       "permanent": true
     }
   ]
