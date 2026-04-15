@@ -37,7 +37,6 @@ const formatPhoneNumber = (value: string) => {
     return formatted;
 };
 
-// Simplified and unified TikTok Icon to match Lucide weight
 const TikTokIcon = ({ size = 20 }: { size?: number }) => (
   <svg 
     width={size} 
@@ -150,13 +149,19 @@ export default function App() {
     const title = 'Хто твоє "Мовне Альтер-Его"?';
     const text = `${title}\n\nМій тип: ${result?.persona}! Дізнайся свій:`;
     const url = window.location.origin + window.location.pathname;
+    
     if (platform === 'telegram') {
-      window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
-    } else if (navigator.share) {
-      navigator.share({ title, text, url }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(`${text} ${url}`);
-      alert("Скопійовано!");
+      window.open('https://t.me/+tefTRl_Ff8hkMzNi', '_blank');
+    } else if (platform === 'instagram') {
+      window.open('https://www.instagram.com/just_school_ua/', '_blank');
+    } else if (platform === 'tiktok') {
+        // TikTok doesn't have a direct "profile" URL provided, so we keep Web Share or alert
+        if (navigator.share) {
+            navigator.share({ title, text, url }).catch(() => {});
+        } else {
+            navigator.clipboard.writeText(`${text} ${url}`);
+            alert("Текст та посилання скопійовано!");
+        }
     }
   };
 
@@ -166,21 +171,21 @@ export default function App() {
         return (
           <div className="flex-1 flex flex-col items-center justify-center text-center py-10 px-4">
             <span className="text-just-orange font-mono text-[9px] uppercase tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/10 mb-6">Безкоштовний психологічний тест від JustSchool</span>
-            <h1 className="text-4xl md:text-7xl font-bold mb-6 tracking-tight leading-tight uppercase">Хто твоє <span className="text-just-orange">"Мовне Альтер-Его"</span>?</h1>
+            <h1 className="text-4xl md:text-7xl font-bold mb-6 tracking-tight leading-tight uppercase text-white">Хто твоє <span className="text-just-orange">"Мовне Альтер-Его"</span>?</h1>
             <p className="text-gray-400 text-lg md:text-xl mb-10 max-w-2xl leading-relaxed">Твій знак зодіаку визначає стиль спілкування. Дізнайся правду та отримай персональний план на 16 тижнів.</p>
-            <button onClick={() => setStep('zodiac')} className="bg-just-orange px-10 py-5 rounded-full text-xl font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-orange-600/20 flex items-center gap-3">Оберіть свій знак <ChevronRight /></button>
+            <button onClick={() => setStep('zodiac')} className="bg-just-orange px-10 py-5 rounded-full text-xl font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-orange-600/20 flex items-center gap-3 text-white uppercase tracking-widest">Оберіть свій знак <ChevronRight /></button>
           </div>
         );
       case 'zodiac':
         return (
           <div className="py-6 w-full max-w-2xl">
-            <h2 className="text-3xl font-bold text-center mb-2">Обери свій знак</h2>
-            <p className="text-center text-gray-500 mb-8 text-sm">Зірки знають про твій English все</p>
+            <h2 className="text-3xl font-bold text-center mb-2 text-white uppercase tracking-tight">Обери свій знак</h2>
+            <p className="text-center text-gray-500 mb-8 text-sm">Зірки знають про твій English все. Готуйся до правди</p>
             <div className="grid grid-cols-3 gap-3 md:gap-6">
               {ZODIAC_SIGNS.map(z => (
                 <button key={z.id} onClick={() => { setSelectedZodiac(z.id); setStep('quiz'); }} className="bg-white/5 p-5 md:p-10 rounded-2xl flex flex-col items-center justify-center gap-4 border border-white/5 hover:bg-white/10 active:border-orange-500/50 transition-all aspect-square">
                   <span className="text-5xl md:text-7xl leading-none">{z.icon}</span>
-                  <span className="font-bold text-[10px] md:text-base uppercase tracking-widest leading-none">{z.label}</span>
+                  <span className="font-bold text-[10px] md:text-base uppercase tracking-widest leading-none text-white/80">{z.label}</span>
                 </button>
               ))}
             </div>
@@ -190,12 +195,12 @@ export default function App() {
         return (
           <div className="flex-1 flex flex-col py-10 max-w-xl mx-auto w-full px-4 justify-center text-center">
             <div className="flex justify-between items-center mb-6">
-              <button onClick={() => setStep('zodiac')} className="text-gray-500 flex items-center gap-1"><ArrowLeft size={16}/> Назад</button>
-              <span className="text-just-orange font-mono">{currentQuestionIndex + 1}/{QUESTIONS.length}</span>
+              <button onClick={() => setStep('zodiac')} className="text-gray-500 flex items-center gap-1 hover:text-white transition-colors"><ArrowLeft size={16}/> Назад</button>
+              <span className="text-just-orange font-mono font-bold">{currentQuestionIndex + 1}/{QUESTIONS.length}</span>
             </div>
-            <div className="bg-white/5 p-6 md:p-10 rounded-3xl border border-white/10 relative overflow-hidden backdrop-blur-xl">
-              <div className="absolute top-0 left-0 h-1 bg-just-orange transition-all" style={{ width: `${((currentQuestionIndex + 1) / QUESTIONS.length) * 100}%` }} />
-              <h3 className="text-2xl font-bold mb-8 leading-tight">{QUESTIONS[currentQuestionIndex].question}</h3>
+            <div className="bg-white/5 p-6 md:p-10 rounded-3xl border border-white/10 relative overflow-hidden backdrop-blur-xl shadow-2xl">
+              <div className="absolute top-0 left-0 h-1 bg-just-orange transition-all duration-300 shadow-[0_0_10px_rgba(255,107,0,0.5)]" style={{ width: `${((currentQuestionIndex + 1) / QUESTIONS.length) * 100}%` }} />
+              <h3 className="text-2xl font-bold mb-8 leading-tight text-white">{QUESTIONS[currentQuestionIndex].question}</h3>
               <div className="space-y-3">
                 {QUESTIONS[currentQuestionIndex].options.map(o => (
                   <button key={o.value} onClick={() => {
@@ -203,8 +208,8 @@ export default function App() {
                     setAnswers(prev => ({ ...prev, [questionId]: o.value }));
                     if (currentQuestionIndex < QUESTIONS.length - 1) setCurrentQuestionIndex(prev => prev + 1);
                     else setStep('lead');
-                  }} className="w-full text-left p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-orange-500/50 transition-all flex justify-between items-center group">
-                    <span className="text-base md:text-lg">{o.label}</span> <ChevronRight className="opacity-0 group-hover:opacity-100 text-just-orange transition-all"/>
+                  }} className="w-full text-left p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-orange-500/50 hover:bg-white/10 transition-all flex justify-between items-center group active:scale-[0.98]">
+                    <span className="text-base md:text-lg text-white/90">{o.label}</span> <ChevronRight className="opacity-0 group-hover:opacity-100 text-just-orange transition-all"/>
                   </button>
                 ))}
               </div>
@@ -216,10 +221,10 @@ export default function App() {
           <div className="flex-1 flex flex-col items-center justify-center text-center py-20 px-6">
             <Loader2 className="w-16 h-16 text-just-orange animate-spin mb-8" />
             <div className="h-24 flex items-center justify-center">
-              <h2 className="text-xl md:text-3xl font-bold leading-tight max-w-md">{loadingText}</h2>
+              <h2 className="text-xl md:text-3xl font-bold leading-tight max-w-md text-white">{loadingText}</h2>
             </div>
-            <div className="w-64 h-2 bg-white/10 rounded-full overflow-hidden mt-6">
-              <div className="h-full bg-just-orange" style={{ width: `${loadingProgress}%` }} />
+            <div className="w-64 h-2 bg-white/10 rounded-full overflow-hidden mt-6 border border-white/5">
+              <div className="h-full bg-just-orange transition-all shadow-[0_0_15px_rgba(255,107,0,0.4)]" style={{ width: `${loadingProgress}%` }} />
             </div>
             <span className="text-just-orange font-mono font-bold mt-4">{loadingProgress}%</span>
           </div>
@@ -228,14 +233,14 @@ export default function App() {
         return (
           <div className="flex-1 flex flex-col items-center justify-center py-10 w-full max-w-md mx-auto px-4">
             <div className="bg-white/5 p-8 md:p-12 rounded-[3rem] border border-white/10 text-center w-full backdrop-blur-3xl shadow-2xl">
-              <Sparkles className="w-12 h-12 text-just-orange mx-auto mb-6"/>
-              <h2 className="text-3xl font-bold mb-2 uppercase tracking-tight">Майже готово!</h2>
-              <p className="text-gray-400 mb-8 text-sm px-4">Залиш контакти, щоб отримати свій зірковий розбір</p>
+              <Sparkles className="w-12 h-12 text-just-orange mx-auto mb-6 animate-pulse"/>
+              <h2 className="text-3xl font-bold mb-2 uppercase tracking-tight text-white leading-none">Майже готово!</h2>
+              <p className="text-gray-400 mb-8 text-sm">Залиш контакти, щоб отримати свій зірковий розбір</p>
               <form onSubmit={handleLeadSubmit} className="space-y-4">
-                <input type="text" placeholder="Ім'я" required className="w-full p-4 rounded-2xl bg-black/30 border border-white/10 outline-none focus:border-orange-500 text-white" value={leadName} onChange={e => setLeadName(e.target.value)} />
-                <input type="tel" placeholder="+380 (XX) XXX-XX-XX" required className="w-full p-4 rounded-2xl bg-black/30 border border-white/10 outline-none focus:border-orange-500 text-white" value={leadPhone} onChange={e => setLeadPhone(formatPhoneNumber(e.target.value))} />
-                <input type="email" placeholder="Email" required className="w-full p-4 rounded-2xl bg-black/30 border border-white/10 outline-none focus:border-orange-500 text-white" value={leadEmail} onChange={e => setLeadEmail(e.target.value)} />
-                <button type="submit" disabled={leadPhone.replace(/\D/g,'').length!==12} className="w-full p-5 bg-just-orange rounded-2xl font-bold text-xl active:scale-95 transition-all shadow-lg shadow-orange-600/30 disabled:opacity-30 uppercase tracking-widest">Дізнатися тип</button>
+                <input type="text" placeholder="Ім'я" required className="w-full p-4 rounded-2xl bg-black/30 border border-white/10 outline-none focus:border-orange-500 text-white transition-all" value={leadName} onChange={e => setLeadName(e.target.value)} />
+                <input type="tel" placeholder="+380 (XX) XXX-XX-XX" required className="w-full p-4 rounded-2xl bg-black/30 border border-white/10 outline-none focus:border-orange-500 text-white transition-all" value={leadPhone} onChange={e => setLeadPhone(formatPhoneNumber(e.target.value))} />
+                <input type="email" placeholder="Email" required className="w-full p-4 rounded-2xl bg-black/30 border border-white/10 outline-none focus:border-orange-500 text-white transition-all" value={leadEmail} onChange={e => setLeadEmail(e.target.value)} />
+                <button type="submit" disabled={leadPhone.replace(/\D/g,'').length!==12} className="w-full p-5 bg-just-orange rounded-2xl font-bold text-xl active:scale-95 transition-all shadow-lg shadow-orange-600/30 disabled:opacity-30 uppercase tracking-widest text-white">Дізнатися тип</button>
               </form>
             </div>
           </div>
@@ -246,7 +251,7 @@ export default function App() {
           <div className="w-full flex flex-col py-8 px-4 pb-40 items-center">
             <div className="text-center mb-10 w-full">
               <span className="text-just-yellow font-mono text-[10px] tracking-[0.4em] uppercase">Astro-English Identity</span>
-              <h2 className="text-4xl md:text-7xl font-bold uppercase mt-2 leading-tight tracking-tighter">{result.persona}</h2>
+              <h2 className="text-4xl md:text-7xl font-bold uppercase mt-2 leading-tight tracking-tighter text-white">{result.persona}</h2>
             </div>
             
             <div className="bg-white/5 p-6 md:p-12 rounded-[2.5rem] border border-white/10 mb-12 backdrop-blur-3xl shadow-2xl w-full">
@@ -255,14 +260,14 @@ export default function App() {
                   <Star className="text-purple-500" size={20}/> 
                   <div className="text-left">
                     <div className="text-[10px] opacity-40 uppercase leading-none mb-1">Управитель</div>
-                    <div className="font-bold text-sm md:text-base leading-none">{selectedZodiac && ZODIAC_SIGNS.find(z=>z.id===selectedZodiac)?.ruler}</div>
+                    <div className="font-bold text-sm md:text-base leading-none text-white">{selectedZodiac && ZODIAC_SIGNS.find(z=>z.id===selectedZodiac)?.ruler}</div>
                   </div>
                 </div>
                 <div className="bg-white/5 p-4 rounded-2xl flex items-center gap-3 border border-white/5">
                   <Flame className="text-orange-500" size={20}/> 
                   <div className="text-left">
-                    <div className="text-[10px] opacity-40 uppercase leading-none mb-1">Стихія</div>
-                    <div className="font-bold text-sm md:text-base leading-none">{selectedZodiac && ZODIAC_SIGNS.find(z=>z.id===selectedZodiac)?.element}</div>
+                    <div className="text-[10px] opacity-40 uppercase leading-none mb-1 text-white/50">Стихія</div>
+                    <div className="font-bold text-sm md:text-base leading-none text-white">{selectedZodiac && ZODIAC_SIGNS.find(z=>z.id===selectedZodiac)?.element}</div>
                   </div>
                 </div>
               </div>
@@ -290,27 +295,27 @@ export default function App() {
             </div>
 
             <div className="flex flex-col items-center gap-12 mb-20 w-full px-4">
-              <div className="w-full max-w-lg aspect-square rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl shadow-orange-500/20">
+              <div className="w-full max-w-lg aspect-square rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl shadow-orange-500/20 bg-black/20">
                 <img src={result.imageUrl} alt={result.persona} className="w-full h-full object-cover" />
               </div>
               <div className="w-full max-w-md space-y-6">
                 <div className="grid grid-cols-3 gap-3">
-                  <button onClick={()=>shareToPlatform('telegram')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-[#229ED9]/20 transition-all group">
-                    <Send className="text-[#229ED9] group-hover:scale-110 transition-transform" size={20}/>
-                    <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">TG</span>
+                  <button onClick={()=>shareToPlatform('telegram')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-[#229ED9]/20 transition-all group hover:bg-white/10">
+                    <Send className="text-[#229ED9] group-hover:scale-110 transition-transform" size={24}/>
+                    <span className="text-[10px] font-bold opacity-50 uppercase text-white">TG</span>
                   </button>
-                  <button onClick={()=>shareToPlatform('instagram')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-[#E4405F]/20 transition-all group">
-                    <Instagram className="text-[#E4405F] group-hover:scale-110 transition-transform" size={20}/>
-                    <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">IG</span>
+                  <button onClick={()=>shareToPlatform('instagram')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-[#E4405F]/20 transition-all group hover:bg-white/10">
+                    <Instagram className="text-[#E4405F] group-hover:scale-110 transition-transform" size={24}/>
+                    <span className="text-[10px] font-bold opacity-50 uppercase text-white leading-none mt-1">IG</span>
                   </button>
-                  <button onClick={()=>shareToPlatform('tiktok')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-white/10 transition-all group">
+                  <button onClick={()=>shareToPlatform('tiktok')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-white/10 transition-all group hover:bg-white/10">
                     <div className="text-white group-hover:scale-110 transition-transform flex items-center justify-center">
-                      <TikTokIcon size={20} />
+                      <TikTokIcon size={24} />
                     </div>
-                    <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">TikTok</span>
+                    <span className="text-[10px] font-bold opacity-50 uppercase text-white leading-none mt-1">TikTok</span>
                   </button>
                 </div>
-                <button onClick={() => { setStep('hero'); setSelectedZodiac(null); setResult(null); setCurrentQuestionIndex(0); }} className="w-full py-5 bg-white/5 border border-white/10 rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 hover:bg-white/10 transition-all uppercase tracking-widest">Пройти ще раз</button>
+                <button onClick={() => { setStep('hero'); setSelectedZodiac(null); setResult(null); setCurrentQuestionIndex(0); }} className="w-full py-5 bg-white/5 border border-white/10 rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 hover:bg-white/10 transition-all uppercase tracking-widest text-white">Пройти ще раз</button>
               </div>
             </div>
           </div>
@@ -333,6 +338,7 @@ export default function App() {
       </main>
 
       <style>{`
+        .text-glow-orange { text-shadow: 0 0 10px rgba(255, 107, 0, 0.4); }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 107, 0, 0.3); border-radius: 10px; }
       `}</style>
