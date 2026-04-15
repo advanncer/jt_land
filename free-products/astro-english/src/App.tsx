@@ -14,7 +14,9 @@ import {
   Wind,
   Droplets,
   Send,
-  MessageCircle
+  MessageCircle,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import { ZODIAC_SIGNS, QUESTIONS } from './constants';
 import { ZodiacSign, QuizResult } from './types';
@@ -96,7 +98,6 @@ export default function App() {
     if (platform === 'telegram') {
       window.open(`https://t.me/share/url?url=${url}&text=${encodeURIComponent(text)}`, '_blank');
     } else {
-      // For Instagram and TikTok, direct sharing of generated cards via Web Share API is preferred if available
       if (navigator.share) {
         navigator.share({
           title: 'Моє Мовне Альтер-Его',
@@ -139,8 +140,8 @@ export default function App() {
             exit={{ opacity: 0, y: -20 }}
             className="flex-1 flex flex-col items-center justify-center max-w-2xl text-center z-10 w-full"
           >
-            <div className="mb-4">
-              <span className="text-just-orange font-mono text-xs md:text-sm uppercase tracking-[0.2em] bg-just-orange/10 px-4 py-2 rounded-full border border-just-orange/20">
+            <div className="mb-4 flex justify-center">
+              <span className="text-just-orange font-mono text-[9px] md:text-xs uppercase tracking-[0.1em] md:tracking-[0.2em] bg-just-orange/10 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-just-orange/20 inline-block max-w-[90vw] leading-tight">
                 Безкоштовний психологічний тест від JustSchool
               </span>
             </div>
@@ -167,29 +168,29 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.1 }}
-            className="flex-1 flex flex-col w-full max-w-5xl z-10 pt-4 pb-8"
+            className="flex-1 flex flex-col w-full max-w-4xl z-10 pt-4 pb-8"
           >
-            <div className="text-center mb-6 shrink-0">
+            <div className="text-center mb-4 md:mb-6 shrink-0">
               <h2 className="text-2xl md:text-3xl font-display font-bold mb-1">Обери свій знак</h2>
-              <p className="text-white/50 text-sm">Зірки знають про твій English все. Готуйся до правди</p>
+              <p className="text-white/50 text-xs md:text-sm">Зірки знають про твій English все. Готуйся до правди</p>
             </div>
             <div 
               ref={scrollRef}
               className="flex-1 overflow-y-auto pr-2 custom-scrollbar"
             >
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 pb-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-3 pb-4">
                 {ZODIAC_SIGNS.map((zodiac) => (
                   <motion.button
                     key={zodiac.id}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleZodiacSelect(zodiac.id)}
-                    className="glass p-5 md:p-8 rounded-2xl flex flex-col items-center gap-3 md:gap-4 transition-all hover:bg-white/20 group relative overflow-hidden border border-white/5 active:bg-just-orange/20"
+                    className="glass p-3 md:p-4 rounded-xl flex flex-col items-center gap-2 transition-all hover:bg-white/20 group relative overflow-hidden border border-white/5 active:bg-just-orange/20"
                   >
                     <div className="absolute top-0 left-0 w-full h-1 bg-just-orange opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="text-4xl md:text-5xl group-hover:scale-110 transition-transform pointer-events-none">{zodiac.icon}</span>
+                    <span className="text-2xl md:text-3xl group-hover:scale-110 transition-transform pointer-events-none">{zodiac.icon}</span>
                     <div className="text-center pointer-events-none">
-                      <div className="font-bold text-sm md:text-base whitespace-nowrap uppercase tracking-widest">{zodiac.label}</div>
+                      <div className="font-bold text-[10px] md:text-xs whitespace-nowrap uppercase tracking-widest">{zodiac.label}</div>
                     </div>
                   </motion.button>
                 ))}
@@ -289,16 +290,16 @@ export default function App() {
               >
                 Astro-English Identity
               </motion.div>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-white tracking-tight">
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-white tracking-tight leading-tight">
                 {result.persona}
               </h2>
             </div>
 
-            <div className="glass p-5 md:p-6 rounded-[2rem] border-white/5 shadow-2xl relative overflow-hidden mb-6">
+            <div className="glass p-5 md:p-8 rounded-[2rem] border-white/5 shadow-2xl relative overflow-hidden mb-6">
               <div className="absolute top-0 right-0 w-48 h-48 bg-just-orange/5 blur-[80px] -mr-24 -mt-24" />
 
-              <div className="relative space-y-4">
-                <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="relative space-y-6">
+                <div className="grid grid-cols-2 gap-3">
                   <div className="glass-dark p-3 rounded-2xl border-white/5 flex items-center gap-3">
                     <div className="w-8 h-8 rounded-xl bg-just-purple/20 flex items-center justify-center text-just-purple shrink-0">
                       <Star className="w-4 h-4" />
@@ -322,21 +323,43 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="prose prose-invert prose-sm max-w-none text-white/90 leading-relaxed prose-p:mb-3 last:prose-p:mb-0">
-                  <div className="text-just-orange font-bold italic mb-4 text-[10px] md:text-xs border-l-2 border-just-orange pl-3 py-1 uppercase tracking-tight">
-                    «{selectedZodiac && ZODIAC_SIGNS.find(z => z.id === selectedZodiac)?.metaphor}»
+                <div className="space-y-4">
+                  <div className="text-just-orange font-bold italic text-sm md:text-base border-l-2 border-just-orange pl-4 py-1 leading-relaxed">
+                    «{result.motto}»
                   </div>
-                  <div className="text-sm md:text-base">
+                  
+                  <div className="text-white/90 text-sm md:text-base leading-relaxed">
                     <ReactMarkdown>{result.roast}</ReactMarkdown>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10">
-                  <div className="flex items-center gap-2 text-just-yellow font-bold italic mb-2 text-xs md:text-sm">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Твій план навчання:</span>
+                <div className="pt-6 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-just-blue font-bold text-xs uppercase tracking-wider">
+                      <CheckCircle2 className="w-4 h-4" />
+                      Сильні сторони:
+                    </div>
+                    <p className="text-xs md:text-sm text-white/60 leading-relaxed italic">
+                      {result.audit.strengths}
+                    </p>
                   </div>
-                  <div className="prose prose-invert prose-yellow prose-xs sm:prose-sm max-w-none text-white/80 prose-li:my-1">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-just-orange font-bold text-xs uppercase tracking-wider">
+                      <AlertCircle className="w-4 h-4" />
+                      Слабкі сторони:
+                    </div>
+                    <p className="text-xs md:text-sm text-white/60 leading-relaxed italic">
+                      {result.audit.weaknesses}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-white/10">
+                  <div className="flex items-center gap-2 text-just-yellow font-bold italic mb-3 text-sm md:text-base">
+                    <Sparkles className="w-4 h-4" />
+                    <span>Твій план навчання на 16 тижнів:</span>
+                  </div>
+                  <div className="prose prose-invert prose-yellow prose-sm max-w-none text-white/80 prose-li:my-2">
                     <ReactMarkdown>{result.advice}</ReactMarkdown>
                   </div>
                 </div>

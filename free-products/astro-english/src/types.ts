@@ -1,6 +1,6 @@
-export type ZodiacSign = 
-  | 'Aries' | 'Taurus' | 'Gemini' | 'Cancer' 
-  | 'Leo' | 'Virgo' | 'Libra' | 'Scorpio' 
+export type ZodiacSign =
+  | 'Aries' | 'Taurus' | 'Gemini' | 'Cancer'
+  | 'Leo' | 'Virgo' | 'Libra' | 'Scorpio'
   | 'Sagittarius' | 'Capricorn' | 'Aquarius' | 'Pisces';
 
 export interface ZodiacInfo {
@@ -25,7 +25,12 @@ export interface QuizQuestion {
 
 export interface QuizResult {
   persona: string;
+  motto: string;
   roast: string;
+  audit: {
+    strengths: string;
+    weaknesses: string;
+  };
   advice: string;
   imageUrl?: string;
 }
