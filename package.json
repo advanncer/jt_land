@@ -7,15 +7,16 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "redeploy": "echo 'Forcing Vercel to rebuild'"
   },
   "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.4.7",
     "lucide-react": "^0.479.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "react-markdown": "^10.1.0",
-    "clsx": "^2.1.1",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
