@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Sparkles,
   ChevronRight,
@@ -98,6 +98,7 @@ export default function App() {
       "Розраховуємо персональну стратегію на 16 тижнів...",
       "Майже готово! Твій мовний діагноз формується..."
     ];
+    
     let t = 0;
     const tInt = setInterval(() => {
       t = (t + 1) % texts.length;
@@ -112,14 +113,14 @@ export default function App() {
     }, 50);
 
     try {
-      const dataPromise = getAstroResult(selectedZodiac, answers);
+      const data = await getAstroResult(selectedZodiac, answers);
       
       const payload = {
         Name: leadName,
         Phone: leadPhone ? `'+${leadPhone.replace(/\D/g, '')}` : "",
         Email: leadEmail,
         Zodiac: selectedZodiac,
-        Persona: "", // will update later or keep empty for fast sub
+        Persona: data.persona,
         Answear: Object.entries(answers).map(([q, a]) => `${q}: ${a}`).join(" | "),
         Geo: geo,
         ...utmData,
@@ -127,27 +128,20 @@ export default function App() {
         Lead_type: "Astro_English_Quiz"
       };
 
-      // Wait for data and minimum time
-      const [finalData] = await Promise.all([
-        dataPromise,
-        new Promise(res => setTimeout(res, 5000))
-      ]);
-      
-      clearInterval(tInt);
-      clearInterval(pInt);
-      setLoadingProgress(100);
-      
-      // Update payload with real persona
-      payload.Persona = finalData.persona;
-      
-      // Send data
+      // Send data as fast as possible
       fetch(N8N_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).catch(() => {});
       const qp = new URLSearchParams(payload as any).toString();
       fetch(`${GOOGLE_SHEETS_WEBHOOK_URL}?${qp}`, { method: "GET", mode: "no-cors" }).catch(() => {});
 
       if (window.fbq) window.fbq("track", "Lead");
 
-      setResult(finalData);
+      // Wait for min 5 seconds animation
+      await new Promise(res => setTimeout(res, 5000));
+      
+      clearInterval(tInt);
+      clearInterval(pInt);
+      setLoadingProgress(100);
+      setResult(data);
       setStep('result');
       window.scrollTo(0, 0);
 
@@ -184,23 +178,23 @@ export default function App() {
     <div className="min-h-screen w-full bg-[#050505] text-white flex flex-col items-center overflow-x-hidden font-sans">
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-900/10 to-orange-900/10 opacity-50" />
-        <div className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] bg-blue-600/10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[80%] h-[80%] bg-orange-600/10 blur-[150px] rounded-full" />
+        <div className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] bg-blue-600/5 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[80%] h-[80%] bg-orange-600/5 blur-[150px] rounded-full" />
       </div>
 
       <main className="relative z-10 w-full max-w-4xl flex-1 flex flex-col p-4 md:p-6">
-        <AnimatePresence mode="wait">
+        
           {step === 'hero' && (
-            <motion.div key="hero" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col items-center justify-center text-center py-10 px-4">
+            <div className="flex-1 flex flex-col items-center justify-center text-center py-10 px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <span className="text-just-orange font-mono text-[9px] uppercase tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/10 mb-6">Безкоштовний психологічний тест від JustSchool</span>
               <h1 className="text-4xl md:text-7xl font-bold mb-6 tracking-tight">Хто твоє <span className="text-just-orange">"Мовне Альтер-Его"</span>?</h1>
-              <p className="text-gray-400 text-lg md:text-xl mb-10 max-w-2xl">Твій знак зодіаку визначає стиль спілкування. Дізнайся правду та отримай персональний план на 16 тижнів.</p>
+              <p className="text-gray-400 text-lg md:text-xl mb-10 max-w-2xl leading-relaxed">Твій знак зодіаку визначає стиль спілкування. Дізнайся правду та отримай персональний план на 16 тижнів.</p>
               <button onClick={handleStart} className="bg-just-orange px-10 py-5 rounded-full text-xl font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-orange-600/20 flex items-center gap-3">Оберіть свій знак <ChevronRight /></button>
-            </motion.div>
+            </div>
           )}
 
           {step === 'zodiac' && (
-            <motion.div key="zodiac" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="py-6 w-full">
+            <div className="py-6 w-full animate-in fade-in duration-500">
               <h2 className="text-3xl font-bold text-center mb-2">Обери свій знак</h2>
               <p className="text-center text-gray-500 mb-8 text-sm">Зірки знають про твій English все</p>
               <div className="grid grid-cols-3 gap-3 md:gap-6">
@@ -211,11 +205,11 @@ export default function App() {
                   </button>
                 ))}
               </div>
-            </motion.div>
+            </div>
           )}
 
           {step === 'quiz' && (
-            <motion.div key="quiz" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col py-10 max-w-xl mx-auto w-full px-4">
+            <div className="flex-1 flex flex-col py-10 max-w-xl mx-auto w-full px-4 animate-in fade-in slide-in-from-right-4 duration-500">
                <div className="flex justify-between items-center mb-6">
                  <button onClick={() => setStep('zodiac')} className="text-gray-500 flex items-center gap-1"><ArrowLeft size={16}/> Назад</button>
                  <span className="text-just-orange font-mono">{currentQuestionIndex+1}/{QUESTIONS.length}</span>
@@ -231,38 +225,38 @@ export default function App() {
                    ))}
                  </div>
                </div>
-            </motion.div>
+            </div>
           )}
 
           {step === 'loading' && (
-            <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col items-center justify-center text-center py-20 px-6">
+            <div className="flex-1 flex flex-col items-center justify-center text-center py-20 px-6 animate-in fade-in duration-500">
               <Loader2 className="w-16 h-16 text-just-orange animate-spin mb-8" />
               <h2 className="text-xl md:text-3xl font-bold mb-6 h-20 flex items-center justify-center leading-tight">{loadingText}</h2>
               <div className="w-64 h-2 bg-white/10 rounded-full overflow-hidden mb-2">
                 <div className="h-full bg-just-orange transition-all duration-300" style={{ width: `${loadingProgress}%` }} />
               </div>
               <span className="text-just-orange font-mono font-bold">{loadingProgress}%</span>
-            </motion.div>
+            </div>
           )}
 
           {step === 'lead' && (
-            <motion.div key="lead" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col items-center justify-center py-10 w-full max-w-md mx-auto px-4">
+            <div className="flex-1 flex flex-col items-center justify-center py-10 w-full max-w-md mx-auto px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="bg-white/5 p-8 md:p-12 rounded-[3rem] border border-white/10 text-center w-full backdrop-blur-3xl shadow-2xl">
                 <Sparkles className="w-12 h-12 text-just-orange mx-auto mb-6"/>
                 <h2 className="text-3xl font-bold mb-2">Майже готово!</h2>
                 <p className="text-gray-400 mb-8 text-sm px-4">Залиш контакти, щоб отримати свій зірковий розбір</p>
                 <form onSubmit={handleLeadSubmit} className="space-y-4">
-                  <input type="text" placeholder="Ім'я" required className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-orange-500 text-white" value={leadName} onChange={e => setLeadName(e.target.value)} />
-                  <input type="tel" placeholder="+380 (XX) XXX-XX-XX" required className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-orange-500 text-white" value={leadPhone} onChange={e => setLeadPhone(formatPhoneNumber(e.target.value))} />
-                  <input type="email" placeholder="Email" required className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-orange-500 text-white" value={leadEmail} onChange={e => setLeadEmail(e.target.value)} />
+                  <input type="text" placeholder="Ім'я" required className="w-full p-4 rounded-2xl bg-black/30 border border-white/10 outline-none focus:border-orange-500 text-white" value={leadName} onChange={e => setLeadName(e.target.value)} />
+                  <input type="tel" placeholder="+380 (XX) XXX-XX-XX" required className="w-full p-4 rounded-2xl bg-black/30 border border-white/10 outline-none focus:border-orange-500 text-white" value={leadPhone} onChange={e => setLeadPhone(formatPhoneNumber(e.target.value))} />
+                  <input type="email" placeholder="Email" required className="w-full p-4 rounded-2xl bg-black/30 border border-white/10 outline-none focus:border-orange-500 text-white" value={leadEmail} onChange={e => setLeadEmail(e.target.value)} />
                   <button type="submit" disabled={leadPhone.replace(/\D/g,'').length!==12} className="w-full p-5 bg-just-orange rounded-2xl font-bold text-xl active:scale-95 transition-all shadow-lg shadow-orange-600/30 disabled:opacity-30">Дізнатися тип</button>
                 </form>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {step === 'result' && result && (
-            <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full flex flex-col py-8 px-4 pb-40">
+            <div className="w-full flex flex-col py-8 px-4 pb-40 animate-in fade-in slide-in-from-bottom-8 duration-1000">
               <div className="text-center mb-10">
                 <span className="text-just-yellow font-mono text-[10px] tracking-[0.4em] uppercase">Astro-English Identity</span>
                 <h2 className="text-4xl md:text-7xl font-bold uppercase mt-2 leading-tight">{result.persona}</h2>
@@ -308,24 +302,30 @@ export default function App() {
                   <div className="grid grid-cols-3 gap-3">
                     <button onClick={()=>shareToPlatform('telegram')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-[#229ED9]/20 transition-all group">
                       <Send className="text-[#229ED9] group-hover:scale-110 transition-transform" size={24}/>
-                      <span className="text-[10px] font-bold opacity-50">TG</span>
+                      <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">TG</span>
                     </button>
                     <button onClick={()=>shareToPlatform('instagram')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-[#E4405F]/20 transition-all group">
                       <Instagram className="text-[#E4405F] group-hover:scale-110 transition-transform" size={24}/>
-                      <span className="text-[10px] font-bold opacity-50">IG</span>
+                      <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">Instagram</span>
                     </button>
                     <button onClick={()=>shareToPlatform('tiktok')} className="aspect-square bg-white/5 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/5 active:bg-white/10 transition-all group">
                       <TikTokIcon className="text-white group-hover:scale-110 transition-transform" size={24} />
-                      <span className="text-[10px] font-bold opacity-50">TIKTOK</span>
+                      <span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">TikTok</span>
                     </button>
                   </div>
                   <button onClick={reset} className="w-full py-5 bg-white/5 border border-white/10 rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 hover:bg-white/10 transition-all"><RefreshCw size={18}/> Пройти тест ще раз</button>
                 </div>
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        
       </main>
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 107, 0, 0.3); border-radius: 10px; }
+        .font-display { font-family: system-ui, -apple-system, sans-serif; }
+      `}</style>
     </div>
   );
 }
