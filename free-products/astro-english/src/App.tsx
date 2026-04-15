@@ -14,9 +14,7 @@ import {
   Wind,
   Droplets,
   Send,
-  MessageCircle,
-  CheckCircle2,
-  AlertCircle
+  Instagram
 } from 'lucide-react';
 import { ZODIAC_SIGNS, QUESTIONS } from './constants';
 import { ZodiacSign, QuizResult } from './types';
@@ -42,6 +40,13 @@ const formatPhoneNumber = (value: string) => {
     }
     return formatted;
 };
+
+// Custom TikTok Icon
+const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47V14.42a6.72 6.72 0 01-1.3 4.2 6.6 6.6 0 01-4.7 2.4c-1.3.12-2.67-.14-3.83-.8a6.53 6.53 0 01-3.23-4.22 6.64 6.64 0 014.24-7.54c.73-.25 1.5-.39 2.27-.42v4.05c-.42.01-.84.1-1.23.28a2.53 2.53 0 00-1.43 2.2c-.01.55.2 1.11.6 1.48.42.39.99.59 1.56.57a2.55 2.55 0 002.5-2.5V0z"/>
+  </svg>
+);
 
 export default function App() {
   const [step, setStep] = useState<'hero' | 'zodiac' | 'quiz' | 'loading' | 'result' | 'lead'>('hero');
@@ -87,7 +92,7 @@ export default function App() {
       const textInterval = setInterval(() => {
         textIdx = (textIdx + 1) % texts.length;
         setLoadingText(texts[textIdx]);
-      }, 700);
+      }, 1000); // 1 second per text for readability
 
       const progressInterval = setInterval(() => {
         setLoadingProgress((prev) => {
@@ -98,7 +103,7 @@ export default function App() {
           }
           return prev + 1;
         });
-      }, 30); // ~3 seconds total
+      }, 50); // ~5 seconds total (50ms * 100 steps)
 
       return () => {
         clearInterval(progressInterval);
@@ -158,24 +163,23 @@ export default function App() {
           mode: "no-cors"
         }).catch(console.error);
 
-        // Transition to result only after progress is 100
-        const checkReady = setInterval(() => {
-           setLoadingProgress(p => {
-             if (p >= 100) {
-               clearInterval(checkReady);
-               setStep('result');
-               window.scrollTo(0, 0);
-             }
-             return p;
-           });
-        }, 100);
-
+        // Transition logic handled by progress watcher in useEffect if needed, or simple check here
       } catch (error) {
         console.error("Failed", error);
         setStep('hero');
       }
     }
   };
+
+  // Watcher to finish loading
+  useEffect(() => {
+    if (step === 'loading' && loadingProgress >= 100 && result) {
+      setTimeout(() => {
+        setStep('result');
+        window.scrollTo(0, 0);
+      }, 500);
+    }
+  }, [loadingProgress, result, step]);
 
   const handleLeadSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,15 +196,17 @@ export default function App() {
   };
 
   const shareToPlatform = (platform: 'telegram' | 'instagram' | 'tiktok') => {
-    const text = `Мій мовний тип: ${result?.persona}! Дізнайся свій тип за посиланням: ${window.location.href}`;
-    const url = encodeURIComponent(window.location.href);
+    const title = 'Хто твоє "Мовне Альтер-Его"?';
+    const text = `${title}\n\nМій мовний тип: ${result?.persona}! Дізнайся свій тип за посиланням:`;
+    const url = window.location.origin + window.location.pathname;
+    
     if (platform === 'telegram') {
-      window.open(`https://t.me/share/url?url=${url}&text=${encodeURIComponent(text)}`, '_blank');
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
     } else if (navigator.share) {
-      navigator.share({ title: 'Моє Мовне Альтер-Его', text: text, url: window.location.href }).catch(console.error);
+      navigator.share({ title: title, text: text, url: url }).catch(console.error);
     } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert("Посилання скопійовано!");
+      navigator.clipboard.writeText(`${text} ${url}`);
+      alert("Текст та посилання скопійовано!");
     }
   };
 
@@ -274,7 +280,7 @@ export default function App() {
                 <Loader2 className="w-20 h-20 text-just-orange animate-spin" />
                 <div className="absolute inset-0 blur-2xl bg-just-orange/30 animate-pulse" />
               </div>
-              <div className="h-20 flex items-center justify-center">
+              <div className="h-24 flex items-center justify-center">
                 <motion.h2 
                   key={loadingText}
                   initial={{ opacity: 0, y: 10 }}
@@ -321,9 +327,18 @@ export default function App() {
                 </div>
                 <div className="w-full max-w-md space-y-4 px-4">
                   <div className="grid grid-cols-3 gap-3">
-                    <button onClick={() => shareToPlatform('telegram')} className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 border border-white/5 active:scale-95"><Send className="w-6 h-6 text-[#229ED9]" /> <span className="text-[10px] font-bold opacity-50">TG</span></button>
-                    <button onClick={() => shareToPlatform('instagram')} className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 border border-white/5 active:scale-95"><MessageCircle className="w-6 h-6 text-[#E4405F]" /> <span className="text-[10px] font-bold opacity-50">IG</span></button>
-                    <button onClick={() => shareToPlatform('tiktok')} className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 border border-white/5 active:scale-95"><Share2 className="w-6 h-6 text-[#00f2ea]" /> <span className="text-[10px] font-bold opacity-50">TIKTOK</span></button>
+                    <button onClick={() => shareToPlatform('telegram')} className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-[#229ED9]/20 border border-white/5 active:scale-95">
+                      <Send className="w-6 h-6 text-[#229ED9]" /> 
+                      <span className="text-[10px] font-bold opacity-70">TG</span>
+                    </button>
+                    <button onClick={() => shareToPlatform('instagram')} className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-[#E4405F]/20 border border-white/5 active:scale-95">
+                      <Instagram className="w-6 h-6 text-[#E4405F]" /> 
+                      <span className="text-[10px] font-bold opacity-70">IG</span>
+                    </button>
+                    <button onClick={() => shareToPlatform('tiktok')} className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 border border-white/5 active:scale-95">
+                      <TikTokIcon className="w-6 h-6 text-white" /> 
+                      <span className="text-[10px] font-bold opacity-70">TIKTOK</span>
+                    </button>
                   </div>
                   <button onClick={() => { setStep('hero'); setSelectedZodiac(null); }} className="w-full py-5 glass border border-white/10 text-white font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2 active:scale-95"><RefreshCw className="w-5 h-5" /> Пройти тест ще раз</button>
                 </div>
