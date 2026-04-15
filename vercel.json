@@ -45,11 +45,11 @@
       "destination": "/eng-adult/lp_pains/:path*"
     },
     {
-      "source": "/free-product",
+      "source": "/free-products/astro-english",
       "destination": "/free-products/astro-english/index.html"
     },
     {
-      "source": "/free-product/:path*",
+      "source": "/free-products/astro-english/:path*",
       "destination": "/free-products/astro-english/:path*"
     }
   ],
@@ -76,7 +76,7 @@
     },
     {
       "source": "/freeproduct",
-      "destination": "/free-product",
+      "destination": "/free-products/astro-english",
       "permanent": true
     }
   ]
