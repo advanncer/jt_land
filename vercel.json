@@ -46,11 +46,11 @@
     },
     {
       "source": "/free-product",
-      "destination": "/free-products/free-product/index.html"
+      "destination": "/free-products/astro-english/index.html"
     },
     {
       "source": "/free-product/:path*",
-      "destination": "/free-products/free-product/:path*"
+      "destination": "/free-products/astro-english/:path*"
     }
   ],
   "redirects": [
