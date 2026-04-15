@@ -50,6 +50,7 @@ export default function App() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [result, setResult] = useState<QuizResult | null>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingText, setLoadingText] = useState('З’єднуємося з космічним сервером...');
   const [leadName, setLeadName] = useState('');
   const [leadPhone, setLeadPhone] = useState('');
   const [leadEmail, setLeadEmail] = useState('');
@@ -74,16 +75,35 @@ export default function App() {
 
   useEffect(() => {
     if (step === 'loading') {
-      const interval = setInterval(() => {
+      const texts = [
+        "Аналізуємо твій зірковий шлях...",
+        "Поки ти чекаєш, 500 учнів JustSchool вже вивчили по 10 нових слів 🚀",
+        "Зіставляємо твій ретроградний Меркурій з рівнем Grammar...",
+        "Розраховуємо персональну стратегію на 16 тижнів...",
+        "Майже готово! Твій мовний діагноз формується..."
+      ];
+      
+      let textIdx = 0;
+      const textInterval = setInterval(() => {
+        textIdx = (textIdx + 1) % texts.length;
+        setLoadingText(texts[textIdx]);
+      }, 700);
+
+      const progressInterval = setInterval(() => {
         setLoadingProgress((prev) => {
           if (prev >= 100) {
-            clearInterval(interval);
+            clearInterval(progressInterval);
+            clearInterval(textInterval);
             return 100;
           }
-          return prev + 2;
+          return prev + 1;
         });
-      }, 30);
-      return () => clearInterval(interval);
+      }, 30); // ~3 seconds total
+
+      return () => {
+        clearInterval(progressInterval);
+        clearInterval(textInterval);
+      };
     }
   }, [step]);
 
@@ -122,14 +142,12 @@ export default function App() {
           Lead_type: "Astro_English_Quiz"
         };
 
-        // n8n
         fetch(N8N_WEBHOOK_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         }).catch(console.error);
 
-        // Google Sheets (as GET query params)
         const queryParams = new URLSearchParams();
         Object.entries(payload).forEach(([key, val]) => {
           queryParams.append(key, String(val));
@@ -140,8 +158,18 @@ export default function App() {
           mode: "no-cors"
         }).catch(console.error);
 
-        setStep('result');
-        window.scrollTo(0, 0);
+        // Transition to result only after progress is 100
+        const checkReady = setInterval(() => {
+           setLoadingProgress(p => {
+             if (p >= 100) {
+               clearInterval(checkReady);
+               setStep('result');
+               window.scrollTo(0, 0);
+             }
+             return p;
+           });
+        }, 100);
+
       } catch (error) {
         console.error("Failed", error);
         setStep('hero');
@@ -187,7 +215,7 @@ export default function App() {
         <AnimatePresence mode="wait">
           {step === 'hero' && (
             <motion.div key="hero" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-              className="flex-1 flex flex-col items-center justify-center text-center py-10">
+              className="flex-1 flex flex-col items-center justify-center text-center py-10 px-4">
               <div className="mb-6">
                 <span className="text-just-orange font-mono text-[8px] md:text-xs uppercase tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/10">
                   Безкоштовний психологічний тест від JustSchool
@@ -241,10 +269,25 @@ export default function App() {
           )}
 
           {step === 'loading' && (
-            <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col items-center justify-center text-center">
-              <div className="mb-8 relative"><Loader2 className="w-20 h-20 text-just-orange animate-spin" /><div className="absolute inset-0 blur-xl bg-just-orange/20" /></div>
-              <h2 className="text-3xl font-display font-bold mb-4">Аналізуємо твій шлях...</h2>
-              <div className="w-64 h-2 bg-white/10 rounded-full overflow-hidden mb-4"><motion.div className="h-full bg-just-orange" initial={{ width: 0 }} animate={{ width: `${loadingProgress}%` }} /></div>
+            <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col items-center justify-center text-center py-20 px-6">
+              <div className="mb-10 relative">
+                <Loader2 className="w-20 h-20 text-just-orange animate-spin" />
+                <div className="absolute inset-0 blur-2xl bg-just-orange/30 animate-pulse" />
+              </div>
+              <div className="h-20 flex items-center justify-center">
+                <motion.h2 
+                  key={loadingText}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-xl md:text-3xl font-display font-bold max-w-md mx-auto"
+                >
+                  {loadingText}
+                </motion.h2>
+              </div>
+              <div className="w-full max-w-sm h-3 bg-white/5 rounded-full overflow-hidden mt-8 border border-white/10">
+                <motion.div className="h-full bg-gradient-to-r from-just-orange to-just-yellow shadow-[0_0_20px_rgba(255,107,0,0.5)]" initial={{ width: 0 }} animate={{ width: `${loadingProgress}%` }} />
+              </div>
+              <p className="text-just-orange font-bold mt-4 font-mono">{loadingProgress}%</p>
             </motion.div>
           )}
 
@@ -276,7 +319,7 @@ export default function App() {
                 <div className="relative w-72 h-72 md:w-96 md:h-96 rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl">
                   <img src={result.imageUrl} alt={result.persona} className="w-full h-full object-cover" />
                 </div>
-                <div className="w-full max-w-md space-y-4">
+                <div className="w-full max-w-md space-y-4 px-4">
                   <div className="grid grid-cols-3 gap-3">
                     <button onClick={() => shareToPlatform('telegram')} className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 border border-white/5 active:scale-95"><Send className="w-6 h-6 text-[#229ED9]" /> <span className="text-[10px] font-bold opacity-50">TG</span></button>
                     <button onClick={() => shareToPlatform('instagram')} className="p-5 glass rounded-2xl flex flex-col items-center gap-2 hover:bg-white/10 border border-white/5 active:scale-95"><MessageCircle className="w-6 h-6 text-[#E4405F]" /> <span className="text-[10px] font-bold opacity-50">IG</span></button>
@@ -293,8 +336,8 @@ export default function App() {
               <div className="glass p-8 md:p-10 rounded-[3rem] border border-white/10 bg-black/40 backdrop-blur-3xl text-center">
                 <Sparkles className="w-16 h-16 text-just-orange mx-auto mb-6" />
                 <h2 className="text-3xl font-display font-bold mb-3">Майже готово! ✨</h2>
-                <p className="text-white/50 text-sm mb-8">Залиш контакти, щоб отримати свій зірковий розбір</p>
-                <form onSubmit={handleLeadSubmit} className="space-y-4">
+                <p className="text-white/50 text-sm mb-8 px-4">Залиш контакти, щоб отримати свій зірковий розбір</p>
+                <form onSubmit={handleLeadSubmit} className="space-y-4 px-2">
                   <input type="text" placeholder="Твоє ім'я" required value={leadName} onChange={(e) => setLeadName(e.target.value)}
                     className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-just-orange outline-none transition-all text-white" />
                   <input type="tel" placeholder="+380 (XX) XXX-XX-XX" required value={leadPhone} onChange={handlePhoneChange} maxLength={19}
