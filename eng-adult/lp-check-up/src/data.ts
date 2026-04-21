@@ -1,8 +1,8 @@
-import review1 from "/reviews/1123.jpg";
-import review2 from "/reviews/2149064545.jpg";
-import review3 from "/reviews/2149283315.jpg";
-import review4 from "/reviews/2392.jpg";
-import review5 from "/reviews/7622.jpg";
+import review1 from "./assets/reviews/1123.jpg";
+import review2 from "./assets/reviews/2149064545.jpg";
+import review3 from "./assets/reviews/2149283315.jpg";
+import review4 from "./assets/reviews/2392.jpg";
+import review5 from "./assets/reviews/7622.jpg";
 
 export interface QuizOption {
   label: string;
