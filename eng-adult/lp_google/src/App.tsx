@@ -134,6 +134,18 @@ export default function App() {
   const [leadEmail, setLeadEmail] = useState("");
   const [loaderProgress, setLoaderProgress] = useState(0);
 
+  useEffect(() => {
+    let link: HTMLLinkElement | null =
+      document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = "/favicon.svg";
+    link.type = "image/svg+xml";
+  }, []);
+
   const currentStep = quizData.find((s) => s.step === step);
   const totalQuestions = quizData.filter(
     (s) => s.type === "choice" || s.type === "testimonials_interstitial",
