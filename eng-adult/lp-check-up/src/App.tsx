@@ -56,20 +56,6 @@ import {
 } from "lucide-react";
 import { quizData } from "./data";
 
-import reviewPhoto1 from "/reviews/1123.jpg";
-import reviewPhoto2 from "/reviews/2149064545.jpg";
-import reviewPhoto3 from "/reviews/2149283315.jpg";
-import reviewPhoto4 from "/reviews/2392.jpg";
-import reviewPhoto5 from "/reviews/7622.jpg";
-
-const reviewPhotos = [
-  reviewPhoto1,
-  reviewPhoto2,
-  reviewPhoto3,
-  reviewPhoto4,
-  reviewPhoto5,
-];
-
 declare global {
   interface Window {
     fbq: (...args: any[]) => void;
@@ -391,14 +377,14 @@ export default function App() {
                   currentStep.reviews && (
                     <div className="mb-6 flex-1 flex flex-col min-h-0">
                       <div className="flex overflow-x-auto gap-4 pb-6 custom-scrollbar -mx-4 px-4 snap-x snap-mandatory flex-1 items-center">
-                        {currentStep.reviews.map((rev, index) => (
+                        {currentStep.reviews.map((rev) => (
                           <div
                             key={rev.name}
                             className="bg-white p-5 rounded-3xl border border-slate-100 text-left shrink-0 w-[85%] max-w-[280px] shadow-sm snap-center relative flex flex-col h-full"
                           >
                             <div className="flex items-center gap-3 mb-3">
                               <img
-                                src={reviewPhotos[index % reviewPhotos.length]}
+                                src={rev.photoUrl}
                                 className="w-10 h-10 rounded-full object-cover object-center"
                               />
                               <div className="font-black text-sm text-slate-900">
