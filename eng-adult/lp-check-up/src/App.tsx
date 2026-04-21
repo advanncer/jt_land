@@ -56,6 +56,12 @@ import {
 } from "lucide-react";
 import { quizData } from "./data";
 
+declare global {
+  interface Window {
+    fbq: (...args: any[]) => void;
+  }
+}
+
 const GOOGLE_SHEETS_WEBHOOK_URL =
   "https://script.google.com/macros/s/AKfycbzjHz2H9Am5CfJ6dtrvu82h9Vr0bi_lc6eb6Ljm-jEuqHcz-UIdEXHcx4lhL-uDVjTmZA/exec";
 
@@ -180,6 +186,10 @@ export default function App() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (window.fbq) {
+      window.fbq("track", "Purchase", { currency: "UAH", value: 0 });
+    }
 
     let ipData = { ip: "unknown", country: "unknown" };
     try {
