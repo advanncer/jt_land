@@ -56,6 +56,20 @@ import {
 } from "lucide-react";
 import { quizData } from "./data";
 
+import reviewPhoto1 from "/reviews/1123.jpg";
+import reviewPhoto2 from "/reviews/2149064545.jpg";
+import reviewPhoto3 from "/reviews/2149283315.jpg";
+import reviewPhoto4 from "/reviews/2392.jpg";
+import reviewPhoto5 from "/reviews/7622.jpg";
+
+const reviewPhotos = [
+  reviewPhoto1,
+  reviewPhoto2,
+  reviewPhoto3,
+  reviewPhoto4,
+  reviewPhoto5,
+];
+
 declare global {
   interface Window {
     fbq: (...args: any[]) => void;
@@ -377,15 +391,15 @@ export default function App() {
                   currentStep.reviews && (
                     <div className="mb-6 flex-1 flex flex-col min-h-0">
                       <div className="flex overflow-x-auto gap-4 pb-6 custom-scrollbar -mx-4 px-4 snap-x snap-mandatory flex-1 items-center">
-                        {currentStep.reviews.map((rev) => (
+                        {currentStep.reviews.map((rev, index) => (
                           <div
                             key={rev.name}
                             className="bg-white p-5 rounded-3xl border border-slate-100 text-left shrink-0 w-[85%] max-w-[280px] shadow-sm snap-center relative flex flex-col h-full"
                           >
                             <div className="flex items-center gap-3 mb-3">
                               <img
-                                src={rev.photoUrl}
-                                className="w-10 h-10 rounded-full object-cover"
+                                src={reviewPhotos[index % reviewPhotos.length]}
+                                className="w-10 h-10 rounded-full object-cover object-center"
                               />
                               <div className="font-black text-sm text-slate-900">
                                 {rev.name}
@@ -405,7 +419,9 @@ export default function App() {
                   )}
 
                 <div
-                  className={`grid gap-2.5 w-full ${currentStep.type === "choice" ? "mt-auto" : ""} pb-4`}
+                  className={`grid gap-2.5 w-full ${
+                    currentStep.type === "choice" ? "mt-auto" : ""
+                  } pb-4`}
                 >
                   {currentStep.options?.map((opt) => {
                     const OptIcon = opt.icon ? icons[opt.icon] : null;
@@ -598,10 +614,18 @@ export default function App() {
                   {currentStep.points?.map((p, i) => (
                     <div
                       key={p}
-                      className={`flex items-center gap-4 text-[10px] font-black uppercase tracking-wider transition-opacity duration-500 ${loaderProgress > i * 25 ? "text-slate-900" : "text-slate-200"}`}
+                      className={`flex items-center gap-4 text-[10px] font-black uppercase tracking-wider transition-opacity duration-500 ${
+                        loaderProgress > i * 25
+                          ? "text-slate-900"
+                          : "text-slate-200"
+                      }`}
                     >
                       <div
-                        className={`w-2 h-2 rounded-full shrink-0 ${loaderProgress > i * 25 ? "bg-orange-500" : "bg-slate-200"}`}
+                        className={`w-2 h-2 rounded-full shrink-0 ${
+                          loaderProgress > i * 25
+                            ? "bg-orange-500"
+                            : "bg-slate-200"
+                        }`}
                       />
                       {p}
                     </div>
