@@ -16,7 +16,14 @@ export interface QuizStep {
   title?: string;
   subtitle?: string;
   subtext?: string;
-  type: 'hero' | 'choice' | 'testimonials_interstitial' | 'loader' | 'program_ready' | 'lead_name' | 'lead_contacts';
+  type:
+    | "hero"
+    | "choice"
+    | "testimonials_interstitial"
+    | "loader"
+    | "program_ready"
+    | "lead_name"
+    | "lead_contacts";
   icon?: string;
   options?: QuizOption[];
   points?: string[];
@@ -37,9 +44,10 @@ export interface QuizStep {
 export const quizData: QuizStep[] = [
   {
     step: 1,
-    type: 'hero',
+    type: "hero",
     question: "Заговори англійською вільно — з JustSchool",
-    subtext: "Наші студенти виходять на новий рівень та долають мовний бар'єр вже за перший місяць. Почни говорити з перших хвилин на інтерактивній платформі, що підлаштовується під твій темп. Пройди тест, дізнайся свій рівень та отримай персональний план навчання.",
+    subtext:
+      "Наші студенти виходять на новий рівень та долають мовний бар'єр вже за перший місяць. Почни говорити з перших хвилин на інтерактивній платформі, що підлаштовується під твій темп. Пройди тест, дізнайся свій рівень та отримай персональний план навчання.",
     social_proof: "🎓 Вибір 100 000+ студентів по всьому світу",
     pre_cta: "Лише 30 секунд, щоб дізнатися рівень:",
     cta: "Пройти тест",
@@ -47,238 +55,390 @@ export const quizData: QuizStep[] = [
     points: [
       "Почни говорити з перших хвилин",
       "Навчайся на інтерактивній платформі",
-      "Отримай персональний план навчання"
-    ]
+      "Отримай персональний план навчання",
+    ],
   },
   {
     step: 2,
-    type: 'choice',
-    icon: 'Users',
+    type: "choice",
+    icon: "Users",
     question: "Для кого ви обираєте навчання?",
     options: [
       { label: "Для себе", value: "self", icon: "User" },
-      { label: "Для дитини", value: "child", icon: "Smile" },
-      { label: "Для всієї родини", value: "family", icon: "Home" }
-    ]
+      { label: "Для дитини", value: "child", icon: "Gift" },
+      { label: "Для всієї родини", value: "family", icon: "Group" },
+    ],
   },
   {
     step: 3,
-    type: 'choice',
-    icon: 'Cake',
+    type: "choice",
+    icon: "Cake",
     question: "Вкажіть ваш вік",
-    subtext: "Вік — це лише цифра! У нас є студенти від 5 до 65 років. Головне — ваше бажання вчитися, а комфортний темп ми забезпечимо.",
+    subtext:
+      "Вік — це лише цифра! У нас є студенти від 5 до 65 років. Головне — ваше бажання вчитися, а комфортний темп ми забезпечимо.",
     options: [
       { label: "Менше 18", value: "u18", icon: "Sunrise" },
       { label: "18-24", value: "18-24", icon: "Sun" },
       { label: "25-35", value: "25-35", icon: "Sunset" },
-      { label: "35+", value: "35+", icon: "Moon" }
-    ]
+      { label: "35+", value: "35+", icon: "Moon" },
+    ],
   },
   {
     step: 4,
-    type: 'choice',
-    icon: 'Target',
+    type: "choice",
+    icon: "Target",
     question: "Яка ваша головна мета?",
     options: [
       { label: "Кар'єра та робота", value: "career", icon: "Briefcase" },
-      { label: "Подорожі та життя за кордоном", value: "travel", icon: "Globe2" },
-      { label: "Вільне спілкування для себе", value: "free", icon: "MessageCircle" },
-      { label: "Підготовка до іспитів (IELTS/НМТ)", value: "exams", icon: "BookOpen" }
-    ]
+      {
+        label: "Подорожі та життя за кордоном",
+        value: "travel",
+        icon: "Globe2",
+      },
+      {
+        label: "Вільне спілкування для себе",
+        value: "free",
+        icon: "MessageSquare",
+      },
+      {
+        label: "Підготовка до іспитів (IELTS/НМТ)",
+        value: "exams",
+        icon: "BookOpen",
+      },
+    ],
   },
   {
     step: 5,
-    type: 'choice',
-    icon: 'BarChart3',
+    type: "choice",
+    icon: "BarChart3",
     question: "Як би ви оцінили свій поточний рівень?",
-    subtext: "Не хвилюйтеся, якщо ви починаєте з нуля. Ми допоможемо побудувати фундамент, на якому ви впевнено заговорите англійською.",
+    subtext:
+      "Не хвилюйтеся, якщо ви починаєте з нуля. Ми допоможемо побудувати фундамент, на якому ви впевнено заговорите англійською.",
     options: [
       { label: "Починаю з нуля", value: "zero", icon: "Battery" },
-      { label: "Вчив у школі, але нічого не пам'ятаю", value: "school", icon: "BatteryLow" },
-      { label: "Розумію, але важко розмовляти", value: "passive", icon: "BatteryMedium" },
-      { label: "Впевнений середній рівень", value: "intermediate", icon: "BatteryFull" }
-    ]
+      {
+        label: "Вчив у школі, але нічого не пам'ятаю",
+        value: "school",
+        icon: "BatteryLow",
+      },
+      {
+        label: "Розумію, але важко розмовляти",
+        value: "passive",
+        icon: "BatteryMedium",
+      },
+      {
+        label: "Впевнений середній рівень",
+        value: "intermediate",
+        icon: "BatteryFull",
+      },
+    ],
   },
   {
     step: 6,
-    type: 'testimonials_interstitial',
-    icon: 'Heart',
+    type: "testimonials_interstitial",
+    icon: "Heart",
     title: "Наші студенти вже досягають своїх цілей. Ви — наступні!",
-    subtitle: "Подивіться, як наші студенти апгрейднули свою англійську та змінили життя:",
+    subtitle:
+      "Подивіться, як наші студенти апгрейднули свою англійську та змінили життя:",
     reviews: [
-      { name: "Аліна", text: "JustSchool — це любов! За 2 місяці занять я подолала мовний бар'єр і успішно пройшла співбесіду. Платформа просто неймовірна, все в одному місці!", photoUrl: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=800" },
-      { name: "Ігор", text: "Формат ідеально підійшов для мого щільного графіка. Дуже багато розмовної практики на кожному уроці, ніякої сухої теорії. Бачу реальний прогрес.", photoUrl: "https://images.pexels.com/photos/937481/pexels-photo-937481.jpeg?auto=compress&cs=tinysrgb&w=800" },
-      { name: "Сергій", text: "Спершу сумнівався, чи онлайн-навчання для мене, але після пробного уроку всі страхи зникли. Методист підібрав крутого викладача!", photoUrl: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=800" },
-      { name: "Марина", text: "Мені подобається, що в JustSchool ми не просто зубримо правила, а реально розмовляємо. Моя впевненість під час дзвінків з іноземними колегами зросла в рази.", photoUrl: "https://images.pexels.com/photos/1181519/pexels-photo-1181519.jpeg?auto=compress&cs=tinysrgb&w=800" },
-      { name: "Дмитро", text: "Додаток — це знахідка! Вчу слова в метро, а ввечері практикую їх на уроці. Дуже зручно, сучасно та ефективно, рекомендую всім.", photoUrl: "https://images.pexels.com/photos/846741/pexels-photo-846741.jpeg?auto=compress&cs=tinysrgb&w=800" }
+      {
+        name: "Аліна",
+        text: "JustSchool — це любов! За 2 місяці занять я подолала мовний бар'єр і успішно пройшла співбесіду. Платформа просто неймовірна, все в одному місці!",
+        photoUrl:
+          "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=800",
+      },
+      {
+        name: "Ігор",
+        text: "Формат ідеально підійшов для мого щільного графіка. Дуже багато розмовної практики на кожному уроці, ніякої сухої теорії. Бачу реальний прогрес.",
+        photoUrl:
+          "https://images.pexels.com/photos/937481/pexels-photo-937481.jpeg?auto=compress&cs=tinysrgb&w=800",
+      },
+      {
+        name: "Сергій",
+        text: "Спершу сумнівався, чи онлайн-навчання для мене, але після пробного уроку всі страхи зникли. Методист підібрав крутого викладача!",
+        photoUrl:
+          "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=800",
+      },
+      {
+        name: "Марина",
+        text: "Мені подобається, що в JustSchool ми не просто зубримо правила, а реально розмовляємо. Моя впевненість під час дзвінків з іноземними колегами зросла в рази.",
+        photoUrl:
+          "https://images.pexels.com/photos/1181519/pexels-photo-1181519.jpeg?auto=compress&cs=tinysrgb&w=800",
+      },
+      {
+        name: "Дмитро",
+        text: "Додаток — це знахідка! Вчу слова в метро, а ввечері практикую їх на уроці. Дуже зручно, сучасно та ефективно, рекомендую всім.",
+        photoUrl:
+          "https://images.pexels.com/photos/846741/pexels-photo-846741.jpeg?auto=compress&cs=tinysrgb&w=800",
+      },
     ],
-    cta: "Продовжити тест"
+    cta: "Продовжити тест",
   },
   {
     step: 7,
-    type: 'choice',
-    icon: 'LayoutGrid',
+    type: "choice",
+    icon: "LayoutGrid",
     question: "Який формат занять для вас найзручніший?",
     options: [
       { label: "Індивідуально з вчителем", value: "solo", icon: "User" },
-      { label: "У невеликій групі (до 4-х людей)", value: "group", icon: "Users" },
-      { label: "Самостійно на платформі", value: "self-study", icon: "PlaySquare" },
-      { label: "Ще не визначився", value: "unsure", icon: "HelpCircle" }
-    ]
+      {
+        label: "У невеликій групі (до 4-х людей)",
+        value: "group",
+        icon: "Users",
+      },
+      {
+        label: "Самостійно на платформі",
+        value: "self-study",
+        icon: "PlaySquare",
+      },
+      { label: "Ще не визначився", value: "unsure", icon: "HelpCircle" },
+    ],
   },
   {
     step: 8,
-    type: 'choice',
-    icon: 'Frown',
+    type: "choice",
+    icon: "Frown",
     question: "Що було найскладнішим у минулому досвіді навчання?",
     options: [
-      { label: "Нудна граматика замість розмов", value: "grammar", icon: "Book" },
-      { label: "Важко було підібрати зручний час", value: "time", icon: "Clock" },
-      { label: "Брак мотивації та системи", value: "motivation", icon: "TrendingDown" },
-      { label: "Не бачив реального прогресу", value: "no-progress", icon: "XCircle" }
-    ]
+      {
+        label: "Нудна граматика замість розмов",
+        value: "grammar",
+        icon: "BookOpen",
+      },
+      {
+        label: "Важко було підібрати зручний час",
+        value: "time",
+        icon: "Clock",
+      },
+      {
+        label: "Брак мотивації та системи",
+        value: "motivation",
+        icon: "TrendingDown",
+      },
+      {
+        label: "Не бачив реального прогресу",
+        value: "no-progress",
+        icon: "XCircle",
+      },
+    ],
   },
   {
     step: 9,
-    type: 'choice',
-    icon: 'Clock',
+    type: "choice",
+    icon: "Clock",
     question: "Скільки часу ви готові приділяти англійській на тиждень?",
-    subtext: "Навіть 15 хвилин практики на нашій платформі дають кращий результат, ніж багатогодинні заняття раз на тиждень.",
+    subtext:
+      "Навіть 15 хвилин практики на нашій платформі дають кращий результат, ніж багатогодинні заняття раз на тиждень.",
     options: [
-      { label: "1-2 заняття (підтримуючий темп)", value: "low", icon: "Coffee" },
+      {
+        label: "1-2 заняття (підтримуючий темп)",
+        value: "low",
+        icon: "Coffee",
+      },
       { label: "3-4 заняття (інтенсивний ріст)", value: "medium", icon: "Zap" },
-      { label: "Кожного дня потроху (максимальна швидкість)", value: "high", icon: "Rocket" }
-    ]
+      {
+        label: "Кожного дня потроху (максимальна швидкість)",
+        value: "high",
+        icon: "Rocket",
+      },
+    ],
   },
   {
     step: 10,
-    type: 'choice',
-    icon: 'CalendarDays',
+    type: "choice",
+    icon: "CalendarDays",
     question: "В який час вам зручніше займатися?",
     options: [
-      { label: "Ранок (до 12:00)", value: "morning", icon: "Sunrise" },
-      { label: "День (12:00 - 18:00)", value: "day", icon: "Sun" },
-      { label: "Вечір (після 18:00)", value: "evening", icon: "Moon" },
-      { label: "Будь-коли, маю гнучкий графік", value: "flex", icon: "Shuffle" }
-    ]
+      { label: "Ранок (до 12:00)", value: "morning", icon: "Coffee" },
+      { label: "День (12:00 - 18:00)", value: "day", icon: "Timer" },
+      { label: "Вечір (після 18:00)", value: "evening", icon: "Plane" },
+      {
+        label: "Будь-коли, маю гнучкий графік",
+        value: "flex",
+        icon: "Shuffle",
+      },
+    ],
   },
   {
     step: 11,
-    type: 'choice',
-    icon: 'Smartphone',
+    type: "choice",
+    icon: "Smartphone",
     question: "Чи важлива для вас наявність мобільного додатка для тренувань?",
     options: [
-      { label: "Так, хочу вчити слова в дорозі", value: "yes", icon: "ThumbsUp" },
-      { label: "Ні, планую вчити лише за комп'ютером", value: "no", icon: "Monitor" },
-      { label: "Бажано, щоб усе було в одному місці", value: "maybe", icon: "CheckCircle" }
-    ]
+      {
+        label: "Так, хочу вчити слова в дорозі",
+        value: "yes",
+        icon: "ThumbsUp",
+      },
+      {
+        label: "Ні, планую вчити лише за комп'ютером",
+        value: "no",
+        icon: "Monitor",
+      },
+      {
+        label: "Бажано, щоб усе було в одному місці",
+        value: "maybe",
+        icon: "Check",
+      },
+    ],
   },
   {
     step: 12,
-    type: 'choice',
-    icon: 'UserCheck',
+    type: "choice",
+    icon: "UserCheck",
     question: "З ким би ви хотіли займатися?",
-    subtext: "Усі наші викладачі проходять суворий відбір. Ви будете вчитися лише у найкращих.",
+    subtext:
+      "Усі наші викладачі проходять суворий відбір. Ви будете вчитися лише у найкращих.",
     options: [
       { label: "З україномовним викладачем", value: "local", icon: "User" },
-      { label: "З носієм мови (Native Speaker)", value: "native", icon: "Globe" },
-      { label: "Головне, щоб ми знайшли спільну мову", value: "match", icon: "HeartHandshake" }
-    ]
+      {
+        label: "З носієм мови (Native Speaker)",
+        value: "native",
+        icon: "Globe",
+      },
+      {
+        label: "Головне, щоб ми знайшли спільну мову",
+        value: "match",
+        icon: "HeartHandshake",
+      },
+    ],
   },
   {
     step: 13,
-    type: 'choice',
-    icon: 'TrendingUp',
+    type: "choice",
+    icon: "TrendingUp",
     question: "Яка навичка для вас зараз у пріоритеті?",
     options: [
       { label: "Розмовна мова та вимова", value: "speaking", icon: "Mic" },
       { label: "Граматика та письмо", value: "grammar", icon: "Edit" },
       { label: "Сприйняття на слух", value: "listening", icon: "Headphones" },
-      { label: "Професійна лексика", value: "business", icon: "Briefcase" }
-    ]
+      { label: "Професійна лексика", value: "business", icon: "Briefcase" },
+    ],
   },
   {
     step: 14,
-    type: 'choice',
-    icon: 'Timer',
+    type: "choice",
+    icon: "Timer",
     question: "Як швидко ви хочете побачити перші відчутні результати?",
     options: [
-      { label: "За місяць (потрібен швидкий старт)", value: "1m", icon: "Rocket" },
-      { label: "За 3 місяці (впевнений прогрес)", value: "3m", icon: "TrendingUp" },
-      { label: "Готовий до довготривалого навчання", value: "long-term", icon: "Award" }
-    ]
+      {
+        label: "За місяць (потрібен швидкий старт)",
+        value: "1m",
+        icon: "Rocket",
+      },
+      {
+        label: "За 3 місяці (впевнений прогрес)",
+        value: "3m",
+        icon: "TrendingUp",
+      },
+      {
+        label: "Готовий до довготривалого навчання",
+        value: "long-term",
+        icon: "Award",
+      },
+    ],
   },
   {
     step: 15,
-    type: 'choice',
-    icon: 'Trophy',
+    type: "choice",
+    icon: "Trophy",
     question: "Що для вас є найкращою мотивацією продовжувати навчання?",
     options: [
-      { label: "Визнання моїх успіхів викладачем", value: "recognition", icon: "Award" },
-      { label: "Розуміння фільмів та пісень в оригіналі", value: "culture", icon: "Film" },
-      { label: "Системний графік та підтримка методиста", value: "support", icon: "Shield" },
-      { label: "Можливість вільно спілкуватися в подорожах", value: "success", icon: "Plane" }
-    ]
+      {
+        label: "Визнання моїх успіхів викладачем",
+        value: "recognition",
+        icon: "Award",
+      },
+      {
+        label: "Розуміння фільмів та пісень в оригіналі",
+        value: "culture",
+        icon: "Film",
+      },
+      {
+        label: "Системний графік та підтримка методиста",
+        value: "support",
+        icon: "Shield",
+      },
+      {
+        label: "Можливість вільно спілкуватися в подорожах",
+        value: "success",
+        icon: "Plane",
+      },
+    ],
   },
   {
     step: 16,
-    type: 'choice',
-    icon: 'Gift',
-    question: "Чи готові ви присвятити 30 хвилин пробному уроку, щоб протестувати нашу платформу?",
-    subtext: "Це абсолютно безкоштовно. Наш методист покаже, як проходять заняття, та визначить ваш точний рівень.",
+    type: "choice",
+    icon: "Gift",
+    question:
+      "Чи готові ви присвятити 30 хвилин пробному уроку, щоб протестувати нашу платформу?",
+    subtext:
+      "Це абсолютно безкоштовно. Наш методист покаже, як проходять заняття, та визначить ваш точний рівень.",
     options: [
       { label: "Так, готовий спробувати!", value: "yes", icon: "Check" },
-      { label: "Хотів би спершу дізнатися деталі", value: "later", icon: "FileText" },
-      { label: "Так, підберіть мені зручний час", value: "free", icon: "Clock" }
-    ]
+      {
+        label: "Хотів би спершу дізнатися деталі",
+        value: "later",
+        icon: "FileText",
+      },
+      {
+        label: "Так, підберіть мені зручний час",
+        value: "free",
+        icon: "Clock",
+      },
+    ],
   },
   {
     step: 17,
-    type: 'loader',
-    icon: 'Wand2',
+    type: "loader",
+    icon: "Wand2",
     title: "Обробляємо ваші дані...",
     points: [
       "Аналізуємо вашу мету навчання",
       "Оцінюємо побажання щодо графіка",
       "Підбираємо найкращих викладачів",
-      "Бронюємо місце на пробний урок"
-    ]
+      "Бронюємо місце на пробний урок",
+    ],
   },
   {
     step: 18,
-    type: 'program_ready',
-    icon: 'Sparkles',
+    type: "program_ready",
+    icon: "Sparkles",
     title: "Ваша персональна стратегія готова!",
-    subtitle: "Ми проаналізували ваші відповіді та склали оптимальний маршрут до вашої вільної англійської.",
+    subtitle:
+      "Ми проаналізували ваші відповіді та склали оптимальний маршрут до вашої вільної англійської.",
     points: [
       "Фокус на розмовній мові з першого уроку",
       "Доступ до інтерактивної платформи 24/7",
-      "Підбір ментора, який розділяє ваші інтереси"
+      "Підбір ментора, який розділяє ваші інтереси",
     ],
-    cta: "Отримати програму"
+    cta: "Отримати програму",
   },
   {
     step: 19,
-    type: 'lead_name',
-    icon: 'User',
+    type: "lead_name",
+    icon: "User",
     title: "Раді знайомству! Як нам до тебе звертатися?",
-    subtitle: "Ми вже майже створили твій ідеальний маршрут до вільної англійської. Скажи своє ім'я, щоб ми зробили твою стратегію навчання максимально персоналізованою та комфортною.",
+    subtitle:
+      "Ми вже майже створили твій ідеальний маршрут до вільної англійської. Скажи своє ім'я, щоб ми зробили твою стратегію навчання максимально персоналізованою та комфортною.",
     form: {
       name_placeholder: "Твоє ім'я",
-      cta: "Далі"
-    }
+      cta: "Далі",
+    },
   },
   {
     step: 20,
-    type: 'lead_contacts',
-    icon: 'Mail',
+    type: "lead_contacts",
+    icon: "Mail",
     title: "Твоя покрокова стратегія успіху готова!",
-    subtitle: "Залиш свої контакти, щоб отримати персональний план та справжній заряд мотивації для потужного старту. Ми допоможемо з усіма налаштуваннями та будемо поруч на кожному етапі, щоб твоя англійська нарешті стала вільною!",
-    guarantee_text: "Ми допоможемо тобі в усьому. Твої дані в безпеці та використовуються лише для зв'язку з методистом.",
+    subtitle:
+      "Залиш свої контакти, щоб отримати персональний план та справжній заряд мотивації для потужного старту. Ми допоможемо з усіма налаштуваннями та будемо поруч на кожному етапі, щоб твоя англійська нарешті стала вільною!",
+    guarantee_text:
+      "Ми допоможемо тобі в усьому. Твої дані в безпеці та використовуються лише для зв'язку з методистом.",
     form: {
       email_placeholder: "Твій e-mail",
       phone_placeholder: "Твій номер телефону",
-      cta: "Відправити та отримати план"
-    }
-  }
+      cta: "Відправити та отримати план",
+    },
+  },
 ];

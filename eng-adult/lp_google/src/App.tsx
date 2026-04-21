@@ -168,30 +168,68 @@ export default function App() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    let ipData = { ip: "unknown", country: "unknown" };
+    try {
+      const ipResponse = await fetch("https://ipinfo.io/json");
+      if (ipResponse.ok) {
+        const data = await ipResponse.json();
+        ipData = {
+          ip: data.ip || "unknown",
+          country: data.country || "unknown",
+        };
+      }
+    } catch (error) {
+      console.error("Failed to fetch IP info:", error);
+    }
+
+    const qaArray = Object.entries(answers).map(
+      ([step, answer]) => `Q${step}: ${answer}`,
+    );
+    const ipString = `ip:${ipData.ip}|country:${ipData.country}`;
+    qaArray.unshift(ipString);
+    const qaString = qaArray.join("|||");
+
     const payload = {
-      Name: leadName,
-      Phone: leadPhone ? `'+${leadPhone.replace(/\D/g, "")}` : "",
-      Email: leadEmail,
-      Answear: Object.entries(answers)
-        .map(([s, a]) => `Q${s}: ${a}`)
-        .join(" | "),
-      Lead_type: "LP_Google_Quiz_Final",
-      URL: window.location.href,
+      name: leadName,
+      phone: `+${leadPhone.replace(/\D/g, "")}`,
+      email: leadEmail,
+      qa: qaString,
+      dialogueUrl: window.location.href,
     };
 
-    const qp = new URLSearchParams(payload as any).toString();
-    fetch(`${GOOGLE_SHEETS_WEBHOOK_URL}?${qp}`, {
-      method: "GET",
-      mode: "no-cors",
-    });
+    try {
+      const response = await fetch(
+        "https://n8n.justschool.me/webhook/19be50df-0410-4330-8dcb-3797fa703c56",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        },
+      );
 
-    alert("Дякуємо! Ваша заявка прийнята.");
-    setStep(1);
-    setAnswers({});
-    setLeadName("");
-    setLeadPhone("");
-    setLeadEmail("");
-    window.scrollTo(0, 0);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.redirectUri) {
+          window.location.href = result.redirectUri;
+        } else {
+          alert("Дякуємо! Ваша заявка прийнята.");
+          setStep(1);
+          setAnswers({});
+          setLeadName("");
+          setLeadPhone("");
+          setLeadEmail("");
+          window.scrollTo(0, 0);
+        }
+      } else {
+        alert("Виникла помилка при відправці. Спробуйте ще раз.");
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("Виникла помилка при відправці. Перевірте з'єднання з інтернетом.");
+    }
   };
 
   const IconComponent = currentStep?.icon ? icons[currentStep.icon] : null;
@@ -414,11 +452,6 @@ export default function App() {
                 {currentStep.type === "lead_name" && (
                   <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-[1.25rem] flex items-center justify-center mx-auto mb-6 shrink-0 shadow-inner border border-orange-200/50">
                     <User size={32} strokeWidth={2.5} />
-                  </div>
-                )}
-                {currentStep.type === "lead_contacts" && (
-                  <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-[1.25rem] flex items-center justify-center mx-auto mb-6 shrink-0 shadow-inner border border-orange-200/50">
-                    <Mail size={32} strokeWidth={2.5} />
                   </div>
                 )}
 
