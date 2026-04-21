@@ -1,8 +1,8 @@
-import review1 from "./assets/reviews/1123.jpg";
-import review2 from "./assets/reviews/2149064545.jpg";
-import review3 from "./assets/reviews/2149283315.jpg";
-import review4 from "./assets/reviews/2392.jpg";
-import review5 from "./assets/reviews/7622.jpg";
+import alinaPhoto from "./assets/reviews/alina.jpg";
+import dmitroPhoto from "./assets/reviews/dmitro.jpg";
+import igorPhoto from "./assets/reviews/igor.jpg";
+import marinaPhoto from "./assets/reviews/marina.jpg";
+import sergiyPhoto from "./assets/reviews/sergiy.jpg";
 
 export interface QuizOption {
   label: string;
@@ -150,27 +150,27 @@ export const quizData: QuizStep[] = [
       {
         name: "Аліна",
         text: "JustSchool — це любов! За 2 місяці занять я подолала мовний бар'єр і успішно пройшла співбесіду. Платформа просто неймовірна, все в одному місці!",
-        photoUrl: review1,
+        photoUrl: alinaPhoto,
       },
       {
         name: "Ігор",
         text: "Формат ідеально підійшов для мого щільного графіка. Дуже багато розмовної практики на кожному уроці, ніякої сухої теорії. Бачу реальний прогрес.",
-        photoUrl: review4,
+        photoUrl: igorPhoto,
       },
       {
         name: "Сергій",
         text: "Спершу сумнівався, чи онлайн-навчання для мене, але після пробного уроку всі страхи зникли. Методист підібрав крутого викладача!",
-        photoUrl: review3,
+        photoUrl: sergiyPhoto,
       },
       {
         name: "Марина",
         text: "Мені подобається, що в JustSchool ми не просто зубримо правила, а реально розмовляємо. Моя впевненість під час дзвінків з іноземними колегами зросла в рази.",
-        photoUrl: review2,
+        photoUrl: marinaPhoto,
       },
       {
         name: "Дмитро",
         text: "Додаток — це знахідка! Вчу слова в метро, а ввечері практикую їх на уроці. Дуже зручно, сучасно та ефективно, рекомендую всім.",
-        photoUrl: review5,
+        photoUrl: dmitroPhoto,
       },
     ],
     cta: "Продовжити тест",

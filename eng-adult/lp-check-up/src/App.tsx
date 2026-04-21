@@ -376,11 +376,11 @@ export default function App() {
                 {currentStep.type === "testimonials_interstitial" &&
                   currentStep.reviews && (
                     <div className="mb-6 flex-1 flex flex-col min-h-0">
-                      <div className="flex overflow-x-auto gap-4 pb-6 custom-scrollbar -mx-4 px-4 snap-x snap-mandatory flex-1 items-center">
+                      <div className="grid grid-flow-col auto-cols-[85%] overflow-x-auto gap-4 pb-6 custom-scrollbar -mx-4 px-4 snap-x snap-mandatory flex-1">
                         {currentStep.reviews.map((rev) => (
                           <div
                             key={rev.name}
-                            className="bg-white p-5 rounded-3xl border border-slate-100 text-left shrink-0 w-[85%] max-w-[280px] shadow-sm snap-center relative flex flex-col h-full"
+                            className="bg-white p-5 rounded-3xl border border-slate-100 text-left shrink-0 max-w-[280px] shadow-sm snap-center relative flex flex-col h-full"
                           >
                             <div className="flex items-center gap-3 mb-3">
                               <img
