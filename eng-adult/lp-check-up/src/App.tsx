@@ -187,10 +187,6 @@ export default function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (window.fbq) {
-      window.fbq("track", "Purchase", { currency: "UAH", value: 0 });
-    }
-
     let ipData = { ip: "unknown", country: "unknown" };
     try {
       const ipResponse = await fetch("https://ipinfo.io/json");
@@ -241,6 +237,9 @@ export default function App() {
       );
 
       if (response.ok) {
+        if (window.fbq) {
+          window.fbq("track", "Lead");
+        }
         const result = await response.json();
         if (result.redirectUri) {
           window.location.href = result.redirectUri;
