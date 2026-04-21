@@ -144,32 +144,27 @@ export const quizData: QuizStep[] = [
       {
         name: "Аліна",
         text: "JustSchool — це любов! За 2 місяці занять я подолала мовний бар'єр і успішно пройшла співбесіду. Платформа просто неймовірна, все в одному місці!",
-        photoUrl:
-          "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=800",
+        photoUrl: "/reviews/1123.jpg",
       },
       {
         name: "Ігор",
         text: "Формат ідеально підійшов для мого щільного графіка. Дуже багато розмовної практики на кожному уроці, ніякої сухої теорії. Бачу реальний прогрес.",
-        photoUrl:
-          "https://images.pexels.com/photos/937481/pexels-photo-937481.jpeg?auto=compress&cs=tinysrgb&w=800",
+        photoUrl: "/reviews/2149064545.jpg",
       },
       {
         name: "Сергій",
         text: "Спершу сумнівався, чи онлайн-навчання для мене, але після пробного уроку всі страхи зникли. Методист підібрав крутого викладача!",
-        photoUrl:
-          "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=800",
+        photoUrl: "/reviews/2149283315.jpg",
       },
       {
         name: "Марина",
         text: "Мені подобається, що в JustSchool ми не просто зубримо правила, а реально розмовляємо. Моя впевненість під час дзвінків з іноземними колегами зросла в рази.",
-        photoUrl:
-          "https://images.pexels.com/photos/1181519/pexels-photo-1181519.jpeg?auto=compress&cs=tinysrgb&w=800",
+        photoUrl: "/reviews/2392.jpg",
       },
       {
         name: "Дмитро",
         text: "Додаток — це знахідка! Вчу слова в метро, а ввечері практикую їх на уроці. Дуже зручно, сучасно та ефективно, рекомендую всім.",
-        photoUrl:
-          "https://images.pexels.com/photos/846741/pexels-photo-846741.jpeg?auto=compress&cs=tinysrgb&w=800",
+        photoUrl: "/reviews/7622.jpg",
       },
     ],
     cta: "Продовжити тест",

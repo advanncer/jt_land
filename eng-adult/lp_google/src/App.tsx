@@ -202,12 +202,20 @@ export default function App() {
     qaArray.unshift(ipString);
     const qaString = qaArray.join("|||");
 
+    const urlParams = new URLSearchParams(window.location.search);
+
     const payload = {
       name: leadName,
       phone: `+${leadPhone.replace(/\D/g, "")}`,
       email: leadEmail,
       qa: qaString,
       dialogueUrl: window.location.href,
+      utm_source: urlParams.get("utm_source"),
+      utm_medium: urlParams.get("utm_medium"),
+      utm_campaign: urlParams.get("utm_campaign"),
+      utm_term: urlParams.get("utm_term"),
+      utm_content: urlParams.get("utm_content"),
+      utm_subject: "English",
     };
 
     try {
