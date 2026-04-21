@@ -238,7 +238,7 @@ export default function App() {
 
       if (response.ok) {
         if (window.fbq) {
-          window.fbq("track", "Lead");
+          window.fbq("track", "Purchase", { currency: "UAH", value: 0 });
         }
         const result = await response.json();
         if (result.redirectUri) {
