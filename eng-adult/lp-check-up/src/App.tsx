@@ -210,16 +210,6 @@ export default function App() {
 
     const urlParams = new URLSearchParams(window.location.search);
 
-    let studentType = "English";
-    const studentTypeAnswer = answers[2];
-    if (studentTypeAnswer === "self") {
-      studentType = "Дорослий";
-    } else if (studentTypeAnswer === "child") {
-      studentType = "Дитина";
-    } else if (studentTypeAnswer === "family") {
-      studentType = "Сім'я";
-    }
-
     const payload = {
       name: leadName,
       phone: `+${leadPhone.replace(/\D/g, "")}`,
@@ -231,7 +221,7 @@ export default function App() {
       utm_campaign: urlParams.get("utm_campaign"),
       utm_term: urlParams.get("utm_term"),
       utm_content: urlParams.get("utm_content"),
-      utm_subject: studentType,
+      utm_subject: "English",
     };
 
     try {
