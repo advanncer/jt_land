@@ -58,6 +58,7 @@ import { quizData } from "./data";
 
 declare global {
   interface Window {
+    dataLayer: any[];
     fbq: (...args: any[]) => void;
   }
 }
@@ -237,6 +238,12 @@ export default function App() {
       );
 
       if (response.ok) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: "form_success",
+          quiz_name: "lp-check-up",
+        });
+
         if (window.fbq) {
           window.fbq("track", "Purchase", { currency: "UAH", value: 0 });
         }
