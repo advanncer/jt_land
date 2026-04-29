@@ -316,14 +316,14 @@ export default function App() {
           </div>
         )}
 
-      <main className="flex-1 w-full max-w-lg flex flex-col p-4 justify-start overflow-y-auto custom-scrollbar relative z-10">
+      <main className="flex-1 w-full max-w-lg flex flex-col overflow-y-auto custom-scrollbar relative z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="w-full h-full flex flex-col pt-2"
+            className="w-full min-h-full flex flex-col"
           >
             {IconComponent &&
               currentStep?.type !== "hero" &&
@@ -337,15 +337,17 @@ export default function App() {
               )}
 
             {currentStep?.type === "hero" && (
-              <div className="text-center flex flex-col items-center h-full">
-                <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight tracking-tight pt-2">
-                  {currentStep.question || currentStep.title}
-                </h1>
-                <p className="text-sm md:text-base text-slate-500 mb-8 leading-relaxed font-medium">
-                  {currentStep.subtext || currentStep.subtitle}
-                </p>
+              <div className="text-center flex flex-col items-center min-h-full p-4 pt-6">
+                <div className="flex-1 flex flex-col items-center">
+                  <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight tracking-tight pt-2">
+                    {currentStep.question || currentStep.title}
+                  </h1>
+                  <p className="text-sm md:text-base text-slate-500 mb-8 leading-relaxed font-medium">
+                    {currentStep.subtext || currentStep.subtitle}
+                  </p>
+                </div>
 
-                <div className="w-full mt-auto">
+                <div className="w-full sticky bottom-0 bg-slate-50/90 backdrop-blur-md pt-4 pb-2 z-20">
                   <div className="p-5 bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 mb-4">
                     <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-tighter">
                       {currentStep.pre_cta}
@@ -369,138 +371,149 @@ export default function App() {
 
             {(currentStep?.type === "choice" ||
               currentStep?.type === "testimonials_interstitial") && (
-              <div className="text-center flex flex-col h-full">
-                <h2 className="text-2xl md:text-3xl font-black mb-3 leading-tight">
-                  {currentStep.question || currentStep.title}
-                </h2>
-                {currentStep.subtext && (
-                  <p className="text-sm md:text-base text-slate-500 mb-6 font-medium leading-relaxed max-w-sm mx-auto px-2">
-                    {currentStep.subtext || currentStep.subtitle}
-                  </p>
-                )}
-
-                {currentStep.type === "testimonials_interstitial" &&
-                  currentStep.reviews && (
-                    <div className="mb-6 flex-1 flex flex-col min-h-0">
-                      <div className="grid grid-flow-col auto-cols-[85%] overflow-x-auto gap-4 pb-6 custom-scrollbar -mx-4 px-4 snap-x snap-mandatory flex-1">
-                        {currentStep.reviews.map((rev) => (
-                          <div
-                            key={rev.name}
-                            className="bg-white p-5 rounded-3xl border border-slate-100 text-left shrink-0 max-w-[280px] shadow-sm snap-center relative flex flex-col h-full"
-                          >
-                            <div className="flex items-center gap-3 mb-3">
-                              <img
-                                src={rev.photoUrl}
-                                className="w-10 h-10 rounded-full object-cover object-center"
-                              />
-                              <div className="font-black text-sm text-slate-900">
-                                {rev.name}
-                              </div>
-                            </div>
-                            <p className="text-xs text-slate-600 font-medium leading-relaxed italic relative z-10 flex-1">
-                              "{rev.text}"
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest flex items-center justify-center gap-2 mt-2">
-                        <ArrowLeft size={10} /> свайп відгуки{" "}
-                        <ChevronRight size={10} />
-                      </div>
-                    </div>
+              <div className="text-center flex flex-col min-h-full p-4 pt-2">
+                <div className="flex-1 flex flex-col">
+                  <h2 className="text-2xl md:text-3xl font-black mb-3 leading-tight">
+                    {currentStep.question || currentStep.title}
+                  </h2>
+                  {currentStep.subtext && (
+                    <p className="text-sm md:text-base text-slate-500 mb-6 font-medium leading-relaxed max-w-sm mx-auto px-2">
+                      {currentStep.subtext || currentStep.subtitle}
+                    </p>
                   )}
 
-                <div
-                  className={`grid gap-2.5 w-full ${
-                    currentStep.type === "choice" ? "mt-auto" : ""
-                  } pb-4`}
-                >
-                  {currentStep.options?.map((opt) => {
-                    const OptIcon = opt.icon ? icons[opt.icon] : null;
-                    return (
-                      <button
-                        key={opt.value}
-                        onClick={() => handleChoice(opt.label)}
-                        className="w-full text-left p-3.5 rounded-2xl border-2 border-slate-100 bg-white hover:border-orange-500 active:bg-orange-50 transition-all font-bold text-sm flex items-center gap-4 group shadow-sm active:scale-[0.98]"
-                      >
-                        {OptIcon && (
-                          <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-orange-100 group-hover:text-orange-500 transition-colors shrink-0">
-                            <OptIcon size={20} strokeWidth={2} />
-                          </div>
-                        )}
-                        <span className="flex-1 leading-snug">{opt.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-                {currentStep.type === "testimonials_interstitial" && (
-                  <button
-                    onClick={() => setStep(step + 1)}
-                    className="w-full mt-2 py-4 bg-slate-900 text-white rounded-2xl font-black text-lg uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 active:scale-95"
+                  {currentStep.type === "testimonials_interstitial" &&
+                    currentStep.reviews && (
+                      <div className="mb-6 flex-1 flex flex-col min-h-0">
+                        <div className="grid grid-flow-col auto-cols-[85%] overflow-x-auto gap-4 pb-6 custom-scrollbar -mx-4 px-4 snap-x snap-mandatory flex-1">
+                          {currentStep.reviews.map((rev) => (
+                            <div
+                              key={rev.name}
+                              className="bg-white p-5 rounded-3xl border border-slate-100 text-left shrink-0 max-w-[280px] shadow-sm snap-center relative flex flex-col h-full"
+                            >
+                              <div className="flex items-center gap-3 mb-3">
+                                <img
+                                  src={rev.photoUrl}
+                                  className="w-10 h-10 rounded-full object-cover object-center"
+                                />
+                                <div className="font-black text-sm text-slate-900">
+                                  {rev.name}
+                                </div>
+                              </div>
+                              <p className="text-xs text-slate-600 font-medium leading-relaxed italic relative z-10 flex-1">
+                                "{rev.text}"
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest flex items-center justify-center gap-2 mt-2">
+                          <ArrowLeft size={10} /> свайп відгуки{" "}
+                          <ChevronRight size={10} />
+                        </div>
+                      </div>
+                    )}
+
+                  <div
+                    className={`grid gap-2.5 w-full ${
+                      currentStep.type === "choice" ? "mt-auto pb-4" : ""
+                    }`}
                   >
-                    {currentStep.cta}
-                  </button>
+                    {currentStep.options?.map((opt) => {
+                      const OptIcon = opt.icon ? icons[opt.icon] : null;
+                      return (
+                        <button
+                          key={opt.value}
+                          onClick={() => handleChoice(opt.label)}
+                          className="w-full text-left p-3.5 rounded-2xl border-2 border-slate-100 bg-white hover:border-orange-500 active:bg-orange-50 transition-all font-bold text-sm flex items-center gap-4 group shadow-sm active:scale-[0.98]"
+                        >
+                          {OptIcon && (
+                            <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-orange-100 group-hover:text-orange-500 transition-colors shrink-0">
+                              <OptIcon size={20} strokeWidth={2} />
+                            </div>
+                          )}
+                          <span className="flex-1 leading-snug">
+                            {opt.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {currentStep.type === "testimonials_interstitial" && (
+                  <div className="sticky bottom-0 bg-slate-50/90 backdrop-blur-md pt-2 pb-4 z-20">
+                    <button
+                      onClick={() => setStep(step + 1)}
+                      className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-lg uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 active:scale-95"
+                    >
+                      {currentStep.cta}
+                    </button>
+                  </div>
                 )}
               </div>
             )}
 
             {currentStep?.type === "program_ready" && (
-              <div className="bg-slate-900 text-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden flex flex-col text-center flex-1 my-4">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-3xl rounded-full" />
+              <div className="min-h-full p-4 flex flex-col">
+                <div className="bg-slate-900 text-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden flex flex-col text-center flex-1 my-0">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-3xl rounded-full" />
 
-                <div className="w-16 h-16 bg-orange-500/20 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 relative z-10 shrink-0">
-                  <Sparkles size={32} strokeWidth={2.5} />
+                  <div className="w-16 h-16 bg-orange-500/20 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 relative z-10 shrink-0">
+                    <Sparkles size={32} strokeWidth={2.5} />
+                  </div>
+
+                  <h2 className="text-2xl font-black mb-3 leading-tight relative z-10">
+                    {currentStep.title}
+                  </h2>
+                  <p className="text-slate-400 text-xs md:text-sm mb-8 relative z-10 font-bold leading-relaxed">
+                    {currentStep.subtitle}
+                  </p>
+
+                  <ul className="space-y-3 mb-8 relative z-10 text-left mt-auto">
+                    {currentStep.points?.map((p) => (
+                      <li
+                        key={p}
+                        className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5"
+                      >
+                        <CheckCircle2
+                          className="text-orange-500 shrink-0"
+                          size={20}
+                        />
+                        <span className="text-sm text-slate-200 font-bold leading-tight">
+                          {p}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => setStep(step + 1)}
+                    className="w-full py-4 bg-orange-500 text-white rounded-2xl font-black text-lg uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg shadow-orange-900/40 active:scale-95 relative z-10 mt-auto"
+                  >
+                    {currentStep.cta}
+                  </button>
                 </div>
-
-                <h2 className="text-2xl font-black mb-3 leading-tight relative z-10">
-                  {currentStep.title}
-                </h2>
-                <p className="text-slate-400 text-xs md:text-sm mb-8 relative z-10 font-bold leading-relaxed">
-                  {currentStep.subtitle}
-                </p>
-
-                <ul className="space-y-3 mb-8 relative z-10 text-left mt-auto">
-                  {currentStep.points?.map((p) => (
-                    <li
-                      key={p}
-                      className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5"
-                    >
-                      <CheckCircle2
-                        className="text-orange-500 shrink-0"
-                        size={20}
-                      />
-                      <span className="text-sm text-slate-200 font-bold leading-tight">
-                        {p}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => setStep(step + 1)}
-                  className="w-full py-4 bg-orange-500 text-white rounded-2xl font-black text-lg uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg shadow-orange-900/40 active:scale-95 relative z-10 mt-auto"
-                >
-                  {currentStep.cta}
-                </button>
               </div>
             )}
 
             {(currentStep?.type === "lead_name" ||
               currentStep?.type === "lead_contacts") && (
-              <div className="text-center flex flex-col h-full py-4">
-                {currentStep.type === "lead_name" && (
-                  <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-[1.25rem] flex items-center justify-center mx-auto mb-6 shrink-0 shadow-inner border border-orange-200/50">
-                    <User size={32} strokeWidth={2.5} />
-                  </div>
-                )}
+              <div className="text-center flex flex-col min-h-full p-4 pt-4">
+                <div className="flex-1 flex flex-col">
+                  {currentStep.type === "lead_name" && (
+                    <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-[1.25rem] flex items-center justify-center mx-auto mb-6 shrink-0 shadow-inner border border-orange-200/50">
+                      <User size={32} strokeWidth={2.5} />
+                    </div>
+                  )}
 
-                <h2 className="text-2xl md:text-3xl font-black mb-3 text-slate-900 leading-tight uppercase tracking-tighter px-2">
-                  {currentStep.title}
-                </h2>
-                <p className="text-sm text-slate-500 mb-8 font-medium leading-relaxed max-w-sm mx-auto px-4">
-                  {currentStep.subtitle}
-                </p>
+                  <h2 className="text-2xl md:text-3xl font-black mb-3 text-slate-900 leading-tight uppercase tracking-tighter px-2">
+                    {currentStep.title}
+                  </h2>
+                  <p className="text-sm text-slate-500 mb-8 font-medium leading-relaxed max-w-sm mx-auto px-4">
+                    {currentStep.subtitle}
+                  </p>
+                </div>
 
-                <div className="mt-auto w-full">
+                <div className="sticky bottom-0 bg-slate-50/90 backdrop-blur-md pt-4 pb-4 z-20">
                   {currentStep.type === "lead_contacts" && (
                     <div className="mb-6 p-4 bg-orange-50 rounded-2xl border border-orange-100 flex gap-3 items-center text-left">
                       <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-white shrink-0 text-lg">
@@ -580,7 +593,7 @@ export default function App() {
             )}
 
             {currentStep?.type === "loader" && (
-              <div className="text-center py-8 px-4 flex flex-col justify-center flex-1 h-full">
+              <div className="text-center py-8 px-4 flex flex-col justify-center flex-1 min-h-full">
                 <div className="w-20 h-20 bg-orange-100 text-orange-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 shrink-0 shadow-inner border border-orange-200/50">
                   <Loader2
                     className="animate-spin"
