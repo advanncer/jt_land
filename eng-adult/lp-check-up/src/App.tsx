@@ -271,7 +271,7 @@ export default function App() {
   const IconComponent = currentStep?.icon ? icons[currentStep.icon] : null;
 
   return (
-    <div className="min-h-[100dvh] w-full bg-slate-50 text-slate-900 font-sans flex flex-col items-center overflow-x-hidden selection:bg-orange-100 relative">
+    <div className="h-[100dvh] w-full bg-slate-50 text-slate-900 font-sans flex flex-col items-center overflow-hidden selection:bg-orange-100 relative">
       <header className="w-full max-w-4xl px-4 py-3 flex justify-between items-center border-b border-slate-100 sticky top-0 bg-white/90 backdrop-blur-md z-50 h-[60px] shrink-0">
         <div className="w-10">
           {step > 1 && (
@@ -316,14 +316,14 @@ export default function App() {
           </div>
         )}
 
-      <main className="flex-1 w-full max-w-lg flex flex-col overflow-y-auto custom-scrollbar relative z-10">
+      <main className="flex-1 w-full max-w-lg flex flex-col relative z-10 overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="w-full min-h-full flex flex-col"
+            className="w-full h-full flex flex-col overflow-y-auto custom-scrollbar"
           >
             {IconComponent &&
               currentStep?.type !== "hero" &&
@@ -337,7 +337,7 @@ export default function App() {
               )}
 
             {currentStep?.type === "hero" && (
-              <div className="text-center flex flex-col items-center min-h-full p-4 pt-6">
+              <div className="text-center flex flex-col items-center h-full p-4 pt-6">
                 <div className="flex-1 flex flex-col items-center">
                   <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight tracking-tight pt-2">
                     {currentStep.question || currentStep.title}
@@ -371,7 +371,7 @@ export default function App() {
 
             {(currentStep?.type === "choice" ||
               currentStep?.type === "testimonials_interstitial") && (
-              <div className="text-center flex flex-col min-h-full p-4 pt-2">
+              <div className="text-center flex flex-col h-full p-4 pt-2">
                 <div className="flex-1 flex flex-col">
                   <h2 className="text-2xl md:text-3xl font-black mb-3 leading-tight">
                     {currentStep.question || currentStep.title}
@@ -454,7 +454,7 @@ export default function App() {
             )}
 
             {currentStep?.type === "program_ready" && (
-              <div className="min-h-full p-4 flex flex-col">
+              <div className="h-full p-4 flex flex-col">
                 <div className="bg-slate-900 text-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden flex flex-col text-center flex-1 my-0">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-3xl rounded-full" />
 
@@ -497,7 +497,7 @@ export default function App() {
 
             {(currentStep?.type === "lead_name" ||
               currentStep?.type === "lead_contacts") && (
-              <div className="text-center flex flex-col min-h-full p-4 pt-4">
+              <div className="text-center flex flex-col h-full p-4 pt-4">
                 <div className="flex-1 flex flex-col">
                   {currentStep.type === "lead_name" && (
                     <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-[1.25rem] flex items-center justify-center mx-auto mb-6 shrink-0 shadow-inner border border-orange-200/50">
@@ -593,7 +593,7 @@ export default function App() {
             )}
 
             {currentStep?.type === "loader" && (
-              <div className="text-center py-8 px-4 flex flex-col justify-center flex-1 min-h-full">
+              <div className="text-center py-8 px-4 flex flex-col justify-center flex-1 h-full">
                 <div className="w-20 h-20 bg-orange-100 text-orange-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 shrink-0 shadow-inner border border-orange-200/50">
                   <Loader2
                     className="animate-spin"
