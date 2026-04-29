@@ -331,13 +331,13 @@ export default function App() {
               currentStep?.type !== "program_ready" &&
               currentStep?.type !== "lead_name" &&
               currentStep?.type !== "lead_contacts" && (
-                <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-[1.25rem] flex items-center justify-center mx-auto mb-4 shrink-0 shadow-sm border border-orange-200/50">
+                <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-[1.25rem] flex items-center justify-center mx-auto mb-4 mt-8 shrink-0 shadow-sm border border-orange-200/50">
                   <IconComponent size={32} strokeWidth={2.5} />
                 </div>
               )}
 
             {currentStep?.type === "hero" && (
-              <div className="text-center flex flex-col items-center h-full p-4 pt-6">
+              <div className="text-center flex flex-col items-center h-full p-4 pt-12 md:pt-20">
                 <div className="flex-1 flex flex-col items-center">
                   <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight tracking-tight pt-2">
                     {currentStep.question || currentStep.title}
@@ -371,7 +371,7 @@ export default function App() {
 
             {(currentStep?.type === "choice" ||
               currentStep?.type === "testimonials_interstitial") && (
-              <div className="text-center flex flex-col h-full p-4 pt-2">
+              <div className="text-center flex flex-col h-full p-4 pt-6 md:pt-12">
                 <div className="flex-1 flex flex-col">
                   <h2 className="text-2xl md:text-3xl font-black mb-3 leading-tight">
                     {currentStep.question || currentStep.title}
@@ -497,7 +497,7 @@ export default function App() {
 
             {(currentStep?.type === "lead_name" ||
               currentStep?.type === "lead_contacts") && (
-              <div className="text-center flex flex-col h-full p-4 pt-4">
+              <div className="text-center flex flex-col h-full p-4 pt-12 md:pt-16">
                 <div className="flex-1 flex flex-col">
                   {currentStep.type === "lead_name" && (
                     <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-[1.25rem] flex items-center justify-center mx-auto mb-6 shrink-0 shadow-inner border border-orange-200/50">
