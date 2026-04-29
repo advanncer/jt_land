@@ -323,7 +323,7 @@ export default function App() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="w-full h-full flex flex-col overflow-y-auto custom-scrollbar"
+            className="w-full h-full flex flex-col overflow-y-auto no-scrollbar"
           >
             {IconComponent &&
               currentStep?.type !== "hero" &&
@@ -337,7 +337,7 @@ export default function App() {
               )}
 
             {currentStep?.type === "hero" && (
-              <div className="text-center flex flex-col items-center h-full p-4 pt-12 md:pt-20">
+              <div className="text-center flex flex-col items-center h-full p-4 pt-12 md:pt-16">
                 <div className="flex-1 flex flex-col items-center">
                   <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight tracking-tight pt-2">
                     {currentStep.question || currentStep.title}
@@ -645,6 +645,8 @@ export default function App() {
       <style>{`
         body { overflow-x: hidden; width: 100%; position: relative; background: #f8fafc; }
         input::placeholder { color: #cbd5e1; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; text-align: center; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .custom-scrollbar::-webkit-scrollbar { height: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
       `}</style>
