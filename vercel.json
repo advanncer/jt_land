@@ -88,6 +88,14 @@
     {
       "source": "/free-products/astro-english/:path*",
       "destination": "/free-products/astro-english/:path*"
+    },
+    {
+      "source": "/eng-adult/lp-check-up",
+      "destination": "/eng-adult/lp-check-up/index.html"
+    },
+    {
+      "source": "/eng-adult/lp-check-up/:path*",
+      "destination": "/eng-adult/lp-check-up/:path*"
     }
   ],
   "redirects": [
