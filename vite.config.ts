@@ -18,8 +18,16 @@ export default defineConfig({
         astroEnglish: resolve(
           __dirname,
           "free-products/astro-english/index.html",
-        ),
         bloggerLp1: resolve(__dirname, "blogger/lp1/index.html"),
+        engAdultLpJsAdult: resolve(
+          __dirname,
+          "eng-adult/lp-js-adult/index.html",
+        ),
+        engChildLpJsChild: resolve(
+          __dirname,
+          "eng-child/lp-js-child/index.html",
+        ),
+        },
         engAdultLpCheckUp: resolve(
           __dirname,
           "eng-adult/lp-check-up/index.html",

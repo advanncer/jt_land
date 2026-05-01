@@ -1,0 +1,1 @@
+@import "tailwindcss"; @theme { --font-sans: "Inter", system-ui, -apple-system, sans-serif; } :root { --orange-500: #f97316; --orange-600: #ea580c; } body { margin: 0; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
