@@ -30,6 +30,14 @@
   ],
   "rewrites": [
     {
+      "source": "/eng-adult/main",
+      "destination": "/eng-adult/main/index.html"
+    },
+    {
+      "source": "/eng-adult/main/:path*",
+      "destination": "/eng-adult/main/:path*"
+    },
+    {
       "source": "/",
       "destination": "/free-products/combo-lead-magnit/index.html"
     },

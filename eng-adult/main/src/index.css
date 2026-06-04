@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --skyeng-blue: #0071a0;
+  --skyeng-yellow: #fad800;
+}
+
+body {
+  margin: 0;
+  font-family: 'Stratos', sans-serif;
+}
+
+@font-face {
+  font-family: 'Stratos';
+  src: url('https://cdn-user53347.skyeng.ru/assets/fonts/stratos/stratosskyengweb-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Stratos';
+  src: url('https://cdn-user53347.skyeng.ru/assets/fonts/stratos/stratosskyengweb-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
