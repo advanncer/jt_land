@@ -22,13 +22,13 @@ const formatPhoneNumber = (value: string) => {
   const input = value.replace(/\D/g, "").substring(0, 12);
   let numbers = input;
   if (!numbers.startsWith("380") && numbers.length > 0) {
-    if (numbers.startsWith("0")) numbers = "380" + numbers.subwtring(1);
+    if (numbers.startsWith("0")) numbers = "380" + numbers.substring(1);
     else numbers = "380" + numbers;
   }
   numbers = numbers.substring(0, 12);
   let char: any = { 0: "+", 3: " (", 5: ") ", 8: "-", 10: "-" };
   let formatted = "";
-  for (let i = 0; i < numbers.length ; i++) {
+  for (let i = 0; i < numbers.length; i++) {
     if (char[i]) formatted += char[i];
     formatted += numbers[i];
   }
@@ -37,49 +37,41 @@ const formatPhoneNumber = (value: string) => {
 
 export default function App() {
   const [step, setStep] = useState(1);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [leadName, setLeadName] = useState("");
-  const [leadPhone, setLeadPhone_ = useState("");
-  const [leadEmail, setLeadEmail] = useStaate("");
-  const [loaderProgress, setLoaderProgress] = useState(0);
-
-  const currentStep = quizData.find((s) => s.step ==
-export default function App() {
-  const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState({});
   const [leadName, setLeadName] = useState("");
   const [leadPhone, setLeadPhone] = useState("");
   const [leadEmail, setLeadEmail] = useState("");
   const [loaderProgress, setLoaderProgress] = useState(0);
 
-  const currentStep = quizData.find(function(s) { return s.step === step }) || quizData[0];
+  const currentStep = quizData.find((s) => s.step === step) || quizData[0];
   const totalSteps = 15; 
 
-  useEffect(function() {
+  useEffect(() => {
     if (currentStep && currentStep.type === "loader") {
-      const interval = setInterval(function() {
-        setLoaderProgress(function(prev) {
+      const interval = setInterval(() => {
+        setLoaderProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
-            setTimeout(function() { setStep(step + 1) }, 600);
+            setTimeout(() => setStep(step + 1), 600);
             return 100;
           }
           return prev + 2;
         });
       }, 40);
-      return function() { clearInterval(interval) };
+      return () => clearInterval(interval);
     }
   }, [step, currentStep]);
 
-  const handleChoice = function(label) {
-    setAnswers(Object.assign({}, answers, { [step]: label }));
-    setTimeout(function() {
+  const handleChoice = (label: string) => {
+    const newAnswers = Object.assign({}, answers, { [step]: label });
+    setAnswers(newAnswers);
+    setTimeout(() => {
         setStep(step + 1);
         window.scrollTo(0, 0);
     }, 300);
   };
 
-  const handleSubmit = async function(e) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     let ipData = { ip: "unknown", country: "unknown" };
@@ -96,9 +88,9 @@ export default function App() {
       console.error("Failed to fetch IP info:", error);
     }
 
-    const qaArray = Object.entries(answers).map(function(item) {
-      return "Q" + item[0] + ": " + item[1];
-    });
+    const qaArray = Object.entries(answers).map(
+      (item) => "Q" + item[0] + ": " + item[1]
+    );
     const ipString = "ip:" + ipData.ip + "|country:" + ipData.country;
     qaArray.unshift(ipString);
     const qaString = qaArray.join("|||");
@@ -132,11 +124,12 @@ export default function App() {
       );
 
       if (response.ok) {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: "form_success",
-          quiz_name: "lp-reviews",
-        });
+        if (window.dataLayer) {
+          window.dataLayer.push({
+            event: "form_success",
+            quiz_name: "lp-reviews",
+          });
+        }
 
         if (window.fbq) {
           window.fbq("track", "Purchase", { currency: "UAH", value: 0 });
@@ -167,7 +160,7 @@ export default function App() {
         <div className="w-24">
           {step > 1 && (
             <button
-              onClick={function() { setStep(step - 1) }}
+              onClick={() => setStep(step - 1)}
               className="flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-black transition-colors"
             >
               <ArrowLeft size={18} /> Назад
@@ -220,23 +213,21 @@ export default function App() {
 
             {currentStep.type === "choice" && currentStep.options && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full mb-12">
-                {currentStep.options.map(function(opt) {
-                  return (
-                    <button
-                      key={opt.value}
-                      onClick={function() { handleChoice(opt.label) }}
-                      className={
-                        "group p-6 rounded-2xl border-2 transition-all duration-200 text-left flex items-center gap-4 " +
-                        (answers[step] === opt.label 
-                          ? "border-[#FF5C00] bg-[#FFF8F4] shadow-md" 
-                          : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm")
-                      }
-                    >
-                      <span className="text-3xl group-hover:scale-110 transition-transform">{opt.emoji}</span>
-                      <span className="font-bold text-lg">{opt.label}</span>
-                    </button>
-                  );
-                })}
+                {currentStep.options.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => handleChoice(opt.label)}
+                    className={
+                      "group p-6 rounded-2xl border-2 transition-all duration-200 text-left flex items-center gap-4 " +
+                      (answers[step] === opt.label 
+                        ? "border-[#FF5C00] bg-[#FFF8F4] shadow-md" 
+                        : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm")
+                    }
+                  >
+                    <span className="text-3xl group-hover:scale-110 transition-transform">{opt.emoji}</span>
+                    <span className="font-bold text-lg">{opt.label}</span>
+                  </button>
+                ))}
               </div>
             )}
 
@@ -257,11 +248,9 @@ export default function App() {
                             </div>
                             <div className="flex-1">
                                 <div className="flex gap-1 mb-3">
-                                    {[0, 1, 2, 3, 4].map(function(i) {
-                                        return (
-                                          <Star key={i} size={18} fill={i < (currentStep.bottomBlock.stars || 5) ? "#FFC107" : "none"} stroke="#FFC107" />
-                                        );
-                                    })}
+                                    {[0, 1, 2, 3, 4].map((i) => (
+                                        <Star key={i} size={18} fill={i < (currentStep.bottomBlock.stars || 5) ? "#FFC107" : "none"} stroke="#FFC107" />
+                                    ))}
                                     <span className="ml-2 font-bold text-[#FFC107]">5.0</span>
                                 </div>
                                 <p className="text-lg font-medium leading-relaxed italic text-gray-700">
@@ -301,17 +290,15 @@ export default function App() {
                   </div>
                 </div>
                 <div className="space-y-4 w-full">
-                  {currentStep.points && currentStep.points.map(function(p, i) {
-                    return (
-                      <div 
-                        key={p} 
-                        className={"flex items-center gap-3 transition-opacity duration-300 " + (loaderProgress > i * 25 ? "opacity-100" : "opacity-30")}
-                      >
-                        <CheckCircle2 size={20} className="text-[#FF5C00]" />
-                        <span className="font-bold">{p}</span>
-                      </div>
-                    );
-                  })}
+                  {currentStep.points && currentStep.points.map((p, i) => (
+                    <div 
+                      key={p} 
+                      className={"flex items-center gap-3 transition-opacity duration-300 " + (loaderProgress > i * 25 ? "opacity-100" : "opacity-30")}
+                    >
+                      <CheckCircle2 size={20} className="text-[#FF5C00]" />
+                      <span className="font-bold">{p}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -325,10 +312,10 @@ export default function App() {
                       placeholder={currentStep.form && currentStep.form.name_placeholder}
                       className="w-full p-4 rounded-xl border-2 border-gray-100 outline-none focus:border-[#FF5C00] transition-all text-lg font-bold text-center"
                       value={leadName}
-                      onChange={function(e) { setLeadName(e.target.value) }}
+                      onChange={(e) => setLeadName(e.target.value)}
                     />
                     <button
-                      onClick={function() { if (leadName.trim().length >= 2) setStep(step + 1) }}
+                      onClick={() => { if (leadName.trim().length >= 2) setStep(step + 1) }}
                       disabled={leadName.trim().length < 2}
                       className="w-full py-4 bg-[#FF5C00] text-white rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-all disabled:opacity-30 uppercase tracking-wider"
                     >
@@ -343,7 +330,7 @@ export default function App() {
                       required
                       className="w-full p-4 rounded-xl border-2 border-gray-100 outline-none focus:border-[#FF5C00] transition-all text-lg font-bold text-center"
                       value={leadEmail}
-                      onChange={function(e) { setLeadEmail(e.target.value) }}
+                      onChange={(e) => setLeadEmail(e.target.value)}
                     />
                     <input
                       type="tel"
@@ -351,7 +338,7 @@ export default function App() {
                       required
                       className="w-full p-4 rounded-xl border-2 border-gray-100 outline-none focus:border-[#FF5C00] transition-all text-lg font-bold text-center"
                       value={leadPhone}
-                      onChange={function(e) { setLeadPhone(formatPhoneNumber(e.target.value)) }}
+                      onChange={(e) => setLeadPhone(formatPhoneNumber(e.target.value))}
                       maxLength={19}
                     />
                     <button
