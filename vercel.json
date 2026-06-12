@@ -96,6 +96,15 @@
     {
       "source": "/eng-adult/lp-check-up/:path*",
       "destination": "/eng-adult/lp-check-up/:path*"
+    ,
+    {
+      "source": "/eng-adult/lp-reviews",
+      "destination": "/eng-adult/lp-reviews/index.html"
+    },
+    {
+      "source": "/eng-adult/lp-reviews/:path*",
+      "destination": "/eng-adult/lp-reviews/:path*"
+    }
     },
     {
       "source": "/eng-adult/lp-js-adult",
