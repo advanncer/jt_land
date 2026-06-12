@@ -24,6 +24,7 @@ export interface QuizStep {
   options?: QuizOption[];
   bottomBlock?: BottomBlock;
   points?: string[];
+  displayStep?: number;
 }
 
 export const quizData: QuizStep[] = [
@@ -33,6 +34,7 @@ export const quizData: QuizStep[] = [
   },
   {
     step: 2,
+    displayStep: 1,
     type: "choice",
     question: "Для кого ти шукаєш навчання?",
     options: [
@@ -51,6 +53,7 @@ export const quizData: QuizStep[] = [
   },
   {
     step: 3,
+    displayStep: 2,
     type: "choice",
     question: "Вкажіть ваш вік",
     subtitle: "Вік — це лише цифра! У нас є студенти від 5 до 65 років. Головне — ваше бажання вчитися, а комфортний темп ми забезпечимо.",
@@ -68,6 +71,7 @@ export const quizData: QuizStep[] = [
   },
   {
     step: 4,
+    displayStep: 15,
     type: "loader",
     question: "Ми формуємо для вас персоналізовану програму!",
     points: [
