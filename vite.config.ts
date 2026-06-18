@@ -24,6 +24,7 @@ export default defineConfig({
           __dirname,
           "eng-adult/lp-js-adult/index.html",
         ),
+        engChildQuizBoV1: resolve(__dirname, "eng-child/quiz-bo-v1/index.html"),
         engChildLpJsChild: resolve(
           __dirname,
           "eng-child/lp-js-child/index.html",
