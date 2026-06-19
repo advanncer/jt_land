@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { quizData } from "./data";
-import var1 from "../img/Y26_W5_Static_Quiz_var1.png";
-import var2 from "../img/Y26_W5_Static_Quiz_var2.png";
-import var3 from "../img/Y26_W5_Static_Quiz_var3.png";
-import var4 from "../img/Y26_W5_Static_Quiz_var4.png";
-import var5 from "../img/Y26_W5_Static_Quiz_var5.png";
-import var6 from "../img/Y26_W5_Static_Quiz_var6.png";
-import var7 from "../img/Y26_W5_Static_Quiz_var7.png";
-import var8 from "../img/Y26_W5_Static_Quiz_var8.png";
-import var9 from "../img/Y26_W5_Static_Quiz_var9.png";
+import var1 from "../../../shared/img/Y26_W5_Static_Quiz_var1.webp";
+import var2 from "../../../shared/img/Y26_W5_Static_Quiz_var2.webp";
+import var3 from "../../../shared/img/Y26_W5_Static_Quiz_var3.webp";
+import var4 from "../../../shared/img/Y26_W5_Static_Quiz_var4.webp";
+import var5 from "../../../shared/img/Y26_W5_Static_Quiz_var5.webp";
+import var6 from "../../../shared/img/Y26_W5_Static_Quiz_var6.webp";
+import var7 from "../../../shared/img/Y26_W5_Static_Quiz_var7.webp";
+import var8 from "../../../shared/img/Y26_W5_Static_Quiz_var8.webp";
+import var9 from "../../../shared/img/Y26_W5_Static_Quiz_var9.webp";
 
 const stepImages: { [key: number]: string } = {
   1: var1,
