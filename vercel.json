@@ -120,6 +120,14 @@
     {
       "source": "/eng-child/lp-js-child/:path*",
       "destination": "/eng-child/lp-js-child/:path*"
+    },
+    {
+      "source": "/eng-child/quiz-bo-v1",
+      "destination": "/eng-child/quiz-bo-v1/index.html"
+    },
+    {
+      "source": "/eng-child/quiz-bo-v1/:path*",
+      "destination": "/eng-child/quiz-bo-v1/:path*"
     }
   ],
   "redirects": [

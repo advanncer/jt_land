@@ -8,7 +8,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        engAdultMain: resolve(__dirname, "eng-adult/main/index.html"),        engAdultLp1: resolve(__dirname, "eng-adult/lp1/index.html"),
+        engAdultMain: resolve(__dirname, "eng-adult/main/index.html"),
+        engAdultLp1: resolve(__dirname, "eng-adult/lp1/index.html"),
         engAdultLp1Tg: resolve(__dirname, "eng-adult/lp1-tg/index.html"),
         engAdultLpPains: resolve(__dirname, "eng-adult/lp_pains/index.html"),
         comboLeadMagnit: resolve(
@@ -33,7 +34,10 @@ export default defineConfig({
           __dirname,
           "eng-adult/lp-check-up/index.html",
         ),
-        engAdultLpReviews: resolve(__dirname, "eng-adult/lp-reviews/index.html"),
+        engAdultLpReviews: resolve(
+          __dirname,
+          "eng-adult/lp-reviews/index.html",
+        ),
       },
     },
   },
@@ -42,3 +46,4 @@ export default defineConfig({
 // Force redeploy Wed Apr 15 21:50:33 +04 2026
 // Force redeploy Fri Apr 17 17:47:37 +04 2026
 // Force redeploy Tue Jun 16 19:47:49 +04 2026
+// Force redeploy Mon Jun 22 12:00:00 +04 2026

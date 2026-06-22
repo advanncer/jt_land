@@ -43,7 +43,11 @@ const App: React.FC = () => {
       return;
     }
 
-    const ipString = "ip:" + (ipInfo.ip || "unknown") + "|country:" + (ipInfo.country || "unknown");
+    const ipString =
+      "ip:" +
+      (ipInfo.ip || "unknown") +
+      "|country:" +
+      (ipInfo.country || "unknown");
     const qaParts = [ipString];
 
     quizData.forEach((q) => {
@@ -61,16 +65,16 @@ const App: React.FC = () => {
       qa: qaParts.join("|||"),
       dialogueName: "JustSchool Quiz",
       dialogueId: "unknown",
-      dialogueUrl: window.location.href
+      dialogueUrl: window.location.href,
     };
 
     try {
       const response = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
-      
+
       const result = await response.json();
 
       if (isTgVersion) {
@@ -97,8 +101,19 @@ const App: React.FC = () => {
 
     if (step === 13) {
       if (window.fbq) {
-        window.fbq("trackSingle", "9067851526565677", "Purchase", { currency: "UAH", value: 0 });
-        window.fbq("trackSingle", "1033701209166819", "Purchase", { currency: "UAH", value: 0 });
+        window.fbq("trackSingle", "9067851526565677", "Purchase", {
+          currency: "UAH",
+          value: 0,
+        });
+        window.fbq("trackSingle", "1033701209166819", "Purchase", {
+          currency: "UAH",
+          value: 0,
+        });
+      }
+      if (typeof window.gtag === "function") {
+        window.gtag("event", "conversion", {
+          send_to: "AW-11192598375/F6HqCOzpsMEcEOf-hdkp",
+        });
       }
       submitToCRM(newAnswers);
     } else {
@@ -109,34 +124,42 @@ const App: React.FC = () => {
   if (isSubmitted) {
     return (
       <div className="min-h-screen w-full bg-black flex justify-center relative overflow-hidden font-sans selection:bg-brand-orange/30">
-          <div className="fixed inset-0 bg-black z-0"></div>
-          <div className="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-600/20 blur-[100px] rounded-full z-0 pointer-events-none mix-blend-screen animate-pulse-slow"></div>
-          <div className="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-900/20 blur-[100px] rounded-full z-0 pointer-events-none mix-blend-screen"></div>
+        <div className="fixed inset-0 bg-black z-0"></div>
+        <div className="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-600/20 blur-[100px] rounded-full z-0 pointer-events-none mix-blend-screen animate-pulse-slow"></div>
+        <div className="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-900/20 blur-[100px] rounded-full z-0 pointer-events-none mix-blend-screen"></div>
 
-          <div className="w-full max-w-[480px] bg-black/80 relative z-10 min-h-screen shadow-2xl flex flex-col items-center justify-center p-6 text-center border-x border-white/5 animate-fade-in-up">
-              
-              <div className="w-20 h-20 bg-brand-orange/20 rounded-full flex items-center justify-center mb-6">
-                <span className="text-4xl">🎉</span>
-              </div>
-
-              <h1 className="text-3xl font-bold text-white mb-4">Дякуємо!<br/>Ми вже на зв'язку</h1>
-              
-              <p className="text-gray-300 text-lg mb-8 max-w-sm">
-                Наш менеджер зателефонує вам найближчим часом і підбере ідеального репетитора з англійської саме для вашої дитини.
-              </p>
-
-              <div className="mb-8 p-6 bg-white/5 border border-white/10 rounded-xl max-w-sm flex items-center gap-4 text-left">
-                <span className="text-3xl">📩</span>
-                <p className="text-gray-300 text-sm">
-                  PDF-подарунок із корисними вправами та іграми для вивчення англійської буде відправлено вам на пошту <strong>{answers[13] ? JSON.parse(answers[13][0]).email : ""}</strong>
-                </p>
-              </div>
-              
-              <p className="text-gray-500 text-sm">
-                Зазвичай ми зв'язуємося протягом 30 хвилин у робочий час (9:00–20:00).
-              </p>
-
+        <div className="w-full max-w-[480px] bg-black/80 relative z-10 min-h-screen shadow-2xl flex flex-col items-center justify-center p-6 text-center border-x border-white/5 animate-fade-in-up">
+          <div className="w-20 h-20 bg-brand-orange/20 rounded-full flex items-center justify-center mb-6">
+            <span className="text-4xl">🎉</span>
           </div>
+
+          <h1 className="text-3xl font-bold text-white mb-4">
+            Дякуємо!
+            <br />
+            Ми вже на зв'язку
+          </h1>
+
+          <p className="text-gray-300 text-lg mb-8 max-w-sm">
+            Наш менеджер зателефонує вам найближчим часом і підбере ідеального
+            репетитора з англійської саме для вашої дитини.
+          </p>
+
+          <div className="mb-8 p-6 bg-white/5 border border-white/10 rounded-xl max-w-sm flex items-center gap-4 text-left">
+            <span className="text-3xl">📩</span>
+            <p className="text-gray-300 text-sm">
+              PDF-подарунок із корисними вправами та іграми для вивчення
+              англійської буде відправлено вам на пошту{" "}
+              <strong>
+                {answers[13] ? JSON.parse(answers[13][0]).email : ""}
+              </strong>
+            </p>
+          </div>
+
+          <p className="text-gray-500 text-sm">
+            Зазвичай ми зв'язуємося протягом 30 хвилин у робочий час
+            (9:00–20:00).
+          </p>
+        </div>
       </div>
     );
   }
@@ -156,7 +179,7 @@ const App: React.FC = () => {
             ></div>
           </div>
         )}
-        <Quiz step={step} onNextStep={handleNextStep}  />
+        <Quiz step={step} onNextStep={handleNextStep} />
       </div>
     </div>
   );
