@@ -116,21 +116,73 @@ const icons: { [key: string]: React.FC<any> } = {
   Plane,
 };
 
-const formatPhoneNumber = (value: string) => {
-  const input = value.replace(/\D/g, "").substring(0, 12);
-  let numbers = input;
-  if (!numbers.startsWith("380") && numbers.length > 0) {
-    if (numbers.startsWith("0")) numbers = "380" + numbers.substring(1);
-    else numbers = "380" + numbers;
+const COUNTRIES = [
+  { code: "UA", name: "Україна", flag: "🇺🇦", dial: "380" },
+  { code: "PL", name: "Польща", flag: "🇵🇱", dial: "48" },
+  { code: "DE", name: "Німеччина", flag: "🇩🇪", dial: "49" },
+  { code: "RO", name: "Румунія", flag: "🇷🇴", dial: "40" },
+  { code: "SK", name: "Словаччина", flag: "🇸🇰", dial: "421" },
+  { code: "CZ", name: "Чехія", flag: "🇨🇿", dial: "420" },
+  { code: "GB", name: "Велика Британія", flag: "🇬🇧", dial: "44" },
+  { code: "US", name: "США", flag: "🇺🇸", dial: "1" },
+];
+
+const formatPhoneNumber = (value: string, dialCode: string = "380") => {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length === 0) return "";
+
+  let numbers = digits;
+
+  if (numbers.startsWith(dialCode)) {
+    // Already starts with dialCode
+  } else if (numbers.startsWith("0") && dialCode === "380") {
+    numbers = "380" + numbers.substring(1);
+  } else if (numbers.startsWith("0") && dialCode === "48") {
+    numbers = "48" + numbers.substring(1);
+  } else {
+    numbers = dialCode + numbers;
   }
-  numbers = numbers.substring(0, 12);
-  let char: any = { 0: "+", 3: " (", 5: ") ", 8: "-", 10: "-" };
-  let formatted = "";
-  for (let i = 0; i < numbers.length; i++) {
-    if (char[i]) formatted += char[i];
-    formatted += numbers[i];
+
+  if (numbers.startsWith("380")) {
+    numbers = numbers.substring(0, 12);
+    const char = { 0: "+", 3: " (", 5: ") ", 8: "-", 10: "-" };
+    let formatted = "";
+    for (let i = 0; i < numbers.length; i++) {
+      // @ts-expect-error char map access
+      if (char[i]) formatted += char[i];
+      formatted += numbers[i];
+    }
+    return formatted;
+  } else if (numbers.startsWith("48")) {
+    numbers = numbers.substring(0, 11);
+    const char = { 0: "+", 2: " (", 5: ") ", 8: "-" };
+    let formatted = "";
+    for (let i = 0; i < numbers.length; i++) {
+      // @ts-expect-error char map access
+      if (char[i]) formatted += char[i];
+      formatted += numbers[i];
+    }
+    return formatted;
+  } else if (numbers.startsWith("1")) {
+    numbers = numbers.substring(0, 11);
+    const char = { 0: "+", 1: " (", 4: ") ", 7: "-" };
+    let formatted = "";
+    for (let i = 0; i < numbers.length; i++) {
+      // @ts-expect-error char map access
+      if (char[i]) formatted += char[i];
+      formatted += numbers[i];
+    }
+    return formatted;
+  } else {
+    numbers = numbers.substring(0, 15);
+    let formatted = "+" + dialCode + " ";
+    const remaining = numbers.substring(dialCode.length);
+    for (let i = 0; i < remaining.length; i++) {
+      if (i > 0 && i % 3 === 0) formatted += " ";
+      formatted += remaining[i];
+    }
+    return formatted.trim();
   }
-  return formatted;
 };
 
 export default function App() {
@@ -140,6 +192,24 @@ export default function App() {
   const [leadPhone, setLeadPhone] = useState("");
   const [leadEmail, setLeadEmail] = useState("");
   const [loaderProgress, setLoaderProgress] = useState(0);
+  const [activeCountry, setActiveCountry] = useState(COUNTRIES[0]);
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetch("https://ipinfo.io/json")
+      .then((res) => res.json())
+      .then((data) => {
+        const countryCode = data.country || "UA";
+        const found = COUNTRIES.find(
+          (c) => c.code === countryCode.toUpperCase(),
+        );
+        if (found) {
+          setActiveCountry(found);
+        }
+      })
+      .catch((err) => console.error("Error fetching IP info:", err));
+  }, []);
 
   useEffect(() => {
     let link: HTMLLinkElement | null =
@@ -187,6 +257,8 @@ export default function App() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     let ipData = { ip: "unknown", country: "unknown" };
     try {
@@ -256,14 +328,17 @@ export default function App() {
           setLeadName("");
           setLeadPhone("");
           setLeadEmail("");
+          setIsSubmitting(false);
           window.scrollTo(0, 0);
         }
       } else {
         alert("Виникла помилка при відправці. Спробуйте ще раз.");
+        setIsSubmitting(false);
       }
     } catch (error) {
       console.error("Submission error:", error);
       alert("Виникла помилка при відправці. Перевірте з'єднання з інтернетом.");
+      setIsSubmitting(false);
     }
   };
 
@@ -555,30 +630,120 @@ export default function App() {
                           currentStep.form?.email_placeholder || "Ваш e-mail"
                         }
                         required
-                        className="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-lg font-black text-slate-900 bg-white shadow-sm text-center"
+                        className="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-lg font-black text-slate-900 bg-white shadow-sm text-center disabled:opacity-50"
                         value={leadEmail}
                         onChange={(e) => setLeadEmail(e.target.value)}
+                        disabled={isSubmitting}
                       />
-                      <input
-                        type="tel"
-                        placeholder={
-                          currentStep.form?.phone_placeholder ||
-                          "Твій номер телефону"
-                        }
-                        required
-                        className="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-lg font-black text-slate-900 bg-white shadow-sm text-center"
-                        value={leadPhone}
-                        onChange={(e) =>
-                          setLeadPhone(formatPhoneNumber(e.target.value))
-                        }
-                        maxLength={19}
-                      />
+                      <div className="relative w-full">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowCountryDropdown(!showCountryDropdown)
+                          }
+                          className="absolute inset-y-0 left-0 flex items-center pl-4 pr-3 border-r-2 border-slate-100 gap-1.5 cursor-pointer z-10"
+                        >
+                          <span className="text-2xl">{activeCountry.flag}</span>
+                          <span className="text-[10px] text-slate-400">▼</span>
+                        </button>
+                        <input
+                          type="tel"
+                          placeholder={
+                            activeCountry.dial === "380"
+                              ? "+380 (XX) XXX-XX-XX"
+                              : activeCountry.dial === "48"
+                                ? "+48 (XXX) XXX-XXX"
+                                : activeCountry.dial === "1"
+                                  ? "+1 (XXX) XXX-XXXX"
+                                  : `+${activeCountry.dial} XXXXXXXXX`
+                          }
+                          required
+                          className="w-full p-4 pl-[88px] rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-lg font-black text-slate-900 bg-white shadow-sm disabled:opacity-50"
+                          value={leadPhone}
+                          onChange={(e) =>
+                            setLeadPhone(
+                              formatPhoneNumber(
+                                e.target.value,
+                                activeCountry.dial,
+                              ),
+                            )
+                          }
+                          onFocus={() => {
+                            if (!leadPhone) {
+                              const prefix =
+                                activeCountry.dial === "380"
+                                  ? "+380 ("
+                                  : activeCountry.dial === "48"
+                                    ? "+48 ("
+                                    : activeCountry.dial === "1"
+                                      ? "+1 ("
+                                      : `+${activeCountry.dial} `;
+                              setLeadPhone(prefix);
+                            }
+                          }}
+                          onBlur={() => {
+                            const prefix =
+                              activeCountry.dial === "380"
+                                ? "+380 ("
+                                : activeCountry.dial === "48"
+                                  ? "+48 ("
+                                  : activeCountry.dial === "1"
+                                    ? "+1 ("
+                                    : `+${activeCountry.dial} `;
+                            if (
+                              leadPhone === prefix ||
+                              leadPhone === `+${activeCountry.dial}` ||
+                              leadPhone === "+" ||
+                              leadPhone === `+${activeCountry.dial} `
+                            ) {
+                              setLeadPhone("");
+                            }
+                          }}
+                          maxLength={19}
+                          disabled={isSubmitting}
+                        />
+
+                        {showCountryDropdown && (
+                          <div className="absolute left-0 bottom-[105%] w-64 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-2 max-h-60 overflow-y-auto text-left">
+                            {COUNTRIES.map((c) => (
+                              <button
+                                key={c.code}
+                                type="button"
+                                onClick={() => {
+                                  setActiveCountry(c);
+                                  setShowCountryDropdown(false);
+                                  setLeadPhone("");
+                                }}
+                                className="w-full px-4 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition-colors text-slate-800 font-bold text-sm"
+                              >
+                                <span className="text-xl">{c.flag}</span>
+                                <span className="flex-1">{c.name}</span>
+                                <span className="text-slate-400 text-xs font-semibold">
+                                  +{c.dial}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                       <button
                         type="submit"
-                        disabled={leadPhone.replace(/\D/g, "").length !== 12}
-                        className="w-full py-5 bg-orange-500 text-white rounded-2xl font-black text-lg shadow-lg shadow-orange-200 active:scale-95 transition-all disabled:opacity-30 uppercase tracking-widest"
+                        disabled={
+                          (() => {
+                            const digits = leadPhone.replace(/\D/g, "");
+                            if (activeCountry.dial === "380")
+                              return digits.length !== 12;
+                            if (
+                              activeCountry.dial === "48" ||
+                              activeCountry.dial === "1"
+                            )
+                              return digits.length !== 11;
+                            return digits.length < 9 || digits.length > 15;
+                          })() || isSubmitting
+                        }
+                        className="w-full py-5 bg-orange-500 text-white rounded-2xl font-black text-lg shadow-lg shadow-orange-200 active:scale-[0.98] transition-all disabled:opacity-30 uppercase tracking-widest"
                       >
-                        відправити
+                        {isSubmitting ? "Надсилаємо заявку..." : "відправити"}
                       </button>
                       {currentStep.guarantee_text && (
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-4">
