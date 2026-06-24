@@ -8,7 +8,7 @@ interface QuizProps {
 }
 
 const Logo: React.FC = () => (
-  <div className="w-full flex justify-center mb-6 pt-2">
+  <div className="w-full flex justify-center mb-3">
     <div className="flex items-center gap-2 opacity-90">
       <div className="w-8 h-8 bg-brand-orange rounded-lg flex items-center justify-center text-white font-bold text-lg">
         J
@@ -399,7 +399,7 @@ const Quiz: React.FC<QuizProps> = ({
 
   return (
     <>
-      <div className="w-full px-5 pt-16 pb-32 flex flex-col flex-grow overflow-y-auto no-scrollbar">
+      <div className="w-full px-5 pt-5 pb-32 flex flex-col flex-grow overflow-y-auto no-scrollbar">
         <Logo />
         <div
           key={step}
