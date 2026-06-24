@@ -17,6 +17,7 @@ const App: React.FC = () => {
   const [answers, setAnswers] = useState<Record<number, string[]>>({});
   const [ipInfo, setIpInfo] = useState<{ ip?: string; country?: string }>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isTgVersion = false;
 
@@ -35,11 +36,14 @@ const App: React.FC = () => {
     const formDataJson = finalAnswers[formStepIndex]?.[0];
     if (!formDataJson) return;
 
+    setIsSubmitting(true);
+
     let formData = { name: "", phone: "", email: "" };
     try {
       formData = JSON.parse(formDataJson);
     } catch (e) {
       console.error("Error parsing form data", e);
+      setIsSubmitting(false);
       return;
     }
 
@@ -79,20 +83,24 @@ const App: React.FC = () => {
 
       if (isTgVersion) {
         setIsSubmitted(true);
+        setIsSubmitting(false);
       } else {
         if (result.redirectUri) {
           window.location.href = result.redirectUri;
         } else {
           setIsSubmitted(true);
+          setIsSubmitting(false);
         }
       }
     } catch (err) {
       console.error("Submission failed:", err);
       setIsSubmitted(true);
+      setIsSubmitting(false);
     }
   };
 
   const handleNextStep = (stepAnswers?: string[]) => {
+    if (isSubmitting) return;
     let newAnswers = answers;
     if (stepAnswers) {
       newAnswers = { ...answers, [step]: stepAnswers };
@@ -179,7 +187,11 @@ const App: React.FC = () => {
             ></div>
           </div>
         )}
-        <Quiz step={step} onNextStep={handleNextStep} />
+        <Quiz
+          step={step}
+          onNextStep={handleNextStep}
+          isSubmitting={isSubmitting}
+        />
       </div>
     </div>
   );
