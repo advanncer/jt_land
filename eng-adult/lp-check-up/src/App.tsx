@@ -217,6 +217,8 @@ export default function App() {
       email: leadEmail,
       qa: qaString,
       dialogueUrl: window.location.href,
+      dialogueName: "JustSchool Quiz",
+      dialogueId: "unknown",
       utm_source: urlParams.get("utm_source"),
       utm_medium: urlParams.get("utm_medium"),
       utm_campaign: urlParams.get("utm_campaign"),
