@@ -226,16 +226,13 @@ export default function App() {
     };
 
     try {
-      const response = await fetch(
-        "https://n8n.justschool.me/webhook/19be50df-0410-4330-8dcb-3797fa703c56",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
+      const response = await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(payload),
+      });
 
       if (response.ok) {
         window.dataLayer = window.dataLayer || [];
