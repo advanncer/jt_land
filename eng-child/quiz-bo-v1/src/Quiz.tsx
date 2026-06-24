@@ -5,6 +5,7 @@ interface QuizProps {
   step: number;
   onNextStep: (answers?: string[]) => void;
   isSubmitting?: boolean;
+  country?: string;
 }
 
 const Logo: React.FC = () => (
@@ -44,41 +45,118 @@ const ShimmerButton: React.FC<{
   </button>
 );
 
-const formatPhoneNumber = (value: string) => {
+const countryDialCodes: Record<string, string> = {
+  UA: "380",
+  PL: "48",
+  DE: "49",
+  GB: "44",
+  US: "1",
+  CA: "1",
+  RO: "40",
+  HU: "36",
+  SK: "421",
+  CZ: "420",
+  MD: "373",
+  IT: "39",
+  FR: "33",
+  ES: "34",
+  PT: "351",
+  IE: "353",
+  AT: "43",
+  CH: "41",
+  BE: "32",
+  NL: "31",
+  DK: "45",
+  NO: "47",
+  SE: "46",
+  FI: "358",
+  EE: "372",
+  LV: "371",
+  LT: "370",
+  GR: "30",
+  CY: "357",
+  IL: "972",
+  TR: "90",
+  AE: "971",
+};
+
+const getFlagEmoji = (countryCode: string) => {
+  if (!countryCode || countryCode.length !== 2) return "🇺🇦";
+  const codePoints = countryCode
+    .toUpperCase()
+    .split("")
+    .map((char) => 127397 + char.charCodeAt(0));
+  try {
+    return String.fromCodePoint(...codePoints);
+  } catch (e) {
+    return "🇺🇦";
+  }
+};
+
+const formatPhoneNumber = (value: string, countryCode: string = "UA") => {
   const digits = value.replace(/\D/g, "");
   if (digits.length === 0) return "";
 
+  const dialCode = countryDialCodes[countryCode.toUpperCase()] || "380";
   let numbers = digits;
-  if (numbers.startsWith("380")) {
-    // Already starts with 380, keep as is
-  } else if (numbers === "3" || numbers === "38") {
-    // User is typing part of country code
-    numbers = "380";
-  } else if (numbers.startsWith("80")) {
-    numbers = "38" + numbers;
-  } else if (numbers === "8") {
-    numbers = "380";
-  } else if (numbers.startsWith("0")) {
+
+  if (numbers.startsWith(dialCode)) {
+    // Starts with dial code, perfect
+  } else if (numbers.startsWith("0") && dialCode === "380") {
     numbers = "380" + numbers.substring(1);
+  } else if (numbers.startsWith("0") && dialCode === "48") {
+    numbers = "48" + numbers.substring(1);
   } else {
-    numbers = "380" + numbers;
+    numbers = dialCode + numbers;
   }
 
-  numbers = numbers.substring(0, 12);
-  const char = { 0: "+", 3: " (", 5: ") ", 8: "-", 10: "-" };
-  let formatted = "";
-  for (let i = 0; i < numbers.length; i++) {
-    // @ts-expect-error char map access
-    if (char[i]) formatted += char[i];
-    formatted += numbers[i];
+  if (numbers.startsWith("380")) {
+    numbers = numbers.substring(0, 12);
+    const char = { 0: "+", 3: " (", 5: ") ", 8: "-", 10: "-" };
+    let formatted = "";
+    for (let i = 0; i < numbers.length; i++) {
+      // @ts-expect-error char map access
+      if (char[i]) formatted += char[i];
+      formatted += numbers[i];
+    }
+    return formatted;
+  } else if (numbers.startsWith("48")) {
+    numbers = numbers.substring(0, 11);
+    const char = { 0: "+", 2: " (", 5: ") ", 8: "-" };
+    let formatted = "";
+    for (let i = 0; i < numbers.length; i++) {
+      // @ts-expect-error char map access
+      if (char[i]) formatted += char[i];
+      formatted += numbers[i];
+    }
+    return formatted;
+  } else if (numbers.startsWith("1")) {
+    numbers = numbers.substring(0, 11);
+    const char = { 0: "+", 1: " (", 4: ") ", 7: "-" };
+    let formatted = "";
+    for (let i = 0; i < numbers.length; i++) {
+      // @ts-expect-error char map access
+      if (char[i]) formatted += char[i];
+      formatted += numbers[i];
+    }
+    return formatted;
+  } else {
+    numbers = numbers.substring(0, 15);
+    let formatted = "+" + dialCode + " ";
+    const remaining = numbers.substring(dialCode.length);
+    for (let i = 0; i < remaining.length; i++) {
+      if (i > 0 && i % 3 === 0) formatted += " ";
+      formatted += remaining[i];
+    }
+    return formatted.trim();
   }
-  return formatted;
 };
 
 const Quiz: React.FC<QuizProps> = ({
   step,
   onNextStep,
   isSubmitting = false,
+  country = "UA",
 }) => {
   const currentStepData = quizData.find((item) => item.step === step);
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
@@ -87,7 +165,15 @@ const Quiz: React.FC<QuizProps> = ({
   let isFormValid = false;
   if (currentStepData && currentStepData.type === "form") {
     const phoneDigits = formData.phone.replace(/\D/g, "");
-    const isPhoneValid = phoneDigits.length === 12;
+    const dialCode = countryDialCodes[country.toUpperCase()] || "380";
+    let isPhoneValid = false;
+    if (dialCode === "380") {
+      isPhoneValid = phoneDigits.length === 12;
+    } else if (dialCode === "48" || dialCode === "1") {
+      isPhoneValid = phoneDigits.length === 11;
+    } else {
+      isPhoneValid = phoneDigits.length >= 9 && phoneDigits.length <= 15;
+    }
     const isNameValid = formData.name.trim().length >= 2;
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
     isFormValid = isPhoneValid && isNameValid && isEmailValid;
@@ -127,7 +213,7 @@ const Quiz: React.FC<QuizProps> = ({
       setFormData({ ...formData, phone: val });
       return;
     }
-    setFormData({ ...formData, phone: formatPhoneNumber(val) });
+    setFormData({ ...formData, phone: formatPhoneNumber(val, country) });
   };
 
   const renderStart = () => (
@@ -320,60 +406,81 @@ const Quiz: React.FC<QuizProps> = ({
     </>
   );
 
-  const renderForm = () => (
-    <>
-      <h2 className="text-2xl font-bold text-white mb-2 text-center">
-        {currentStepData.question}
-      </h2>
-      <p className="text-gray-400 text-center mb-6">{currentStepData.desc}</p>
-      <div className="flex flex-col gap-4 w-full">
-        <input
-          type="text"
-          placeholder="Ваше імʼя*"
-          className="input-glass py-4 text-lg w-full disabled:opacity-50"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          disabled={isSubmitting}
-        />
-        <div className="relative w-full">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none gap-2">
-            <span className="text-xl">🇺🇦</span>
+  const renderForm = () => {
+    const activeDial = countryDialCodes[country.toUpperCase()] || "380";
+    let phonePlaceholder = "+380 (XX) XXX-XX-XX";
+    if (activeDial === "380") phonePlaceholder = "+380 (XX) XXX-XX-XX";
+    else if (activeDial === "48") phonePlaceholder = "+48 (XXX) XXX-XXX";
+    else if (activeDial === "1") phonePlaceholder = "+1 (XXX) XXX-XXXX";
+    else phonePlaceholder = `+${activeDial} XXXXXXXXX`;
+
+    const emptyPrefix =
+      activeDial === "380"
+        ? "+380 ("
+        : activeDial === "48"
+          ? "+48 ("
+          : activeDial === "1"
+            ? "+1 ("
+            : `+${activeDial} `;
+
+    return (
+      <>
+        <h2 className="text-2xl font-bold text-white mb-2 text-center">
+          {currentStepData.question}
+        </h2>
+        <p className="text-gray-400 text-center mb-6">{currentStepData.desc}</p>
+        <div className="flex flex-col gap-4 w-full">
+          <input
+            type="text"
+            placeholder="Ваше імʼя*"
+            className="input-glass py-4 text-lg w-full disabled:opacity-50"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            disabled={isSubmitting}
+          />
+          <div className="relative w-full">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none gap-2">
+              <span className="text-xl">{getFlagEmoji(country)}</span>
+            </div>
+            <input
+              type="tel"
+              placeholder={phonePlaceholder}
+              className="input-glass py-4 pl-12 text-lg w-full disabled:opacity-50"
+              value={formData.phone}
+              onChange={handlePhoneChange}
+              onFocus={() => {
+                if (!formData.phone) {
+                  setFormData({ ...formData, phone: emptyPrefix });
+                }
+              }}
+              onBlur={() => {
+                if (
+                  formData.phone === emptyPrefix ||
+                  formData.phone === `+${activeDial}` ||
+                  formData.phone === "+" ||
+                  formData.phone === `+${activeDial} `
+                ) {
+                  setFormData({ ...formData, phone: "" });
+                }
+              }}
+              maxLength={19}
+              disabled={isSubmitting}
+            />
           </div>
           <input
-            type="tel"
-            placeholder="+380 (XX) XXX-XX-XX"
-            className="input-glass py-4 pl-12 text-lg w-full disabled:opacity-50"
-            value={formData.phone}
-            onChange={handlePhoneChange}
-            onFocus={() => {
-              if (!formData.phone) {
-                setFormData({ ...formData, phone: "+380 (" });
-              }
-            }}
-            onBlur={() => {
-              if (
-                formData.phone === "+380 (" ||
-                formData.phone === "+380" ||
-                formData.phone === "+"
-              ) {
-                setFormData({ ...formData, phone: "" });
-              }
-            }}
-            maxLength={19}
+            type="email"
+            placeholder="Ваш e-mail*"
+            className="input-glass py-4 text-lg w-full disabled:opacity-50"
+            value={formData.email}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             disabled={isSubmitting}
           />
         </div>
-        <input
-          type="email"
-          placeholder="Ваш e-mail*"
-          className="input-glass py-4 text-lg w-full disabled:opacity-50"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          disabled={isSubmitting}
-        />
-      </div>
-    </>
-  );
+      </>
+    );
+  };
 
   let ctaText = "ПРОДОВЖИТИ";
   let showCta = false;

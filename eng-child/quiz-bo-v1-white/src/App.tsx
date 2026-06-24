@@ -191,6 +191,7 @@ const App: React.FC = () => {
           step={step}
           onNextStep={handleNextStep}
           isSubmitting={isSubmitting}
+          country={ipInfo.country}
         />
       </div>
     </div>
