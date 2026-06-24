@@ -136,7 +136,7 @@ const App: React.FC = () => {
         <div className="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-500/5 blur-[120px] rounded-full z-0 pointer-events-none animate-pulse-slow"></div>
         <div className="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full z-0 pointer-events-none"></div>
 
-        <div className="w-full max-w-[480px] bg-white relative z-10 min-h-screen shadow-2xl flex flex-col items-center justify-center p-6 text-center border-x border-slate-100 animate-fade-in-up">
+        <div className="w-full max-w-[480px] sm:max-w-[580px] md:max-w-[680px] bg-white relative z-10 min-h-screen shadow-2xl flex flex-col items-center justify-center p-6 text-center border-x border-slate-100 animate-fade-in-up">
           <div className="w-20 h-20 bg-brand-orange/10 rounded-full flex items-center justify-center mb-6">
             <span className="text-4xl">🎉</span>
           </div>
@@ -178,9 +178,9 @@ const App: React.FC = () => {
       <div className="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-500/5 blur-[120px] rounded-full z-0 pointer-events-none animate-pulse-slow"></div>
       <div className="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full z-0 pointer-events-none"></div>
 
-      <div className="w-full max-w-[480px] bg-white relative z-10 min-h-screen shadow-2xl flex flex-col border-x border-slate-100">
+      <div className="w-full max-w-[480px] sm:max-w-[580px] md:max-w-[680px] bg-white relative z-10 min-h-screen shadow-2xl flex flex-col border-x border-slate-100">
         {step > 1 && !isSubmitted && (
-          <div className="fixed top-0 w-full max-w-[480px] h-[4px] bg-slate-100/80 backdrop-blur-md z-[60]">
+          <div className="fixed top-0 w-full max-w-[480px] sm:max-w-[580px] md:max-w-[680px] h-[4px] bg-slate-100/80 backdrop-blur-md z-[60]">
             <div
               className="h-full bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-500 ease-out shadow-[0_0_15px_rgba(241,102,0,0.5)]"
               style={{ width: progress + "%" }}

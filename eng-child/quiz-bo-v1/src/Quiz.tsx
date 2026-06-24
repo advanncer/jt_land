@@ -243,7 +243,7 @@ const Quiz: React.FC<QuizProps> = ({
       <h2 className="text-2xl font-bold text-white mb-6 text-center">
         JustSchool у цифрах
       </h2>
-      <div className="flex flex-col gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         <div className="bg-white/5 border border-white/10 rounded-xl p-5 text-center">
           <div className="text-3xl font-extrabold text-brand-orange mb-1">
             15 000+
@@ -417,7 +417,7 @@ const Quiz: React.FC<QuizProps> = ({
         </div>
       </div>
       {showCta && (
-        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 bg-gradient-to-t from-black via-black/95 to-transparent pt-6 px-6 pb-8 backdrop-blur-[2px]">
+        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] sm:max-w-[580px] md:max-w-[680px] z-50 bg-gradient-to-t from-black via-black/95 to-transparent pt-6 px-6 pb-8 backdrop-blur-[2px]">
           <ShimmerButton onClick={handleNextClick} disabled={isButtonDisabled}>
             {ctaText}
           </ShimmerButton>
