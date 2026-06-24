@@ -159,7 +159,7 @@ const Quiz: React.FC<QuizProps> = ({
         {currentStepData.answers?.map((answer) => (
           <button
             key={answer.text}
-            className="p-4 text-left rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all font-bold text-white"
+            className="p-4 text-left rounded-xl border border-brand-orange/50 bg-brand-orange/5 hover:border-brand-orange/80 hover:bg-brand-orange/15 transition-all duration-300 font-bold text-white shadow-[0_4px_12px_rgba(241,102,0,0.05)] active:scale-[0.99]"
             onClick={() => handleAnswerClick(answer.text)}
           >
             {answer.text}
@@ -182,7 +182,7 @@ const Quiz: React.FC<QuizProps> = ({
         {currentStepData.answers?.map((answer) => (
           <button
             key={answer.text}
-            className="p-4 text-left rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all font-bold text-white"
+            className="p-4 text-left rounded-xl border border-brand-orange/50 bg-brand-orange/5 hover:border-brand-orange/80 hover:bg-brand-orange/15 transition-all duration-300 font-bold text-white shadow-[0_4px_12px_rgba(241,102,0,0.05)] active:scale-[0.99]"
             onClick={() => handleAnswerClick(answer.text)}
           >
             {answer.text}
