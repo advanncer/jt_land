@@ -128,6 +128,14 @@
     {
       "source": "/eng-child/quiz-bo-v1/:path*",
       "destination": "/eng-child/quiz-bo-v1/:path*"
+    },
+    {
+      "source": "/eng-child/quiz-bo-v1-white",
+      "destination": "/eng-child/quiz-bo-v1-white/index.html"
+    },
+    {
+      "source": "/eng-child/quiz-bo-v1-white/:path*",
+      "destination": "/eng-child/quiz-bo-v1-white/:path*"
     }
   ],
   "redirects": [
