@@ -107,14 +107,6 @@ export default async function handler(request, response) {
   const esputnikApiKey =
     process.env.ESPUTNIK_API_KEY || "47743228FB8260569CA855D42622CFD2";
   if (esputnikApiKey) {
-    const esputnikPayload = {
-      firstName: name,
-      channels: [
-        ...(email ? [{ type: "email", value: email }] : []),
-        ...(phone ? [{ type: "sms", value: phone.replace(/\D/g, "") }] : []),
-      ],
-    };
-
     // Add custom fields for eSputnik
     const esputnikFields = [];
 
@@ -141,9 +133,16 @@ export default async function handler(request, response) {
       });
     }
 
-    if (esputnikFields.length > 0) {
-      esputnikPayload.fields = esputnikFields;
-    }
+    const esputnikPayload = {
+      contact: {
+        firstName: name,
+        channels: [
+          ...(email ? [{ type: "email", value: email }] : []),
+          ...(phone ? [{ type: "sms", value: phone.replace(/\D/g, "") }] : []),
+        ],
+        fields: esputnikFields,
+      },
+    };
 
     const esputnikAuth = Buffer.from(`user:${esputnikApiKey}`).toString(
       "base64",
