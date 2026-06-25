@@ -143,7 +143,60 @@ export default async function handler(request, response) {
       customFieldsIDs.push(295300);
     }
 
-    // 3. Додаткове поле для відповідей на квіз (якщо налаштоване через ENV змінні)
+    // 3. Кастомне поле Name (ID 235152)
+    if (name) {
+      esputnikFields.push({
+        id: 235152,
+        value: name,
+      });
+      customFieldsIDs.push(235152);
+    }
+
+    // 4. Кастомне поле Номер телефону (ID 235245)
+    if (phone) {
+      esputnikFields.push({
+        id: 235245,
+        value: phone,
+      });
+      customFieldsIDs.push(235245);
+    }
+
+    // 5. Кастомне поле Email (ID 235246)
+    if (email) {
+      esputnikFields.push({
+        id: 235246,
+        value: email,
+      });
+      customFieldsIDs.push(235246);
+    }
+
+    // 6. Кастомне поле Тип учня (ID 235249 - "дорослий" або "дитина")
+    let studentType = "";
+    const lowerUrl = dialogueUrl.toLowerCase();
+    const lowerLeadType = (
+      data.Lead_type ||
+      data.lead_type ||
+      ""
+    ).toLowerCase();
+
+    if (lowerUrl.includes("/eng-child/") || lowerLeadType.includes("child")) {
+      studentType = "дитина";
+    } else if (
+      lowerUrl.includes("/eng-adult/") ||
+      lowerLeadType.includes("adult")
+    ) {
+      studentType = "дорослий";
+    }
+
+    if (studentType) {
+      esputnikFields.push({
+        id: 235249,
+        value: studentType,
+      });
+      customFieldsIDs.push(235249);
+    }
+
+    // 7. Додаткове поле для відповідей на квіз (якщо налаштоване через ENV змінні)
     const esputnikQaFieldId = process.env.ESPUTNIK_QA_FIELD_ID;
     if (esputnikQaFieldId && qa) {
       const parsedId = parseInt(esputnikQaFieldId, 10);
