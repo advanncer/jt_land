@@ -7,7 +7,7 @@ export default async function handler(request, response) {
   // If "Джерело ліда" is a dropdown list in eSputnik, this value MUST exist in its list of options.
   // You can change this value to match your exact eSputnik option (e.g. "Site", "Quiz" or "Landing").
   // Or keep it as "AI Landing" and add "AI Landing" as an option in eSputnik UI -> Additional Fields settings.
-  const esputnikLeadSource = "AI Landing";
+  const esputnikLeadSource = "ai_landing";
 
   const data = request.body || {};
 
