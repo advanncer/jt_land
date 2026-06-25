@@ -5,6 +5,9 @@ export default async function handler(request, response) {
 
   const data = request.body || {};
 
+  console.log("=== API SUBMIT CALLED ===");
+  console.log("Incoming request body:", JSON.stringify(data, null, 2));
+
   // 1. Normalize and clean phone number to flat string format (e.g. +380952150831)
   let phone = data.phone || data.Phone || "";
   if (phone && typeof phone === "string") {
@@ -21,6 +24,8 @@ export default async function handler(request, response) {
   const email = data.email || data.Email || "";
   const qa = data.qa || data.Answear || "";
   const dialogueUrl = data.dialogueUrl || data.url || data.URL || "";
+
+  console.log("Normalized values:", { name, phone, email, qa, dialogueUrl });
 
   // 2. Prepare data for NocoDB
   // Parse IP and Country from the QA string for cleaner database entry
@@ -61,6 +66,7 @@ export default async function handler(request, response) {
 
   // --- Send to NocoDB ---
   if (nocoToken && tableId) {
+    console.log("Sending to NocoDB...");
     promises.push(
       fetch(`https://app.nocodb.com/api/v2/tables/${tableId}/records`, {
         method: "POST",
@@ -70,9 +76,9 @@ export default async function handler(request, response) {
         },
         body: JSON.stringify(nocoPayload),
       }).then(async (res) => {
+        const text = await res.text();
+        console.log("NocoDB Response status:", res.status, "Body:", text);
         if (!res.ok) {
-          const text = await res.text();
-          console.error("NocoDB Error response:", text);
           throw new Error(`NocoDB Error: ${res.status}`);
         }
         return { service: "NocoDB", success: true };
@@ -85,12 +91,14 @@ export default async function handler(request, response) {
     data.n8nWebhookUrl ||
     "https://n8n.justschool.me/webhook/19be50df-0410-4330-8dcb-3797fa703c56";
   if (n8nWebhookUrl) {
+    console.log("Sending to n8n webhook:", n8nWebhookUrl);
     promises.push(
       fetch(n8nWebhookUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       }).then(async (res) => {
+        console.log("n8n Response status:", res.status);
         if (!res.ok) {
           throw new Error(`n8n Error: ${res.status}`);
         }
@@ -138,8 +146,6 @@ export default async function handler(request, response) {
       customFieldsIDs.push(parsedId);
     }
 
-    // Using the plural API (contacts) with explicit customFieldsIDs is the most robust way
-    // to force eSputnik to save custom fields for both new and existing (updating) contacts.
     const esputnikPayload = {
       contacts: [
         {
@@ -156,6 +162,9 @@ export default async function handler(request, response) {
       customFieldsIDs: customFieldsIDs,
     };
 
+    console.log("Sending payload to eSputnik /contacts endpoint...");
+    console.log("eSputnik Payload:", JSON.stringify(esputnikPayload, null, 2));
+
     const esputnikAuth = Buffer.from(`user:${esputnikApiKey}`).toString(
       "base64",
     );
@@ -168,12 +177,13 @@ export default async function handler(request, response) {
         },
         body: JSON.stringify(esputnikPayload),
       }).then(async (res) => {
+        const text = await res.text();
+        console.log("eSputnik Response Status:", res.status);
+        console.log("eSputnik Response Body:", text);
         if (!res.ok) {
-          const text = await res.text();
-          console.error("eSputnik Error response:", text);
-          throw new Error(`eSputnik Error: ${res.status}`);
+          throw new Error(`eSputnik Error: ${res.status} - ${text}`);
         }
-        return { service: "eSputnik", success: true };
+        return { service: "eSputnik", success: true, response: text };
       }),
     );
   } else {
