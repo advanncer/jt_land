@@ -170,7 +170,7 @@ export default async function handler(request, response) {
       customFieldsIDs.push(235246);
     }
 
-    // 6. Кастомне поле Тип учня (ID 235249 - "дорослий" або "дитина")
+    // 6. Кастомне поле Тип учня (ID 235249 - "adult" або "child")
     let studentType = "";
     const lowerUrl = dialogueUrl.toLowerCase();
     const lowerLeadType = (
@@ -180,12 +180,12 @@ export default async function handler(request, response) {
     ).toLowerCase();
 
     if (lowerUrl.includes("/eng-child/") || lowerLeadType.includes("child")) {
-      studentType = "дитина";
+      studentType = "child";
     } else if (
       lowerUrl.includes("/eng-adult/") ||
       lowerLeadType.includes("adult")
     ) {
-      studentType = "дорослий";
+      studentType = "adult";
     }
 
     if (studentType) {
