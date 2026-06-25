@@ -3,6 +3,12 @@ export default async function handler(request, response) {
     return response.status(405).json({ error: "Method Not Allowed" });
   }
 
+  // --- CONFIGURABLE ESPUTNIK VALUES ---
+  // If "Джерело ліда" is a dropdown list in eSputnik, this value MUST exist in its list of options.
+  // You can change this value to match your exact eSputnik option (e.g. "Site", "Quiz" or "Landing").
+  // Or keep it as "AI Landing" and add "AI Landing" as an option in eSputnik UI -> Additional Fields settings.
+  const esputnikLeadSource = "AI Landing";
+
   const data = request.body || {};
 
   console.log("=== API SUBMIT CALLED ===");
@@ -120,11 +126,13 @@ export default async function handler(request, response) {
     const customFieldsIDs = [];
 
     // 1. Джерело ліда (%CLIENT.LID_SOURSE% - ID 235251)
-    esputnikFields.push({
-      id: 235251,
-      value: "AI Landing",
-    });
-    customFieldsIDs.push(235251);
+    if (esputnikLeadSource) {
+      esputnikFields.push({
+        id: 235251,
+        value: esputnikLeadSource,
+      });
+      customFieldsIDs.push(235251);
+    }
 
     // 2. URL стрічки / лендингу (%PERSONAL.LANDING_URL% - ID 295300)
     if (dialogueUrl) {
@@ -146,6 +154,7 @@ export default async function handler(request, response) {
       customFieldsIDs.push(parsedId);
     }
 
+    // contacts API payload with mandatory dedupeOn and customFieldsIDs
     const esputnikPayload = {
       contacts: [
         {
@@ -159,6 +168,7 @@ export default async function handler(request, response) {
           fields: esputnikFields,
         },
       ],
+      dedupeOn: "email_or_sms",
       customFieldsIDs: customFieldsIDs,
     };
 
