@@ -1,3 +1,51 @@
+// Helper to detect if a phone number is a dummy/fake number or has invalid carrier codes
+function isDummyPhone(phone) {
+  if (!phone || typeof phone !== "string") return true;
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 7) return true;
+
+  // 1. If the last 7 digits are identical (e.g., 0000000, 1111111, 5555555)
+  const last7 = digits.slice(-7);
+  if (last7.split("").every((char) => char === last7[0])) {
+    return true;
+  }
+
+  // 2. Ukrainian phone number carrier validation
+  if (digits.startsWith("380") && digits.length === 12) {
+    const carrier = digits.slice(3, 5); // key carrier code
+    const validCarriers = [
+      "50",
+      "63",
+      "66",
+      "67",
+      "68",
+      "73",
+      "91",
+      "92",
+      "93",
+      "94",
+      "95",
+      "96",
+      "97",
+      "98",
+      "99",
+    ];
+    if (!validCarriers.includes(carrier)) {
+      return true;
+    }
+  }
+
+  // 3. Polish phone number carrier validation
+  if (digits.startsWith("48") && digits.length === 11) {
+    const carrier = digits.slice(2, 4);
+    if (carrier === "00") {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export default async function handler(request, response) {
   if (request.method !== "POST") {
     return response.status(405).json({ error: "Method Not Allowed" });
@@ -214,7 +262,7 @@ export default async function handler(request, response) {
           firstName: name,
           channels: [
             ...(email ? [{ type: "email", value: email }] : []),
-            ...(phone
+            ...(phone && !isDummyPhone(phone)
               ? [{ type: "sms", value: phone.replace(/\D/g, "") }]
               : []),
           ],
@@ -246,6 +294,73 @@ export default async function handler(request, response) {
         if (!res.ok) {
           throw new Error(`eSputnik Error: ${res.status} - ${text}`);
         }
+
+        // Check if there are failed contacts due to phone validation errors
+        let responseJson = null;
+        try {
+          responseJson = JSON.parse(text);
+        } catch (e) {
+          // ignore parsing error
+        }
+
+        if (responseJson && responseJson.failedContacts && email) {
+          const failedList = Array.isArray(responseJson.failedContacts)
+            ? responseJson.failedContacts
+            : [responseJson.failedContacts];
+
+          const hasPhoneValidationError = failedList.some(
+            (fc) => fc.error && fc.error.toLowerCase().includes("phone number"),
+          );
+
+          if (hasPhoneValidationError) {
+            console.warn(
+              "eSputnik rejected contact due to phone validation error. Retrying with only Email channel...",
+            );
+            // Construct fallback payload (exclude sms channel)
+            const fallbackPayload = {
+              ...esputnikPayload,
+              contacts: esputnikPayload.contacts.map((contact) => ({
+                ...contact,
+                channels: contact.channels.filter((ch) => ch.type !== "sms"),
+              })),
+            };
+
+            console.log(
+              "eSputnik Fallback Payload:",
+              JSON.stringify(fallbackPayload, null, 2),
+            );
+
+            const retryRes = await fetch(
+              "https://esputnik.com/api/v1/contacts",
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Basic ${esputnikAuth}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(fallbackPayload),
+              },
+            );
+
+            const retryText = await retryRes.text();
+            console.log("eSputnik Retry Response Status:", retryRes.status);
+            console.log("eSputnik Retry Response Body:", retryText);
+
+            if (!retryRes.ok) {
+              throw new Error(
+                `eSputnik Retry Error: ${retryRes.status} - ${retryText}`,
+              );
+            }
+
+            return {
+              service: "eSputnik",
+              success: true,
+              response: retryText,
+              retried: true,
+            };
+          }
+        }
+
         return { service: "eSputnik", success: true, response: text };
       }),
     );
