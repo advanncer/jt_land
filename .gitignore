@@ -25,3 +25,4 @@ dist-ssr
 
 # Ignored Archive for reference/backup data
 ignored_archive/
+.vercel
