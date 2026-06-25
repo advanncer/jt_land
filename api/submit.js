@@ -107,14 +107,16 @@ export default async function handler(request, response) {
   const esputnikApiKey =
     process.env.ESPUTNIK_API_KEY || "47743228FB8260569CA855D42622CFD2";
   if (esputnikApiKey) {
-    // Add custom fields for eSputnik
+    // Add custom fields and explicitly track their IDs
     const esputnikFields = [];
+    const customFieldsIDs = [];
 
     // 1. Джерело ліда (%CLIENT.LID_SOURSE% - ID 235251)
     esputnikFields.push({
       id: 235251,
       value: "AI Landing",
     });
+    customFieldsIDs.push(235251);
 
     // 2. URL стрічки / лендингу (%PERSONAL.LANDING_URL% - ID 295300)
     if (dialogueUrl) {
@@ -122,33 +124,43 @@ export default async function handler(request, response) {
         id: 295300,
         value: dialogueUrl,
       });
+      customFieldsIDs.push(295300);
     }
 
     // 3. Додаткове поле для відповідей на квіз (якщо налаштоване через ENV змінні)
     const esputnikQaFieldId = process.env.ESPUTNIK_QA_FIELD_ID;
     if (esputnikQaFieldId && qa) {
+      const parsedId = parseInt(esputnikQaFieldId, 10);
       esputnikFields.push({
-        id: parseInt(esputnikQaFieldId, 10),
+        id: parsedId,
         value: qa,
       });
+      customFieldsIDs.push(parsedId);
     }
 
+    // Using the plural API (contacts) with explicit customFieldsIDs is the most robust way
+    // to force eSputnik to save custom fields for both new and existing (updating) contacts.
     const esputnikPayload = {
-      contact: {
-        firstName: name,
-        channels: [
-          ...(email ? [{ type: "email", value: email }] : []),
-          ...(phone ? [{ type: "sms", value: phone.replace(/\D/g, "") }] : []),
-        ],
-        fields: esputnikFields,
-      },
+      contacts: [
+        {
+          firstName: name,
+          channels: [
+            ...(email ? [{ type: "email", value: email }] : []),
+            ...(phone
+              ? [{ type: "sms", value: phone.replace(/\D/g, "") }]
+              : []),
+          ],
+          fields: esputnikFields,
+        },
+      ],
+      customFieldsIDs: customFieldsIDs,
     };
 
     const esputnikAuth = Buffer.from(`user:${esputnikApiKey}`).toString(
       "base64",
     );
     promises.push(
-      fetch("https://esputnik.com/api/v1/contact", {
+      fetch("https://esputnik.com/api/v1/contacts", {
         method: "POST",
         headers: {
           Authorization: `Basic ${esputnikAuth}`,
