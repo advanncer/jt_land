@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, CheckCircle2, Star } from "lucide-react";
 import { quizData } from "./data";
 import alinaPhoto from "../../lp-check-up/src/assets/reviews/alina.jpg";
-import vladimirPhoto from "../../lp-check-up/src/assets/reviews/dmitro.jpg";
+import dmitroPhoto from "../../lp-check-up/src/assets/reviews/dmitro.jpg";
 
 declare global {
   interface Window {
@@ -12,21 +12,150 @@ declare global {
   }
 }
 
-const formatPhoneNumber = (value: string) => {
-  const input = value.replace(/\D/g, "").substring(0, 12);
-  let numbers = input;
-  if (!numbers.startsWith("380") && numbers.length > 0) {
-    if (numbers.startsWith("0")) numbers = "380" + numbers.substring(1);
-    else numbers = "380" + numbers;
+interface CountryConfig {
+  code: string;
+  name: string;
+  flag: string;
+  dialCode: string;
+  placeholder: string;
+  mask: string;
+  length: number;
+}
+
+const COUNTRIES: CountryConfig[] = [
+  {
+    code: "UA",
+    name: "Україна",
+    flag: "🇺🇦",
+    dialCode: "380",
+    placeholder: "+380 (XX) XXX-XX-XX",
+    mask: "+380 (XX) XXX-XX-XX",
+    length: 12,
+  },
+  {
+    code: "PL",
+    name: "Польща",
+    flag: "🇵🇱",
+    dialCode: "48",
+    placeholder: "+48 (XXX) XXX-XXX",
+    mask: "+48 (XXX) XXX-XXX",
+    length: 11,
+  },
+  {
+    code: "DE",
+    name: "Німеччина",
+    flag: "🇩🇪",
+    dialCode: "49",
+    placeholder: "+49 XXX XXX XXX",
+    mask: "+49 XXX XXX XXX",
+    length: 11,
+  },
+  {
+    code: "RO",
+    name: "Румунія",
+    flag: "🇷🇴",
+    dialCode: "40",
+    placeholder: "+40 XXX XXX XXX",
+    mask: "+40 XXX XXX XXX",
+    length: 11,
+  },
+  {
+    code: "SK",
+    name: "Словаччина",
+    flag: "🇸🇰",
+    dialCode: "421",
+    placeholder: "+421 XXX XXX XXX",
+    mask: "+421 XXX XXX XXX",
+    length: 12,
+  },
+  {
+    code: "CZ",
+    name: "Чехія",
+    flag: "🇨🇿",
+    dialCode: "420",
+    placeholder: "+420 XXX XXX XXX",
+    mask: "+420 XXX XXX XXX",
+    length: 12,
+  },
+  {
+    code: "GB",
+    name: "Великобританія",
+    flag: "🇬🇧",
+    dialCode: "44",
+    placeholder: "+44 XXXX XXXXXX",
+    mask: "+44 XXXX XXXXXX",
+    length: 12,
+  },
+  {
+    code: "US",
+    name: "США / Канада",
+    flag: "🇺🇸",
+    dialCode: "1",
+    placeholder: "+1 (XXX) XXX-XXXX",
+    mask: "+1 (XXX) XXX-XXXX",
+    length: 11,
+  },
+];
+
+const formatPhone = (value: string, country: CountryConfig) => {
+  let digits = value.replace(/\D/g, "");
+
+  // If leading 0 is typed and country is Ukraine, prepend 380
+  if (country.code === "UA" && digits.startsWith("0") && !digits.startsWith("380")) {
+    digits = "380" + digits.substring(1);
   }
-  numbers = numbers.substring(0, 12);
-  let char: any = { 0: "+", 3: " (", 5: ") ", 8: "-", 10: "-" };
+
+  if (!digits) return "";
+
+  // Prepend dialCode if it doesn't match
+  if (!digits.startsWith(country.dialCode)) {
+    if (country.dialCode.startsWith(digits)) {
+      return "+" + digits;
+    }
+    digits = country.dialCode + digits;
+  }
+
   let formatted = "";
-  for (let i = 0; i < numbers.length; i++) {
-    if (char[i]) formatted += char[i];
-    formatted += numbers[i];
+  let digitIndex = 0;
+  const mask = country.mask;
+
+  for (let i = 0; i < mask.length; i++) {
+    const char = mask[i];
+    if (char === "+") {
+      formatted += "+";
+    } else if (char === "X") {
+      if (digitIndex < digits.length) {
+        formatted += digits[digitIndex];
+        digitIndex++;
+      } else {
+        break;
+      }
+    } else {
+      if (digitIndex < digits.length) {
+        formatted += char;
+      } else {
+        break;
+      }
+    }
   }
+
+  // Handle any remainder digits for dynamic configurations
+  if (digitIndex < digits.length) {
+    formatted += " " + digits.substring(digitIndex);
+  }
+
   return formatted;
+};
+
+const isPhoneValid = (phone: string, country: CountryConfig) => {
+  const digits = phone.replace(/\D/g, "");
+  if (country.code === "UA") {
+    return digits.length === 12;
+  }
+  if (country.code === "PL" || country.code === "US") {
+    return digits.length === 11;
+  }
+  return digits.length >= 9 && digits.length <= 15;
 };
 
 export default function App() {
@@ -38,6 +167,10 @@ export default function App() {
   const [leadEmail, setLeadEmail] = useState("");
   const [leadTelegram, setLeadTelegram] = useState("");
 
+  const [activeCountry, setActiveCountry] = useState<CountryConfig>(COUNTRIES[0]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [loaderProgress, setLoaderProgress] = useState(0);
 
   const currentStepData = quizData.find((s) => s.step === step) || quizData[0];
@@ -48,6 +181,37 @@ export default function App() {
   const displayStep = currentStepData.displayStep || 1;
   const totalSteps = 15;
 
+  // Fetch GEO on Mount
+  useEffect(() => {
+    const fetchGeo = async () => {
+      try {
+        const res = await fetch("https://ipinfo.io/json");
+        if (res.ok) {
+          const data = await res.json();
+          const countryCode = data.country;
+          if (countryCode) {
+            const matched = COUNTRIES.find((c) => c.code === countryCode.toUpperCase());
+            if (matched) {
+              setActiveCountry(matched);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("GEO IP retrieval failed", e);
+      }
+    };
+    fetchGeo();
+  }, []);
+
+  // Dropdown Close on Outside Click
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+    const closeDropdown = () => setIsDropdownOpen(false);
+    document.addEventListener("click", closeDropdown);
+    return () => document.removeEventListener("click", closeDropdown);
+  }, [isDropdownOpen]);
+
+  // Loader interval simulation
   useEffect(() => {
     if (isLoader) {
       const interval = setInterval(() => {
@@ -65,6 +229,7 @@ export default function App() {
   }, [step, isLoader]);
 
   const handleChoice = (label: string) => {
+    if (isSubmitting) return; // CRM guard
     const newAnswers = Object.assign({}, answers, { [step]: label });
     setAnswers(newAnswers);
     setTimeout(() => {
@@ -73,9 +238,71 @@ export default function App() {
     }, 300);
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    let digits = val.replace(/\D/g, "");
+
+    // Handle Ukraine 0 prefix shortcut
+    if (activeCountry.code === "UA" && digits.startsWith("0") && !digits.startsWith("380")) {
+      digits = "380" + digits.substring(1);
+    }
+
+    // Dynamic GEO flag auto-detection on typing/pasting
+    const sortedCountries = [...COUNTRIES].sort((a, b) => b.dialCode.length - a.dialCode.length);
+    let detectedCountry = activeCountry;
+
+    for (const c of sortedCountries) {
+      if (digits.startsWith(c.dialCode)) {
+        detectedCountry = c;
+        break;
+      }
+    }
+
+    if (detectedCountry.code !== activeCountry.code) {
+      setActiveCountry(detectedCountry);
+      const formatted = formatPhone(val, detectedCountry);
+      setLeadPhone(formatted);
+    } else {
+      const formatted = formatPhone(val, activeCountry);
+      setLeadPhone(formatted);
+    }
+  };
+
+  const handlePhoneFocus = () => {
+    if (!leadPhone) {
+      if (activeCountry.code === "UA") {
+        setLeadPhone("+380 (");
+      } else if (activeCountry.code === "PL") {
+        setLeadPhone("+48 (");
+      } else if (activeCountry.code === "US") {
+        setLeadPhone("+1 (");
+      } else {
+        setLeadPhone("+" + activeCountry.dialCode + " ");
+      }
+    }
+  };
+
+  const handlePhoneBlur = () => {
+    const digits = leadPhone.replace(/\D/g, "");
+    if (
+      digits === activeCountry.dialCode ||
+      leadPhone.trim() === "+" + activeCountry.dialCode ||
+      leadPhone.trim() === "+" + activeCountry.dialCode + " ("
+    ) {
+      setLeadPhone("");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (leadPhone.replace(/\D/g, "").length !== 12) return;
+    if (isSubmitting) return; // Double Submission Guard
+
+    if (!isPhoneValid(leadPhone, activeCountry)) {
+      alert("Будь ласка, введіть коректний номер телефону відповідно до обраної країни.");
+      return;
+    }
+
+    setIsSubmitting(true);
 
     const qaArray = Object.entries(answers).map(
       (item) => "Q" + item[0] + ": " + item[1],
@@ -133,17 +360,19 @@ export default function App() {
       }
     } catch (error) {
       alert("Виникла помилка при відправці.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const goBack = () => {
+    if (isSubmitting) return; // CRM guard
     if (step > 1) setStep(step - 1);
   };
 
-  const nameError = step === 5 && leadName.length > 0 && leadName.length < 2;
-
   return (
-    <div className="min-h-screen w-full bg-[#FDFDFD] text-[#09090A] font-sans flex flex-col items-center overflow-x-hidden relative">
+    <div className="min-h-screen w-full bg-Surface-Page text-Text-Primary font-sans flex flex-col items-center overflow-x-hidden relative">
+      {/* Figma background layered radial circles */}
       {isHero && (
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
           <div
@@ -170,18 +399,21 @@ export default function App() {
         </div>
       )}
 
+      {/* Header Container */}
       <header className="w-full max-w-5xl px-[18px] py-[24px] md:px-6 flex justify-between items-center relative z-10 shrink-0">
         <div className="w-[69px] flex items-center">
           {!isHero && (
             <button
               onClick={goBack}
-              className="flex items-center gap-[8px] text-[14px] font-medium text-[#09090A] hover:text-[#F46600] transition-colors"
+              disabled={isSubmitting}
+              className="flex items-center gap-[8px] text-[14px] font-medium text-Text-Primary hover:text-Brand-Primary transition-colors cursor-pointer disabled:opacity-50"
             >
               <ArrowLeft size={20} strokeWidth={2.5} /> Назад
             </button>
           )}
         </div>
 
+        {/* Brand Logo */}
         <div className="flex items-center justify-center gap-[10px] absolute left-1/2 -translate-x-1/2">
           <svg
             width="24"
@@ -192,28 +424,30 @@ export default function App() {
           >
             <path
               d="M16 0L19.5 11.5L31 15L19.5 18.5L16 30L12.5 18.5L1 15L12.5 11.5L16 0Z"
-              fill="#F46600"
+              fill="var(--color-Brand-Primary)"
             />
           </svg>
-          <span className="font-bold text-[20px] md:text-[24px] tracking-tight">
+          <span className="font-bold text-[20px] md:text-[24px] tracking-tight text-Text-Primary">
             JustSchool
           </span>
         </div>
 
+        {/* Counter indicator */}
         <div className="w-[69px] text-right">
           {!isHero && !isLead && (
-            <span className="text-[14px] font-semibold text-[#09090A]">
-              {displayStep} / {totalSteps}
+            <span className="text-Text-Primary text-sm font-semibold font-['Montserrat']">
+              {displayStep} / <span className="text-Brand-Primary">{totalSteps}</span>
             </span>
           )}
         </div>
       </header>
 
+      {/* Responsive Animated Progress Bar */}
       {!isHero && !isLead && (
         <div className="w-full max-w-[896px] px-[18px] md:px-0 mb-[32px] z-10">
-          <div className="w-full bg-[#E6E6E6] h-[8px] rounded-[100px] overflow-hidden">
+          <div className="w-full bg-Border-Muted h-2 rounded-[100px] overflow-hidden">
             <motion.div
-              className="bg-[#F46600] h-full rounded-[100px]"
+              className="bg-Brand-Primary h-full rounded-[100px]"
               initial={{ width: 0 }}
               animate={{ width: (displayStep / totalSteps) * 100 + "%" }}
               transition={{ duration: 0.5 }}
@@ -231,24 +465,26 @@ export default function App() {
             exit={{ opacity: 0, y: -10 }}
             className="w-full flex flex-col items-center"
           >
+            {/* 1. HERO PHASE */}
             {isHero && (
               <div className="flex flex-col items-center text-center mt-2 max-w-[896px]">
-                <h1 className="text-[26px] md:text-[56px] font-bold mb-[8px] leading-[32px] md:leading-[1.1] text-[#09090A]">
+                <h1 className="text-[26px] md:text-[56px] font-bold mb-[8px] leading-[32px] md:leading-[1.1] text-Text-Primary">
                   Заговори англійською вільно —{" "}
-                  <span className="text-[#F46600]">з JustSchool</span>
+                  <span className="text-Brand-Primary">з JustSchool</span>
                 </h1>
-                <p className="text-[16px] md:text-[20px] text-[#09090A] leading-[24px] font-normal mb-[8px] max-w-[600px]">
+                <p className="text-[16px] md:text-[20px] text-Text-Primary leading-[24px] font-normal mb-[8px] max-w-[600px]">
                   Наші студенти виходять на новий рівень та долають мовний
-                  бар"єр вже за перший місяць. Почни говорити з перших хвилин на
-                  інтерактивній платформі, що підлаштовується під твій темп.
+                  бар'єр вже за перший місяць. Почни говорити з перших хвилин на
+                  інтерактивній платформі, що підлаштовується под твій темп.
                 </p>
-                <p className="text-[16px] md:text-[20px] text-[#09090A] font-semibold leading-[24px] mb-[24px]">
+                <p className="text-[16px] md:text-[20px] text-Text-Primary font-semibold leading-[24px] mb-[24px]">
                   Пройди тест, дізнайся свій рівень та отримай персональний план
                   навчання.
                 </p>
 
                 <div className="w-full max-w-[284px] md:max-w-md mx-auto flex flex-col items-center">
-                  <div className="bg-[#F2F2FE] rounded-[50px] px-[24px] py-[8px] mb-[10px] flex items-center justify-center gap-[10px] h-[60px] w-full">
+                  {/* Alarm clock check badge */}
+                  <div className="bg-Surface-Accent rounded-[50px] px-[24px] py-[8px] mb-[10px] flex items-center justify-center gap-[10px] h-[60px] w-full">
                     <svg
                       width="18"
                       height="17"
@@ -260,25 +496,25 @@ export default function App() {
                         cx="9"
                         cy="8.5"
                         r="7.5"
-                        stroke="#4D63FF"
+                        stroke="var(--color-Accent-Primary)"
                         strokeWidth="2"
                       />
                       <path
                         d="M9 4.5v4l2 2"
-                        stroke="#4D63FF"
+                        stroke="var(--color-Accent-Primary)"
                         strokeWidth="2"
                         strokeLinecap="round"
                       />
                     </svg>
-                    <span className="text-[14px] font-semibold text-[#09090A]">
-                      Лише <span className="text-[#4D63FF]">30 секунд</span>,
-                      щоб дізнатися рівень
+                    <span className="text-Text-Primary text-sm font-semibold font-['Montserrat']">
+                      Лише <span className="text-Accent-Primary">30 секунд</span>, щоб дізнатися рівень
                     </span>
                   </div>
 
+                  {/* Test action button */}
                   <button
                     onClick={() => setStep(2)}
-                    className="w-full h-[56px] bg-[#F46600] text-white rounded-[10px] font-bold text-[18px] flex items-center justify-center gap-[10px] active:scale-95 transition-all"
+                    className="w-full h-[56px] bg-Brand-Primary text-Base-White rounded-[10px] font-bold text-[18px] flex items-center justify-center gap-[10px] active:scale-95 transition-all cursor-pointer"
                   >
                     Пройти тест{" "}
                     <ArrowLeft
@@ -287,156 +523,156 @@ export default function App() {
                       strokeWidth={2.5}
                     />
                   </button>
-                  <p className="text-[14px] text-[#09090A] font-medium mt-[10px] mb-[32px]">
+                  <p className="text-Text-Primary text-sm font-medium font-['Montserrat'] mt-[10px] mb-[32px]">
                     Безкоштовно та миттєво
                   </p>
 
+                  {/* Overlapping Students Avatars Row */}
                   <div className="flex flex-col items-center w-full">
                     <div className="flex justify-center items-center h-[44px] mb-[16px]">
                       <div className="flex -space-x-3">
-                        <div className="w-[44px] h-[44px] rounded-full border-2 border-white bg-blue-100 z-[5] overflow-hidden">
+                        <div className="w-[44px] h-[44px] rounded-full border-2 border-Base-White bg-blue-100 z-[5] overflow-hidden">
                           <img
                             src={alinaPhoto}
                             className="w-full h-full object-cover"
+                            alt="Student"
                           />
                         </div>
-                        <div className="w-[44px] h-[44px] rounded-full border-2 border-white bg-green-100 z-[4] overflow-hidden">
+                        <div className="w-[44px] h-[44px] rounded-full border-2 border-Base-White bg-green-100 z-[4] overflow-hidden">
                           <img
-                            src={vladimirPhoto}
+                            src={dmitroPhoto}
                             className="w-full h-full object-cover"
+                            alt="Student"
                           />
                         </div>
-                        <div className="w-[44px] h-[44px] rounded-full border-2 border-white bg-purple-100 z-[3] overflow-hidden">
+                        <div className="w-[44px] h-[44px] rounded-full border-2 border-Base-White bg-purple-100 z-[3] overflow-hidden">
                           <img
                             src={alinaPhoto}
                             className="w-full h-full object-cover"
+                            alt="Student"
                           />
                         </div>
-                        <div className="w-[44px] h-[44px] rounded-full border-2 border-white bg-yellow-100 z-[2] overflow-hidden">
+                        <div className="w-[44px] h-[44px] rounded-full border-2 border-Base-White bg-yellow-100 z-[2] overflow-hidden">
                           <img
-                            src={vladimirPhoto}
+                            src={dmitroPhoto}
                             className="w-full h-full object-cover"
+                            alt="Student"
                           />
                         </div>
-                        <div className="w-[44px] h-[44px] rounded-full border-2 border-white bg-[#F2F2FE] flex items-center justify-center text-[#4D63FF] font-semibold text-[13.75px] z-[1]">
+                        <div className="w-[44px] h-[44px] rounded-full border-2 border-Base-White bg-[#F2F2FE] flex items-center justify-center text-Accent-Primary font-semibold text-[13.75px] z-[1]">
                           +20k
                         </div>
                       </div>
                     </div>
-                    <p className="text-[16px] text-[#09090A] font-medium leading-[24px]">
-                      Більше <b>20 000</b> учнів вже дізналися свій рівень
+                    <p className="text-Text-Primary text-base font-medium font-['Montserrat'] leading-[24px]">
+                      Більше <span className="font-bold">20 000</span> учнів вже дізналися свій рівень
                     </p>
                   </div>
                 </div>
               </div>
             )}
 
+            {/* 2. CHOICE PHASES */}
             {currentStepData.type === "choice" && (
               <div className="w-full flex flex-col items-center">
-                <div className="text-center mb-[32px] w-full max-w-[896px]">
-                  <h1 className="text-[24px] font-bold mb-[16px] leading-[30px] text-[#09090A]">
+                <div className="text-center mb-[32px] w-full max-w-[89px] md:max-w-[896px]">
+                  <h1 className="text-Text-Primary text-2xl md:text-3xl font-bold mb-[16px] leading-[30px] font-['Montserrat']">
                     {currentStepData.question}
                   </h1>
                   {currentStepData.subtitle && (
-                    <p className="text-[18px] text-[#09090A] leading-[28px] font-normal">
+                    <p className="text-Text-Primary text-base md:text-lg leading-[28px] font-normal font-['Montserrat'] max-w-[700px] mx-auto">
                       {currentStepData.subtitle}
                     </p>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[10px] w-full mb-[32px] max-w-[896px]">
+                {/* Option selection grids */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[12px] w-full mb-[32px] max-w-[896px]">
                   {currentStepData.options &&
                     currentStepData.options.map((opt) => (
                       <button
                         key={opt.value}
                         onClick={() => handleChoice(opt.label)}
                         className={
-                          "px-[24px] py-[20px] rounded-[16px] text-left flex items-center gap-[12px] min-h-[72px] transition-all " +
+                          "px-[24px] py-[20px] rounded-[16px] text-left flex items-center gap-[12px] min-h-[72px] transition-all cursor-pointer focus:outline-none " +
                           (answers[step] === opt.label
-                            ? "bg-[#FFFAF5] border border-[#F46600]"
-                            : "bg-[#FFFFFF] border border-transparent shadow-[0px_0px_9.8px_rgba(125,125,125,0.09)]")
+                            ? "bg-Interactive-Hover outline outline-1 outline-offset-[-1px] outline-Brand-Primary shadow-[0px_0px_9.8px_rgba(125,125,125,0.09)]"
+                            : "bg-Base-White border border-transparent shadow-[0px_0px_9.8px_rgba(125,125,125,0.09)] hover:shadow-md")
                         }
                       >
-                        <span className="text-[32px]">{opt.emoji}</span>
-                        <span className="font-semibold text-[18px] text-[#09090A] leading-[20px]">
+                        <span className="text-[32px] leading-none">{opt.emoji}</span>
+                        <span className="font-semibold text-[18px] text-Text-Primary leading-[20px] font-['Montserrat']">
                           {opt.label}
                         </span>
                       </button>
                     ))}
                 </div>
 
+                {/* Testimonial or Fact Block container */}
                 {currentStepData.bottomBlock && (
-                  <div className="w-full max-w-[896px] bg-[#F4F5FF] rounded-[16px] p-[20px_24px] md:p-[32px] relative flex flex-col gap-[16px]">
+                  <div className="w-full max-w-[896px]">
                     {currentStepData.bottomBlock.type === "testimonial" ? (
-                      <div className="flex flex-col md:flex-row gap-[16px] items-start w-full">
-                        <div className="flex flex-row items-center gap-[16px]">
-                          <div className="relative w-[44px] h-[44px] rounded-full overflow-hidden">
-                            <img
-                              src={currentStepData.bottomBlock.photoUrl}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-[6px]">
-                            <h4 className="font-semibold text-[18px] leading-[18px] text-[#09090A]">
-                              {currentStepData.bottomBlock.name}
-                            </h4>
-                            <p className="text-[#747474] text-[12px] leading-[16px]">
-                              {currentStepData.bottomBlock.title}
-                            </p>
-                          </div>
-                          <div className="ml-auto md:ml-6 flex items-center gap-[4px]">
-                            {[0, 1, 2, 3, 4].map((i) => (
-                              <Star
-                                key={i}
-                                size={16}
-                                fill="#FFB800"
-                                stroke="none"
+                      <div className="w-full bg-Surface-AccentLight rounded-2xl p-6 md:p-8 flex flex-col gap-4 text-left shadow-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="flex items-center gap-4">
+                            <div className="w-11 h-11 rounded-full overflow-hidden border border-Border-Muted shrink-0">
+                              <img
+                                src={currentStepData.bottomBlock.photoUrl}
+                                className="w-full h-full object-cover"
+                                alt="Alina"
                               />
-                            ))}
-                            <span className="ml-[8px] font-medium text-[#747474] text-[16px]">
-                              5.0
-                            </span>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <h4 className="text-Text-Primary text-lg font-semibold font-['Montserrat'] leading-tight">
+                                {currentStepData.bottomBlock.name}
+                              </h4>
+                              <p className="text-Text-Secondary text-xs font-normal font-['Montserrat'] leading-tight">
+                                {currentStepData.bottomBlock.title}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              {[0, 1, 2, 3, 4].map((i) => (
+                                <Star
+                                  key={i}
+                                  size={16}
+                                  fill="var(--color-Decorative-Yellow)"
+                                  stroke="none"
+                                />
+                              ))}
+                            </div>
+                            <span className="text-Text-Secondary text-base font-medium font-['Montserrat']">5.0</span>
                           </div>
                         </div>
-                        <p className="text-[18px] font-normal leading-[28px] text-[#09090A]">
-                          " {currentStepData.bottomBlock.text} "
+                        <p className="text-Text-Primary text-[16px] md:text-lg font-normal font-['Montserrat'] leading-relaxed italic">
+                          "{currentStepData.bottomBlock.text}"
                         </p>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-[16px]">
-                        <div className="w-[44px] h-[44px] bg-[#E3E3FB] rounded-full flex items-center justify-center shrink-0">
-                          <svg
-                            width="26"
-                            height="30"
-                            viewBox="0 0 26 30"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M13 0C5.82 0 0 5.82 0 13C0 18.83 3.82 23.77 9 25.4V30L13 27L17 30V25.4C22.18 23.77 26 18.83 26 13C26 5.82 20.18 0 13 0ZM13 24C6.92 24 2 19.08 2 13C2 6.92 6.92 2 13 2C19.08 2 24 6.92 24 13C24 19.08 19.08 24 13 24Z"
-                              fill="#4D63FF"
-                            />
-                            <path
-                              d="M13 6C10.79 6 9 7.79 9 10H11C11 8.9 11.9 8 13 8C14.1 8 15 8.9 15 10C15 11.5 13 11.25 13 14H15C15 12.25 17 12 17 10C17 7.79 15.21 6 13 6Z"
-                              fill="#4D63FF"
-                            />
-                            <rect
-                              x="12"
-                              y="16"
-                              width="2"
-                              height="2"
-                              fill="#4D63FF"
-                            />
-                          </svg>
-                        </div>
-                        <div className="flex flex-col gap-[4px]">
-                          <h4 className="text-[#4D63FF] font-bold text-[16px] leading-[24px]">
+                      <div className="w-full bg-Surface-AccentLight rounded-2xl p-6 md:p-8 flex flex-col gap-4 text-left shadow-sm">
+                        <div className="flex items-center gap-4">
+                          <div className="w-11 h-11 bg-Decorative-PurpleSoft rounded-full flex items-center justify-center shrink-0">
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="text-Accent-Primary"
+                            >
+                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                              <path d="M12 16v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                              <circle cx="12" cy="8" r="1" fill="currentColor" />
+                            </svg>
+                          </div>
+                          <h4 className="text-Accent-Primary text-base font-bold font-['Montserrat']">
                             {currentStepData.bottomBlock.title}
                           </h4>
-                          <p className="text-[18px] font-medium leading-[28px] text-[#09090A]">
-                            {currentStepData.bottomBlock.text}
-                          </p>
                         </div>
+                        <p className="text-Text-Primary text-[16px] md:text-lg font-medium font-['Montserrat'] leading-relaxed">
+                          {currentStepData.bottomBlock.text}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -444,19 +680,21 @@ export default function App() {
               </div>
             )}
 
+            {/* 3. LOADER / CALCULATION PHASE */}
             {isLoader && (
               <div className="w-full flex flex-col items-center max-w-[284px] md:max-w-md">
-                <h1 className="text-[24px] font-bold mb-[24px] leading-[30px] text-center text-[#09090A]">
+                <h1 className="text-Text-Primary text-2xl font-bold mb-[24px] leading-[30px] text-center font-['Montserrat']">
                   {currentStepData.question}
                 </h1>
 
+                {/* Animated progress circle indicator */}
                 <div className="relative w-[152px] h-[152px] mb-[32px]">
                   <svg className="w-full h-full transform -rotate-90">
                     <circle
                       cx="76"
                       cy="76"
                       r="68"
-                      stroke="#FFDCC0"
+                      stroke="var(--color-Brand-Soft)"
                       strokeWidth="8"
                       fill="none"
                       strokeLinecap="round"
@@ -465,7 +703,7 @@ export default function App() {
                       cx="76"
                       cy="76"
                       r="68"
-                      stroke="#F46600"
+                      stroke="var(--color-Brand-Primary)"
                       strokeWidth="8"
                       fill="none"
                       strokeLinecap="round"
@@ -479,12 +717,13 @@ export default function App() {
                       transition={{ duration: 0.2 }}
                     />
                   </svg>
-                  <div className="absolute inset-0 flex items-center justify-center text-[36px] font-bold text-[#F46600] tracking-[-0.2px]">
+                  <div className="absolute inset-0 flex items-center justify-center text-[36px] font-bold text-Brand-Primary tracking-[-0.2px]">
                     {loaderProgress}
                     <span className="text-[20px]">%</span>
                   </div>
                 </div>
 
+                {/* Loader active checklists */}
                 <div className="space-y-[20px] w-full">
                   {currentStepData.points &&
                     currentStepData.points.map((p, i) => {
@@ -499,13 +738,13 @@ export default function App() {
                         >
                           <div
                             className={
-                              "w-[24px] h-[24px] rounded-full flex items-center justify-center text-white shrink-0 " +
-                              (isVisible ? "bg-[#FF6100]" : "bg-gray-300")
+                              "w-[24px] h-[24px] rounded-full flex items-center justify-center text-Base-White shrink-0 " +
+                              (isVisible ? "bg-Brand-Primary" : "bg-Border-Muted")
                             }
                           >
                             <CheckCircle2 size={16} strokeWidth={3} />
                           </div>
-                          <span className="font-medium text-[16px] leading-[24px] text-[#09090A]">
+                          <span className="font-medium text-[16px] leading-[24px] text-Text-Primary font-['Montserrat']">
                             {p}
                           </span>
                         </div>
@@ -515,14 +754,16 @@ export default function App() {
               </div>
             )}
 
+            {/* 4. LEAD CAPTURE FORM PHASE */}
             {isLead && (
-              <div className="w-full max-w-[896px] flex flex-col md:flex-row gap-[32px] items-stretch">
-                <div className="w-full md:w-1/2 flex flex-col">
+              <div className="w-full max-w-[896px] flex flex-col md:flex-row gap-[32px] items-stretch text-left">
+                {/* Left Side: Submit Form */}
+                <div className="w-full md:w-1/2 flex flex-col justify-between">
                   <div className="mb-[24px]">
-                    <h2 className="text-[24px] font-bold mb-[16px] leading-[30px] text-[#09090A] text-center md:text-left">
+                    <h2 className="text-Text-Primary text-2xl font-bold mb-[16px] leading-[30px] font-['Montserrat'] text-center md:text-left">
                       Отримай персональний план навчання!
                     </h2>
-                    <p className="text-[18px] text-[#09090A] font-normal leading-[28px] text-center md:text-left">
+                    <p className="text-Text-Primary text-lg font-normal leading-[28px] font-['Montserrat'] text-center md:text-left">
                       Введи свій номер телефону та e-mail, і ми надішлемо тобі
                       деталі про навчання та безкоштовний пробний урок.
                     </p>
@@ -532,95 +773,128 @@ export default function App() {
                     onSubmit={handleSubmit}
                     className="flex flex-col gap-[16px]"
                   >
+                    {/* Name input */}
                     <div>
                       <input
                         type="text"
                         placeholder="Ім’я"
                         required
-                        className={
-                          "w-full p-[18px_16px] h-[56px] rounded-[16px] bg-[#FFFFFF] border transition-all text-[14px] font-medium text-[#09090A] outline-none placeholder:text-[#747474] " +
-                          (nameError ? "border-[#D20000]" : "border-[#F5AC72]")
-                        }
+                        disabled={isSubmitting}
+                        className="w-full p-[18px_16px] h-[56px] rounded-[16px] bg-Base-White border border-Border-Default transition-all text-[14px] font-medium text-Text-Primary outline-none placeholder:text-Text-Secondary focus:border-Brand-Primary disabled:opacity-50"
                         value={leadName}
                         onChange={(e) => setLeadName(e.target.value)}
                       />
-                      {nameError && (
-                        <p className="text-[12px] text-[#D20000] mt-1 pl-4">
-                          Текст помилки
-                        </p>
+                    </div>
+
+                    {/* Phone Input with flag selector */}
+                    <div className="relative flex flex-col w-full">
+                      <div className="relative flex items-center w-full h-[56px] rounded-[16px] bg-Base-White border border-Border-Default">
+                        <button
+                          type="button"
+                          disabled={isSubmitting}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsDropdownOpen(!isDropdownOpen);
+                          }}
+                          className="absolute left-4 flex items-center gap-[6px] focus:outline-none z-10 cursor-pointer h-full"
+                        >
+                          <span className="text-xl leading-none">{activeCountry.flag}</span>
+                          <span className="text-[10px] text-Text-Primary">▼</span>
+                          <span className="text-sm font-semibold text-Text-Primary ml-1">+{activeCountry.dialCode}</span>
+                        </button>
+                        <input
+                          type="tel"
+                          placeholder={activeCountry.placeholder}
+                          required
+                          disabled={isSubmitting}
+                          className="w-full h-full p-[18px_16px] rounded-[16px] bg-transparent outline-none text-[14px] font-medium text-Text-Primary placeholder:text-Text-Secondary border-none transition-all disabled:opacity-50"
+                          style={{
+                            paddingLeft: `${activeCountry.dialCode.length === 1 ? '96px' : activeCountry.dialCode.length === 2 ? '104px' : '112px'}`
+                          }}
+                          value={leadPhone}
+                          onChange={handlePhoneChange}
+                          onFocus={handlePhoneFocus}
+                          onBlur={handlePhoneBlur}
+                        />
+                      </div>
+
+                      {/* Dropdown list of popular countries */}
+                      {isDropdownOpen && (
+                        <div className="absolute top-[60px] left-0 w-full bg-Base-White border border-Border-Muted rounded-2xl shadow-lg z-50 max-h-[220px] overflow-y-auto py-2">
+                          {COUNTRIES.map((country) => (
+                            <button
+                              key={country.code}
+                              type="button"
+                              onClick={() => {
+                                setActiveCountry(country);
+                                setIsDropdownOpen(false);
+                                const digitsOnly = leadPhone.replace(/\D/g, "");
+                                if (!digitsOnly || digitsOnly === activeCountry.dialCode) {
+                                  setLeadPhone("+" + country.dialCode);
+                                } else {
+                                  const formatted = formatPhone(leadPhone, country);
+                                  setLeadPhone(formatted);
+                                }
+                              }}
+                              className="w-full px-4 py-2.5 text-left flex items-center gap-3 hover:bg-Surface-Accent transition-colors focus:outline-none"
+                            >
+                              <span className="text-xl">{country.flag}</span>
+                              <span className="font-semibold text-sm text-Text-Primary flex-1">{country.name}</span>
+                              <span className="text-sm text-Text-Secondary">+{country.dialCode}</span>
+                            </button>
+                          ))}
+                        </div>
                       )}
                     </div>
 
-                    <div className="relative flex items-center">
-                      <div className="absolute left-4 flex items-center gap-[8px] h-full pointer-events-none">
-                        <div className="w-[25px] h-[20px] rounded-[4px] bg-[#F9D549] overflow-hidden relative">
-                          <div className="absolute top-0 w-full h-1/2 bg-[#205EB5]"></div>
-                        </div>
-                        <span className="text-[14px] font-semibold text-[#09090A] flex items-center gap-[4px]">
-                          +380{" "}
-                          <svg
-                            width="13"
-                            height="7"
-                            viewBox="0 0 13 7"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M6.5 7L0 0H13L6.5 7Z" fill="#09090A" />
-                          </svg>
-                        </span>
-                      </div>
-                      <input
-                        type="tel"
-                        placeholder="Номер телефону"
-                        required
-                        className="w-full p-[18px_16px] h-[56px] pl-[120px] rounded-[16px] bg-[#FFFFFF] border border-[#F5AC72] transition-all text-[14px] font-medium text-[#09090A] outline-none placeholder:text-[#747474]"
-                        value={leadPhone}
-                        onChange={(e) =>
-                          setLeadPhone(formatPhoneNumber(e.target.value))
-                        }
-                        maxLength={15}
-                      />
-                    </div>
-
+                    {/* Email Input */}
                     <input
                       type="email"
                       placeholder="Електронна пошта"
                       required
-                      className="w-full p-[18px_16px] h-[56px] rounded-[16px] bg-[#FFFFFF] border border-[#F5AC72] transition-all text-[14px] font-medium text-[#09090A] outline-none placeholder:text-[#747474]"
+                      disabled={isSubmitting}
+                      className="w-full p-[18px_16px] h-[56px] rounded-[16px] bg-Base-White border border-Border-Default transition-all text-[14px] font-medium text-Text-Primary outline-none placeholder:text-Text-Secondary focus:border-Brand-Primary disabled:opacity-50"
                       value={leadEmail}
                       onChange={(e) => setLeadEmail(e.target.value)}
                     />
 
+                    {/* Telegram Nickname input */}
                     <input
                       type="text"
                       placeholder="Ваш нік в Telegram/Viber (@name)"
-                      className="w-full p-[18px_16px] h-[56px] rounded-[16px] bg-[#FFFFFF] border border-[#F5AC72] transition-all text-[14px] font-medium text-[#09090A] outline-none placeholder:text-[#747474]"
+                      disabled={isSubmitting}
+                      className="w-full p-[18px_16px] h-[56px] rounded-[16px] bg-Base-White border border-Border-Default transition-all text-[14px] font-medium text-Text-Primary outline-none placeholder:text-Text-Secondary focus:border-Brand-Primary disabled:opacity-50"
                       value={leadTelegram}
                       onChange={(e) => setLeadTelegram(e.target.value)}
                     />
 
+                    {/* Submit Action Block */}
                     <div className="pt-[8px]">
                       <button
                         type="submit"
-                        className="w-full h-[56px] bg-[#F46600] text-white rounded-[16px] font-bold text-[18px] leading-[28px] active:scale-95 transition-all"
+                        disabled={isSubmitting}
+                        className="w-full h-[56px] bg-Brand-Primary text-Base-White rounded-[16px] font-bold text-[18px] leading-[28px] active:scale-95 transition-all focus:outline-none flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                       >
-                        Залишити заявку
+                        {isSubmitting ? "Надсилаємо заявку..." : "Залишити заявку"}
                       </button>
                     </div>
-                    <p className="text-[14px] text-[#747474] text-center font-normal leading-[22px] px-2">
+
+                    <p className="text-[14px] text-Text-Secondary text-center font-normal leading-[22px] px-2 font-['Montserrat']">
                       Ми допоможемо тобі в усьому. Твої дані в безпеці та
-                      використовуються лише для зв"язку з методистом.
+                      використовуються лише для зв'язку з методистом.
                     </p>
                   </form>
                 </div>
 
-                <div className="w-full md:w-1/2 bg-[#F4F5FF] rounded-[16px] p-[18px] md:p-[32px] flex flex-col items-center relative overflow-hidden">
+                {/* Right Side: Google rating and Reviews card widgets */}
+                <div className="w-full md:w-1/2 bg-Surface-AccentLight rounded-[16px] p-6 md:p-8 flex flex-col items-center relative overflow-hidden">
                   <div className="text-center mb-[16px] relative w-full flex flex-col items-center z-10">
-                    <h3 className="text-[18px] font-bold text-[#09090A] mb-[16px] leading-[28px]">
+                    <h3 className="text-Text-Primary text-lg font-bold mb-[16px] leading-[28px] font-['Montserrat']">
                       Рейтинг Google
                     </h3>
 
-                    <div className="absolute top-[20px] w-full flex justify-between px-[20px]">
+                    {/* Decorative curves */}
+                    <div className="absolute top-[20px] w-full flex justify-between px-[20px] pointer-events-none">
                       <svg
                         width="45"
                         height="109"
@@ -654,17 +928,19 @@ export default function App() {
                       </svg>
                     </div>
 
+                    {/* Star score display */}
                     <div className="flex items-end justify-center gap-[4px] mb-[16px]">
                       <span className="text-[32px] font-black text-[#000000] leading-none">
                         4.7
                       </span>
-                      <span className="text-[25px] font-bold text-[#09090A] leading-none">
+                      <span className="text-[25px] font-bold text-Text-Primary leading-none">
                         /5
                       </span>
                     </div>
+
                     <div className="flex items-center justify-center gap-[8px] mb-[16px]">
                       {[0, 1, 2, 3].map((i) => (
-                        <Star key={i} size={18} fill="#FFB800" stroke="none" />
+                        <Star key={i} size={18} fill="var(--color-Decorative-Yellow)" stroke="none" />
                       ))}
                       <div className="relative w-[18px] h-[17px]">
                         <Star
@@ -674,28 +950,31 @@ export default function App() {
                           className="absolute top-0 left-0"
                         />
                         <div className="absolute top-0 left-0 w-1/2 h-full overflow-hidden">
-                          <Star size={18} fill="#FFB800" stroke="none" />
+                          <Star size={18} fill="var(--color-Decorative-Yellow)" stroke="none" />
                         </div>
                       </div>
                     </div>
-                    <p className="text-[18px] font-normal text-[#09090A] leading-[28px]">
+
+                    <p className="text-Text-Primary text-lg font-normal leading-[28px] font-['Montserrat']">
                       Відгуки наших студентів
                     </p>
                   </div>
 
+                  {/* Review Cards */}
                   <div className="space-y-[16px] w-full mt-[8px] z-10">
-                    <div className="bg-[#FFFFFF] rounded-[16px] p-[16px] shadow-sm flex flex-col gap-[20px]">
-                      <div className="text-[#000000] font-bold text-[14px] flex gap-1">
+                    {/* Review card 1 */}
+                    <div className="bg-Base-White rounded-[16px] p-[16px] shadow-sm flex flex-col gap-[20px]">
+                      <div className="text-[#000000] font-bold text-[14px] flex gap-1 font-['Montserrat']">
                         Education<span className="text-[#FFC107]">.ua</span>
                       </div>
-                      <p className="text-[16px] font-normal leading-[24px] text-[#09090A]">
+                      <p className="text-[16px] font-normal leading-[24px] text-Text-Primary font-['Montserrat']">
                         Все супер, мені комфотно тут вчитись, цікаво проходять
                         уроки. Бізнес англійська це топ, я вже змогла отримати
                         офер у міжнародній компанії. Без Just School цього б не
                         сталось. Дякую!
                       </p>
                       <div className="flex items-center gap-[16px]">
-                        <div className="w-[40px] h-[40px] bg-[#E3E3FB] rounded-full flex items-center justify-center text-[#4D63FF]">
+                        <div className="w-[40px] h-[40px] bg-Decorative-PurpleSoft rounded-full flex items-center justify-center text-Accent-Primary shrink-0 font-['Montserrat']">
                           <svg
                             width="19"
                             height="22"
@@ -708,38 +987,43 @@ export default function App() {
                             <circle cx="12" cy="7" r="4" />
                           </svg>
                         </div>
-                        <span className="font-semibold text-[16px] text-[#09090A]">
+                        <span className="font-semibold text-[16px] text-Text-Primary font-['Montserrat']">
                           Ангеліна
                         </span>
                       </div>
                     </div>
 
-                    <div className="bg-[#FFFFFF] rounded-[16px] p-[16px] shadow-sm flex flex-col gap-[20px]">
-                      <div className="text-[#194CD5] font-black text-[18px] tracking-tighter">
+                    {/* Review card 2 */}
+                    <div className="bg-Base-White rounded-[16px] p-[16px] shadow-sm flex flex-col gap-[20px]">
+                      <div className="text-[#194CD5] font-black text-[18px] tracking-tighter font-['Montserrat']">
                         enguide
                       </div>
-                      <p className="text-[16px] font-normal leading-[24px] text-[#09090A]">
+                      <p className="text-[16px] font-normal leading-[24px] text-Text-Primary font-['Montserrat']">
                         Я займаюсь англійською вже кілька місяців, і це реально
                         приносить результати. Найбільше подобається, що викладач
                         враховує мої цілі, і ми працюємо над тим, що мені дійсно
                         важливо...
                       </p>
                       <div className="flex items-center gap-[16px]">
-                        <img
-                          src={vladimirPhoto}
-                          className="w-[40px] h-[40px] rounded-full object-cover"
-                        />
-                        <span className="font-semibold text-[16px] text-[#09090A]">
+                        <div className="w-[40px] h-[40px] rounded-full overflow-hidden border border-Border-Muted shrink-0">
+                          <img
+                            src={dmitroPhoto}
+                            className="w-full h-full object-cover"
+                            alt="Vladimir"
+                          />
+                        </div>
+                        <span className="font-semibold text-[16px] text-Text-Primary font-['Montserrat']">
                           Владимир Кузьма
                         </span>
                       </div>
                     </div>
                   </div>
 
+                  {/* Slider dots indicator */}
                   <div className="flex justify-center gap-[20px] mt-[24px] z-10">
-                    <div className="w-[14px] h-[14px] rounded-full bg-[#F46600]"></div>
-                    <div className="w-[14px] h-[14px] rounded-full bg-[#FFDCC0]"></div>
-                    <div className="w-[14px] h-[14px] rounded-full bg-[#FFDCC0]"></div>
+                    <div className="w-[14px] h-[14px] rounded-full bg-Brand-Primary"></div>
+                    <div className="w-[14px] h-[14px] rounded-full bg-Brand-Soft"></div>
+                    <div className="w-[14px] h-[14px] rounded-full bg-Brand-Soft"></div>
                   </div>
                 </div>
               </div>
