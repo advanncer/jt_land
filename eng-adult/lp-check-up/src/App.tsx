@@ -224,6 +224,17 @@ export default function App() {
   }, []);
 
   const currentStep = quizData.find((s) => s.step === step);
+
+  useEffect(() => {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "quiz_step_reach",
+      quiz_name: "lp-check-up",
+      step_number: step,
+      step_type: currentStep?.type || "unknown",
+      step_title: currentStep?.title || "unknown",
+    });
+  }, [step, currentStep]);
   const totalQuestions = quizData.filter(
     (s) => s.type === "choice" || s.type === "testimonials_interstitial",
   ).length;
