@@ -38,6 +38,10 @@ export default defineConfig({
           __dirname,
           "eng-adult/lp-check-up/index.html",
         ),
+        engAdultLpCheckUpDark: resolve(
+          __dirname,
+          "eng-adult/lp-check-up-dark/index.html",
+        ),
         engAdultLpReviews: resolve(
           __dirname,
           "eng-adult/lp-reviews/index.html",

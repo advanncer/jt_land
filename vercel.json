@@ -98,6 +98,14 @@
       "destination": "/eng-adult/lp-check-up/:path*"
     },
     {
+      "source": "/eng-adult/lp-check-up-dark",
+      "destination": "/eng-adult/lp-check-up-dark/index.html"
+    },
+    {
+      "source": "/eng-adult/lp-check-up-dark/:path*",
+      "destination": "/eng-adult/lp-check-up-dark/:path*"
+    },
+    {
       "source": "/eng-adult/lp-reviews",
       "destination": "/eng-adult/lp-reviews/index.html"
     },
