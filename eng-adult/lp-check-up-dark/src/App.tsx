@@ -1,0 +1,819 @@
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ChevronRight,
+  ArrowLeft,
+  Loader2,
+  CheckCircle2,
+  Sparkles,
+  Users,
+  Cake,
+  Target,
+  BarChart3,
+  Heart,
+  Frown,
+  Clock,
+  Coffee,
+  Smartphone,
+  UserCheck,
+  TrendingUp,
+  Calendar,
+  Group,
+  Trophy,
+  Gift,
+  Wand2,
+  User,
+  Mail,
+  Globe2,
+  Briefcase,
+  BookOpen,
+  MessageSquare,
+  TrendingDown,
+  Zap,
+  Rocket,
+  Shuffle,
+  ThumbsUp,
+  ThumbsDown,
+  Check,
+  FileText,
+  Globe,
+  Mic,
+  Edit,
+  Headphones,
+  Award,
+  Film,
+  Shield,
+  PlaySquare,
+  HelpCircle,
+  XCircle,
+  LayoutGrid,
+  CalendarDays,
+  Monitor,
+  HeartHandshake,
+  Timer,
+  Plane,
+  Quote,
+} from "lucide-react";
+import { quizData } from "./data";
+
+declare global {
+  interface Window {
+    dataLayer: any[];
+    fbq: (...args: any[]) => void;
+  }
+}
+
+const GOOGLE_SHEETS_WEBHOOK_URL =
+  "https://script.google.com/macros/s/AKfycbzjHz2H9Am5CfJ6dtrvu82h9Vr0bi_lc6eb6Ljm-jEuqHcz-UIdEXHcx4lhL-uDVjTmZA/exec";
+
+const icons: { [key: string]: React.FC<any> } = {
+  Users,
+  Cake,
+  Target,
+  BarChart3,
+  Heart,
+  Frown,
+  Clock,
+  Coffee,
+  Smartphone,
+  UserCheck,
+  TrendingUp,
+  Calendar,
+  Group,
+  Trophy,
+  Gift,
+  Wand2,
+  User,
+  Mail,
+  Sparkles,
+  Globe2,
+  Briefcase,
+  BookOpen,
+  MessageSquare,
+  TrendingDown,
+  Zap,
+  Rocket,
+  Shuffle,
+  ThumbsUp,
+  ThumbsDown,
+  Check,
+  FileText,
+  Globe,
+  Mic,
+  Edit,
+  Headphones,
+  Award,
+  Film,
+  Shield,
+  PlaySquare,
+  HelpCircle,
+  XCircle,
+  LayoutGrid,
+  CalendarDays,
+  Monitor,
+  HeartHandshake,
+  Timer,
+  Plane,
+};
+
+const COUNTRIES = [
+  { code: "UA", name: "Україна", flag: "🇺🇦", dial: "380" },
+  { code: "PL", name: "Польща", flag: "🇵🇱", dial: "48" },
+  { code: "DE", name: "Німеччина", flag: "🇩🇪", dial: "49" },
+  { code: "RO", name: "Румунія", flag: "🇷🇴", dial: "40" },
+  { code: "SK", name: "Словаччина", flag: "🇸🇰", dial: "421" },
+  { code: "CZ", name: "Чехія", flag: "🇨🇿", dial: "420" },
+  { code: "GB", name: "Велика Британія", flag: "🇬🇧", dial: "44" },
+  { code: "US", name: "США", flag: "🇺🇸", dial: "1" },
+];
+
+const formatPhoneNumber = (value: string, dialCode: string = "380") => {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length === 0) return "";
+
+  let numbers = digits;
+
+  if (numbers.startsWith(dialCode)) {
+    // Already starts with dialCode
+  } else if (numbers.startsWith("0") && dialCode === "380") {
+    numbers = "380" + numbers.substring(1);
+  } else if (numbers.startsWith("0") && dialCode === "48") {
+    numbers = "48" + numbers.substring(1);
+  } else {
+    numbers = dialCode + numbers;
+  }
+
+  if (numbers.startsWith("380")) {
+    numbers = numbers.substring(0, 12);
+    const char = { 0: "+", 3: " (", 5: ") ", 8: "-", 10: "-" };
+    let formatted = "";
+    for (let i = 0; i < numbers.length; i++) {
+      // @ts-expect-error char map access
+      if (char[i]) formatted += char[i];
+      formatted += numbers[i];
+    }
+    return formatted;
+  } else if (numbers.startsWith("48")) {
+    numbers = numbers.substring(0, 11);
+    const char = { 0: "+", 2: " (", 5: ") ", 8: "-" };
+    let formatted = "";
+    for (let i = 0; i < numbers.length; i++) {
+      // @ts-expect-error char map access
+      if (char[i]) formatted += char[i];
+      formatted += numbers[i];
+    }
+    return formatted;
+  } else if (numbers.startsWith("1")) {
+    numbers = numbers.substring(0, 11);
+    const char = { 0: "+", 1: " (", 4: ") ", 7: "-" };
+    let formatted = "";
+    for (let i = 0; i < numbers.length; i++) {
+      // @ts-expect-error char map access
+      if (char[i]) formatted += char[i];
+      formatted += numbers[i];
+    }
+    return formatted;
+  } else {
+    numbers = numbers.substring(0, 15);
+    let formatted = "+" + dialCode + " ";
+    const remaining = numbers.substring(dialCode.length);
+    for (let i = 0; i < remaining.length; i++) {
+      if (i > 0 && i % 3 === 0) formatted += " ";
+      formatted += remaining[i];
+    }
+    return formatted.trim();
+  }
+};
+
+export default function App() {
+  const [step, setStep] = useState(1);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [leadName, setLeadName] = useState("");
+  const [leadPhone, setLeadPhone] = useState("");
+  const [leadEmail, setLeadEmail] = useState("");
+  const [loaderProgress, setLoaderProgress] = useState(0);
+  const [activeCountry, setActiveCountry] = useState(COUNTRIES[0]);
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetch("https://ipinfo.io/json")
+      .then((res) => res.json())
+      .then((data) => {
+        const countryCode = data.country || "UA";
+        const found = COUNTRIES.find(
+          (c) => c.code === countryCode.toUpperCase(),
+        );
+        if (found) {
+          setActiveCountry(found);
+        }
+      })
+      .catch((err) => console.error("Error fetching IP info:", err));
+  }, []);
+
+  useEffect(() => {
+    let link: HTMLLinkElement | null =
+      document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = "/favicon.svg";
+    link.type = "image/svg+xml";
+  }, []);
+
+  const currentStep = quizData.find((s) => s.step === step);
+  const totalQuestions = quizData.filter(
+    (s) => s.type === "choice" || s.type === "testimonials_interstitial",
+  ).length;
+  const currentQuestionIndex = quizData.filter(
+    (s) =>
+      s.step <= step &&
+      (s.type === "choice" || s.type === "testimonials_interstitial"),
+  ).length;
+
+  useEffect(() => {
+    if (currentStep?.type === "loader") {
+      const interval = setInterval(() => {
+        setLoaderProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setTimeout(() => setStep(step + 1), 600);
+            return 100;
+          }
+          return prev + 2;
+        });
+      }, 40);
+      return () => clearInterval(interval);
+    }
+  }, [step, currentStep]);
+
+  const handleChoice = (label: string) => {
+    setAnswers({ ...answers, [step]: label });
+    setStep(step + 1);
+    window.scrollTo(0, 0);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    let ipData = { ip: "unknown", country: "unknown" };
+    try {
+      const ipResponse = await fetch("https://ipinfo.io/json");
+      if (ipResponse.ok) {
+        const data = await ipResponse.json();
+        ipData = {
+          ip: data.ip || "unknown",
+          country: data.country || "unknown",
+        };
+      }
+    } catch (error) {
+      console.error("Failed to fetch IP info:", error);
+    }
+
+    const qaArray = Object.entries(answers).map(
+      ([step, answer]) => `Q${step}: ${answer}`,
+    );
+    const ipString = `ip:${ipData.ip}|country:${ipData.country}`;
+    qaArray.unshift(ipString);
+    const qaString = qaArray.join("|||");
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const payload = {
+      name: leadName,
+      phone: `+${leadPhone.replace(/\D/g, "")}`,
+      email: leadEmail,
+      qa: qaString,
+      dialogueUrl: window.location.href,
+      dialogueName: "JustSchool Quiz",
+      dialogueId: "unknown",
+      utm_source: urlParams.get("utm_source"),
+      utm_medium: urlParams.get("utm_medium"),
+      utm_campaign: urlParams.get("utm_campaign"),
+      utm_term: urlParams.get("utm_term"),
+      utm_content: urlParams.get("utm_content"),
+      utm_subject: "English",
+    };
+
+    try {
+      const response = await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: "form_success",
+          quiz_name: "lp-check-up",
+        });
+
+        if (window.fbq) {
+          window.fbq("track", "Purchase", { currency: "UAH", value: 0 });
+        }
+        const result = await response.json();
+        if (result.redirectUri) {
+          window.location.href = result.redirectUri;
+        } else {
+          alert("Дякуємо! Ваша заявка прийнята.");
+          setStep(1);
+          setAnswers({});
+          setLeadName("");
+          setLeadPhone("");
+          setLeadEmail("");
+          setIsSubmitting(false);
+          window.scrollTo(0, 0);
+        }
+      } else {
+        alert("Виникла помилка при відправці. Спробуйте ще раз.");
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("Виникла помилка при відправці. Перевірте з'єднання з інтернетом.");
+      setIsSubmitting(false);
+    }
+  };
+
+  const IconComponent = currentStep?.icon ? icons[currentStep.icon] : null;
+
+  return (
+    <div className="h-[100dvh] w-full bg-slate-950 text-white font-sans flex flex-col items-center overflow-hidden selection:bg-orange-500 selection:text-white relative">
+      <header className="w-full max-w-4xl px-4 py-3 flex justify-between items-center border-b border-slate-800 sticky top-0 bg-slate-900/90 backdrop-blur-md z-50 h-[60px] shrink-0">
+        <div className="w-10">
+          {step > 1 && (
+            <button
+              onClick={() => setStep(step - 1)}
+              className="text-slate-300 hover:text-white transition-colors p-2 -ml-2"
+            >
+              <ArrowLeft size={24} />
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+          <div className="w-7 h-7 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+            J
+          </div>
+          <span className="font-black text-lg tracking-tighter">
+            JustSchool
+          </span>
+        </div>
+
+        <div className="text-[11px] font-black text-slate-300 uppercase tracking-widest min-w-[40px] text-right">
+          {currentStep?.type === "choice" ||
+          currentStep?.type === "testimonials_interstitial"
+            ? `${currentQuestionIndex} / ${totalQuestions}`
+            : ""}
+        </div>
+      </header>
+
+      {step > 1 &&
+        currentStep?.type !== "loader" &&
+        currentStep?.type !== "program_ready" &&
+        currentStep?.type !== "lead_name" &&
+        currentStep?.type !== "lead_contacts" && (
+          <div className="absolute top-[60px] left-0 w-full h-1 bg-slate-800 z-40">
+            <div
+              className="h-full bg-orange-500 transition-all duration-500"
+              style={{
+                width: `${(currentQuestionIndex / totalQuestions) * 100}%`,
+              }}
+            />
+          </div>
+        )}
+
+      <main className="flex-1 w-full max-w-lg flex flex-col relative z-10 overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="w-full h-full flex flex-col overflow-y-auto no-scrollbar"
+          >
+            {IconComponent &&
+              currentStep?.type !== "hero" &&
+              currentStep?.type !== "loader" &&
+              currentStep?.type !== "program_ready" &&
+              currentStep?.type !== "lead_name" &&
+              currentStep?.type !== "lead_contacts" && (
+                <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-[1.25rem] flex items-center justify-center mx-auto mb-4 mt-8 shrink-0 shadow-sm border border-orange-200/50">
+                  <IconComponent size={32} strokeWidth={2.5} />
+                </div>
+              )}
+
+            {currentStep?.type === "hero" && (
+              <div className="text-center flex flex-col items-center h-full p-4 pt-12 md:pt-16">
+                <div className="flex-1 flex flex-col items-center">
+                  <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight tracking-tight pt-2">
+                    {currentStep.question || currentStep.title}
+                  </h1>
+                  <p className="text-sm md:text-base text-slate-400 mb-8 leading-relaxed font-medium">
+                    {currentStep.subtext || currentStep.subtitle}
+                  </p>
+                </div>
+
+                <div className="w-full sticky bottom-0 bg-slate-950/90 backdrop-blur-md pt-4 pb-2 z-20">
+                  <div className="p-5 bg-slate-900 rounded-[2rem] border border-slate-800 shadow-xl shadow-black/50/50 mb-4">
+                    <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-tighter">
+                      {currentStep.pre_cta}
+                    </p>
+                    <button
+                      onClick={() => setStep(step + 1)}
+                      className="w-full bg-orange-500 text-white py-4 rounded-2xl text-lg font-black shadow-lg shadow-orange-200 active:scale-95 transition-all flex items-center justify-center gap-2 uppercase tracking-wide"
+                    >
+                      {currentStep.cta} <ChevronRight size={20} />
+                    </button>
+                    <div className="flex items-center justify-center gap-1.5 mt-3 text-orange-600 font-bold text-[9px] uppercase tracking-widest bg-orange-50 w-fit mx-auto px-3 py-1 rounded-full border border-orange-100">
+                      <Sparkles size={10} /> <span>{currentStep.meta}</span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest pb-2">
+                    {currentStep.social_proof}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {(currentStep?.type === "choice" ||
+              currentStep?.type === "testimonials_interstitial") && (
+              <div className="text-center flex flex-col h-full p-4 pt-6 md:pt-12">
+                <div className="flex-1 flex flex-col">
+                  <h2 className="text-2xl md:text-3xl font-black mb-3 leading-tight">
+                    {currentStep.question || currentStep.title}
+                  </h2>
+                  {currentStep.subtext && (
+                    <p className="text-sm md:text-base text-slate-400 mb-6 font-medium leading-relaxed max-w-sm mx-auto px-2">
+                      {currentStep.subtext || currentStep.subtitle}
+                    </p>
+                  )}
+
+                  {currentStep.type === "testimonials_interstitial" &&
+                    currentStep.reviews && (
+                      <div className="mb-6 flex-1 flex flex-col min-h-0">
+                        <div className="grid grid-flow-col auto-cols-[85%] overflow-x-auto gap-4 pb-6 custom-scrollbar -mx-4 px-4 snap-x snap-mandatory flex-1">
+                          {currentStep.reviews.map((rev) => (
+                            <div
+                              key={rev.name}
+                              className="bg-slate-900 p-5 rounded-3xl border border-slate-800 text-left shrink-0 max-w-[280px] shadow-sm snap-center relative flex flex-col h-full"
+                            >
+                              <div className="flex items-center gap-3 mb-3">
+                                <img
+                                  src={rev.photoUrl}
+                                  className="w-10 h-10 rounded-full object-cover object-center"
+                                />
+                                <div className="font-black text-sm text-white">
+                                  {rev.name}
+                                </div>
+                              </div>
+                              <p className="text-xs text-slate-300 font-medium leading-relaxed italic relative z-10 flex-1">
+                                "{rev.text}"
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest flex items-center justify-center gap-2 mt-2">
+                          <ArrowLeft size={10} /> свайп відгуки{" "}
+                          <ChevronRight size={10} />
+                        </div>
+                      </div>
+                    )}
+
+                  <div
+                    className={`grid gap-2.5 w-full ${
+                      currentStep.type === "choice" ? "mt-auto pb-4" : ""
+                    }`}
+                  >
+                    {currentStep.options?.map((opt) => {
+                      const OptIcon = opt.icon ? icons[opt.icon] : null;
+                      return (
+                        <button
+                          key={opt.value}
+                          onClick={() => handleChoice(opt.label)}
+                          className="w-full text-left p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-900 hover:border-orange-500 active:bg-orange-50 transition-all font-bold text-sm flex items-center gap-4 group shadow-sm active:scale-[0.98]"
+                        >
+                          {OptIcon && (
+                            <div className="w-10 h-10 bg-slate-950 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-orange-100 group-hover:text-orange-500 transition-colors shrink-0">
+                              <OptIcon size={20} strokeWidth={2} />
+                            </div>
+                          )}
+                          <span className="flex-1 leading-snug">
+                            {opt.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {currentStep.type === "testimonials_interstitial" && (
+                  <div className="sticky bottom-0 bg-slate-950/90 backdrop-blur-md pt-2 pb-4 z-20">
+                    <button
+                      onClick={() => setStep(step + 1)}
+                      className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-lg uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl shadow-black/50 active:scale-95"
+                    >
+                      {currentStep.cta}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {currentStep?.type === "program_ready" && (
+              <div className="h-full p-4 flex flex-col">
+                <div className="bg-slate-900 text-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden flex flex-col text-center flex-1 my-0">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-3xl rounded-full" />
+
+                  <div className="w-16 h-16 bg-orange-500/20 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 relative z-10 shrink-0">
+                    <Sparkles size={32} strokeWidth={2.5} />
+                  </div>
+
+                  <h2 className="text-2xl font-black mb-3 leading-tight relative z-10">
+                    {currentStep.title}
+                  </h2>
+                  <p className="text-slate-400 text-xs md:text-sm mb-8 relative z-10 font-bold leading-relaxed">
+                    {currentStep.subtitle}
+                  </p>
+
+                  <ul className="space-y-3 mb-8 relative z-10 text-left mt-auto">
+                    {currentStep.points?.map((p) => (
+                      <li
+                        key={p}
+                        className="flex items-center gap-3 p-4 bg-slate-900/5 rounded-2xl border border-white/5"
+                      >
+                        <CheckCircle2
+                          className="text-orange-500 shrink-0"
+                          size={20}
+                        />
+                        <span className="text-sm text-slate-200 font-bold leading-tight">
+                          {p}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => setStep(step + 1)}
+                    className="w-full py-4 bg-orange-500 text-white rounded-2xl font-black text-lg uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg shadow-orange-900/40 active:scale-95 relative z-10 mt-auto"
+                  >
+                    {currentStep.cta}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {(currentStep?.type === "lead_name" ||
+              currentStep?.type === "lead_contacts") && (
+              <div className="text-center flex flex-col h-full p-4 pt-12 md:pt-16">
+                <div className="flex-1 flex flex-col">
+                  {currentStep.type === "lead_name" && (
+                    <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-[1.25rem] flex items-center justify-center mx-auto mb-6 shrink-0 shadow-inner border border-orange-200/50">
+                      <User size={32} strokeWidth={2.5} />
+                    </div>
+                  )}
+
+                  <h2 className="text-2xl md:text-3xl font-black mb-3 text-white leading-tight uppercase tracking-tighter px-2">
+                    {currentStep.title}
+                  </h2>
+                  <p className="text-sm text-slate-400 mb-8 font-medium leading-relaxed max-w-sm mx-auto px-4">
+                    {currentStep.subtitle}
+                  </p>
+                </div>
+
+                <div className="sticky bottom-0 bg-slate-950/90 backdrop-blur-md pt-4 pb-4 z-20">
+                  {currentStep.type === "lead_contacts" && (
+                    <div className="mb-6 p-4 bg-orange-50 rounded-2xl border border-orange-100 flex gap-3 items-center text-left">
+                      <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-white shrink-0 text-lg">
+                        🎁
+                      </div>
+                      <p className="text-orange-700 font-black text-[10px] uppercase tracking-tight leading-tight">
+                        Безкоштовне пробне заняття з методистом у подарунок!
+                        Отримай також персональні воркбуки для пропрацювання
+                        англійської.
+                      </p>
+                    </div>
+                  )}
+
+                  {currentStep.type === "lead_name" ? (
+                    <div className="space-y-4 w-full">
+                      <input
+                        type="text"
+                        placeholder={
+                          currentStep.form?.name_placeholder || "Ваше ім'я"
+                        }
+                        className="w-full p-4 rounded-2xl border-2 border-slate-800 outline-none focus:border-orange-500 transition-all text-xl font-black text-white bg-slate-900 shadow-sm text-center"
+                        value={leadName}
+                        onChange={(e) => setLeadName(e.target.value)}
+                      />
+                      <button
+                        onClick={() =>
+                          leadName.trim().length >= 2 && setStep(step + 1)
+                        }
+                        disabled={leadName.trim().length < 2}
+                        className="w-full py-5 bg-orange-500 text-white rounded-2xl font-black text-lg shadow-lg shadow-orange-200 active:scale-95 transition-all disabled:opacity-30 uppercase tracking-widest"
+                      >
+                        відправити
+                      </button>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSubmit} className="space-y-4 w-full">
+                      <input
+                        type="email"
+                        placeholder={
+                          currentStep.form?.email_placeholder || "Ваш e-mail"
+                        }
+                        required
+                        className="w-full p-4 rounded-2xl border-2 border-slate-800 outline-none focus:border-orange-500 transition-all text-lg font-black text-white bg-slate-900 shadow-sm text-center disabled:opacity-50"
+                        value={leadEmail}
+                        onChange={(e) => setLeadEmail(e.target.value)}
+                        disabled={isSubmitting}
+                      />
+                      <div className="relative w-full">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowCountryDropdown(!showCountryDropdown)
+                          }
+                          className="absolute inset-y-0 left-0 flex items-center pl-4 pr-3 border-r-2 border-slate-800 gap-1.5 cursor-pointer z-10"
+                        >
+                          <span className="text-2xl">{activeCountry.flag}</span>
+                          <span className="text-[10px] text-slate-400">▼</span>
+                        </button>
+                        <input
+                          type="tel"
+                          placeholder={
+                            activeCountry.dial === "380"
+                              ? "+380 (XX) XXX-XX-XX"
+                              : activeCountry.dial === "48"
+                                ? "+48 (XXX) XXX-XXX"
+                                : activeCountry.dial === "1"
+                                  ? "+1 (XXX) XXX-XXXX"
+                                  : `+${activeCountry.dial} XXXXXXXXX`
+                          }
+                          required
+                          className="w-full p-4 pl-[88px] rounded-2xl border-2 border-slate-800 outline-none focus:border-orange-500 transition-all text-lg font-black text-white bg-slate-900 shadow-sm disabled:opacity-50"
+                          value={leadPhone}
+                          onChange={(e) =>
+                            setLeadPhone(
+                              formatPhoneNumber(
+                                e.target.value,
+                                activeCountry.dial,
+                              ),
+                            )
+                          }
+                          onFocus={() => {
+                            if (!leadPhone) {
+                              const prefix =
+                                activeCountry.dial === "380"
+                                  ? "+380 ("
+                                  : activeCountry.dial === "48"
+                                    ? "+48 ("
+                                    : activeCountry.dial === "1"
+                                      ? "+1 ("
+                                      : `+${activeCountry.dial} `;
+                              setLeadPhone(prefix);
+                            }
+                          }}
+                          onBlur={() => {
+                            const prefix =
+                              activeCountry.dial === "380"
+                                ? "+380 ("
+                                : activeCountry.dial === "48"
+                                  ? "+48 ("
+                                  : activeCountry.dial === "1"
+                                    ? "+1 ("
+                                    : `+${activeCountry.dial} `;
+                            if (
+                              leadPhone === prefix ||
+                              leadPhone === `+${activeCountry.dial}` ||
+                              leadPhone === "+" ||
+                              leadPhone === `+${activeCountry.dial} `
+                            ) {
+                              setLeadPhone("");
+                            }
+                          }}
+                          maxLength={19}
+                          disabled={isSubmitting}
+                        />
+
+                        {showCountryDropdown && (
+                          <div className="absolute left-0 bottom-[105%] w-64 bg-slate-900 border border-slate-700 rounded-2xl shadow-xl z-50 py-2 max-h-60 overflow-y-auto text-left">
+                            {COUNTRIES.map((c) => (
+                              <button
+                                key={c.code}
+                                type="button"
+                                onClick={() => {
+                                  setActiveCountry(c);
+                                  setShowCountryDropdown(false);
+                                  setLeadPhone("");
+                                }}
+                                className="w-full px-4 py-2.5 hover:bg-slate-950 flex items-center gap-3 transition-colors text-slate-200 font-bold text-sm"
+                              >
+                                <span className="text-xl">{c.flag}</span>
+                                <span className="flex-1">{c.name}</span>
+                                <span className="text-slate-400 text-xs font-semibold">
+                                  +{c.dial}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={
+                          (() => {
+                            const digits = leadPhone.replace(/\D/g, "");
+                            if (activeCountry.dial === "380")
+                              return digits.length !== 12;
+                            if (
+                              activeCountry.dial === "48" ||
+                              activeCountry.dial === "1"
+                            )
+                              return digits.length !== 11;
+                            return digits.length < 9 || digits.length > 15;
+                          })() || isSubmitting
+                        }
+                        className="w-full py-5 bg-orange-500 text-white rounded-2xl font-black text-lg shadow-lg shadow-orange-200 active:scale-[0.98] transition-all disabled:opacity-30 uppercase tracking-widest"
+                      >
+                        {isSubmitting ? "Надсилаємо заявку..." : "відправити"}
+                      </button>
+                      {currentStep.guarantee_text && (
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-4">
+                          {currentStep.guarantee_text}
+                        </p>
+                      )}
+                    </form>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {currentStep?.type === "loader" && (
+              <div className="text-center py-8 px-4 flex flex-col justify-center flex-1 h-full">
+                <div className="w-20 h-20 bg-orange-100 text-orange-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 shrink-0 shadow-inner border border-orange-200/50">
+                  <Loader2
+                    className="animate-spin"
+                    size={40}
+                    strokeWidth={2.5}
+                  />
+                </div>
+                <h2 className="text-2xl font-black mb-10 text-white leading-tight uppercase tracking-tight">
+                  {currentStep.question || currentStep.title}
+                </h2>
+
+                <div className="w-full max-w-xs mx-auto bg-slate-800 h-2 rounded-full overflow-hidden mb-6">
+                  <div
+                    className="h-full bg-orange-500"
+                    style={{ width: `${loaderProgress}%` }}
+                  />
+                </div>
+                <div className="text-orange-500 font-black font-mono text-2xl mb-12">
+                  {loaderProgress}%
+                </div>
+
+                <div className="grid gap-3 max-w-[280px] mx-auto text-left w-full mt-auto mb-10">
+                  {currentStep.points?.map((p, i) => (
+                    <div
+                      key={p}
+                      className={`flex items-center gap-4 text-[10px] font-black uppercase tracking-wider transition-opacity duration-500 ${
+                        loaderProgress > i * 25
+                          ? "text-white"
+                          : "text-slate-200"
+                      }`}
+                    >
+                      <div
+                        className={`w-2 h-2 rounded-full shrink-0 ${
+                          loaderProgress > i * 25
+                            ? "bg-orange-500"
+                            : "bg-slate-200"
+                        }`}
+                      />
+                      {p}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </main>
+
+      <style>{`
+        body { overflow-x: hidden; width: 100%; position: relative; background: #f8fafc; }
+        input::placeholder { color: #cbd5e1; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; text-align: center; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { height: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
+      `}</style>
+    </div>
+  );
+}
