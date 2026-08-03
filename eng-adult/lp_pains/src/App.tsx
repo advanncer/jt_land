@@ -10,6 +10,15 @@ declare global {
 }
 const App: React.FC = () => {
   const [step, setStep] = useState(1);
+  useEffect(() => {
+    const dl = (window as any).dataLayer || [];
+    (window as any).dataLayer = dl;
+    dl.push({
+      event: "quiz_step_reach",
+      quiz_name: "eng-adult-lp-pains",
+      step_number: step
+    });
+  }, [step]);
   const [answers, setAnswers] = useState<Record<number, string[]>>({});
   const [ipInfo, setIpInfo] = useState<{ ip?: string; country?: string }>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -72,6 +81,11 @@ const App: React.FC = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (response.ok) {
+        const dl = (window as any).dataLayer || [];
+        (window as any).dataLayer = dl;
+        dl.push({ event: \"form_success\", quiz_name: \"eng-adult-lp-pains\" });
+      }
 
       const result = await response.json();
 

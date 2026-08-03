@@ -28,6 +28,15 @@ const formatPhoneNumber = (value: string) => {
 
 export default function App() {
   const [step, setStep] = useState(1);
+  useEffect(() => {
+    const dl = (window as any).dataLayer || [];
+    (window as any).dataLayer = dl;
+    dl.push({
+      event: "quiz_step_reach",
+      quiz_name: "eng-child-lp-js-child",
+      step_number: step
+    });
+  }, [step]);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [leadName, setLeadName] = useState("");
   const [leadPhone, setLeadPhone] = useState("");
@@ -90,6 +99,11 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (response.ok) {
+        const dl = (window as any).dataLayer || [];
+        (window as any).dataLayer = dl;
+        dl.push({ event: \"form_success\", quiz_name: \"eng-child-lp-js-child\" });
+      }
       if (response.ok) {
         const result = await response.json();
         window.location.href = result.redirectUri || "https://justschool.me/uk/onboarding";

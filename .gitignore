@@ -26,3 +26,7 @@ dist-ssr
 # Ignored Archive for reference/backup data
 ignored_archive/
 .vercel
+
+# GA secrets & tools
+ga-credentials.json
+check_ga.py

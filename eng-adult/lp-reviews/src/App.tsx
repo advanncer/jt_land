@@ -160,6 +160,15 @@ const isPhoneValid = (phone: string, country: CountryConfig) => {
 
 export default function App() {
   const [step, setStep] = useState(1);
+  useEffect(() => {
+    const dl = (window as any).dataLayer || [];
+    (window as any).dataLayer = dl;
+    dl.push({
+      event: "quiz_step_reach",
+      quiz_name: "eng-adult-lp-reviews",
+      step_number: step
+    });
+  }, [step]);
   const [answers, setAnswers] = useState<Record<number, string>>({});
 
   const [leadName, setLeadName] = useState("");
