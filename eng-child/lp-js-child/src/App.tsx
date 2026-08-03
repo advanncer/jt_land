@@ -102,7 +102,7 @@ export default function App() {
       if (response.ok) {
         const dl = (window as any).dataLayer || [];
         (window as any).dataLayer = dl;
-        dl.push({ event: \"form_success\", quiz_name: \"eng-child-lp-js-child\" });
+        dl.push({ event: "form_success", quiz_name: "eng-child-lp-js-child" });
       }
       if (response.ok) {
         const result = await response.json();

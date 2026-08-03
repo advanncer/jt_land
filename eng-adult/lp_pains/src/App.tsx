@@ -84,7 +84,7 @@ const App: React.FC = () => {
       if (response.ok) {
         const dl = (window as any).dataLayer || [];
         (window as any).dataLayer = dl;
-        dl.push({ event: \"form_success\", quiz_name: \"eng-adult-lp-pains\" });
+        dl.push({ event: "form_success", quiz_name: "eng-adult-lp-pains" });
       }
 
       const result = await response.json();

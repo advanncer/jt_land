@@ -104,7 +104,7 @@ export default function App() {
       if (response.ok) {
         const dl = (window as any).dataLayer || [];
         (window as any).dataLayer = dl;
-        dl.push({ event: \"form_success\", quiz_name: \"eng-adult-lp-js-adult\" });
+        dl.push({ event: "form_success", quiz_name: "eng-adult-lp-js-adult" });
       }
       if (response.ok) {
         const result = await response.json();
