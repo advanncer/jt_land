@@ -126,7 +126,7 @@ export default function App() {
         qaArr.push(`Q${s.id}: ${multiAnswers[s.id].join(', ')}`);
     });
     if (checkedWords.size > 0)
-      qaArr.push(`Q_Words: ${Array.from(checkedWords).join(', ')}`);
+      qaArr.push(`Q100: ${Array.from(checkedWords).join(', ')}`);
 
     const urlParams = new URLSearchParams(window.location.search);
     const payload = {
