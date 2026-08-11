@@ -164,16 +164,12 @@ export default function App() {
           quiz_name: 'eng-adult-quiz-plan',
         });
         const result = await res.json();
-        alert("DEBUG SUCCESS: " + JSON.stringify(result, null, 2));
         window.location.href =
           result.redirectUri || 'https://justschool.me/uk/onboarding';
       } else {
-        const errText = await res.text();
-        alert("DEBUG SERVER ERROR: " + res.status + " " + errText);
         window.location.href = 'https://justschool.me/uk/onboarding';
       }
-    } catch (e: any) {
-      alert("DEBUG NETWORK ERROR: " + e.message);
+    } catch {
       window.location.href = 'https://justschool.me/uk/onboarding';
     }
   };
@@ -209,14 +205,8 @@ export default function App() {
           )}
         </div>
 
-        {/* Logo */}
+        {/* Logo removed as requested */}
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-orange-500 rounded-lg flex items-center justify-center text-white font-black text-sm shadow-sm">
-            J
-          </div>
-          <span className="font-black text-violet-950 text-base tracking-tight">
-            JustSchool
-          </span>
         </div>
 
         {/* Step counter */}
