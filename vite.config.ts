@@ -46,6 +46,10 @@ export default defineConfig({
           __dirname,
           "eng-adult/lp-reviews/index.html",
         ),
+        engAdultLp120Days: resolve(
+          __dirname,
+          "eng-adult/120-days/index.html",
+        ),
       },
     },
   },

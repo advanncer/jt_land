@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --color-primary: #F26C21;
+  --color-primary-hover: #E85F14;
+  --color-secondary: #2F80ED;
+}
+
+:root {
+  --primary: #F26C21;
+  --primary-hover: #E85F14;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #F8FAFC; /* Light gray/slate background matching the screenshot vibe */
+}

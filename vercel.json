@@ -144,6 +144,14 @@
     {
       "source": "/eng-child/quiz-bo-v1-white/:path*",
       "destination": "/eng-child/quiz-bo-v1-white/:path*"
+    },
+    {
+      "source": "/eng-adult/120-days",
+      "destination": "/eng-adult/120-days/index.html"
+    },
+    {
+      "source": "/eng-adult/120-days/:path*",
+      "destination": "/eng-adult/120-days/:path*"
     }
   ],
   "redirects": [
