@@ -36,6 +36,8 @@ export default function App() {
       .catch(() => {});
   }, []);
 
+  const currentStepData = STEPS.find(s => s.id === step);
+
   // ─── GTM step tracking ───────────────────────────────────
   useEffect(() => {
     (window as any).dataLayer = (window as any).dataLayer || [];
@@ -43,11 +45,12 @@ export default function App() {
       event: 'quiz_step_reach',
       quiz_name: 'eng-adult-quiz-plan',
       step_number: step,
+      step_type: currentStepData?.type || 'unknown',
+      step_title: currentStepData?.question || currentStepData?.title || 'unknown',
     });
-  }, [step]);
+  }, [step, currentStepData]);
 
   // ─── Loader animation ────────────────────────────────────
-  const currentStepData = STEPS.find(s => s.id === step);
 
   useEffect(() => {
     if (currentStepData?.type !== 'loader') return;
