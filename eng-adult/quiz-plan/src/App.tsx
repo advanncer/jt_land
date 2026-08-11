@@ -191,7 +191,7 @@ export default function App() {
     <div className="min-h-[100dvh] bg-violet-50 flex flex-col">
 
       {/* ── Header ── */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-violet-100 h-14 flex items-center px-4 justify-between shrink-0">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-violet-100 h-12 flex items-center px-4 justify-between shrink-0">
         <div className="w-10">
           {canGoBack && (
             <button
@@ -203,10 +203,6 @@ export default function App() {
               ←
             </button>
           )}
-        </div>
-
-        {/* Logo removed as requested */}
-        <div className="flex items-center gap-2">
         </div>
 
         {/* Step counter */}
