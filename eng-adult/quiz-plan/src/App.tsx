@@ -121,12 +121,12 @@ export default function App() {
     const qaArr: string[] = [ipString];
     STEPS.forEach(s => {
       if (answers[s.id])
-        qaArr.push(`Q${s.id} [${s.question || s.title || ''}]: ${answers[s.id]}`);
+        qaArr.push(`Q${s.id}: ${answers[s.id]}`);
       if (multiAnswers[s.id]?.length)
-        qaArr.push(`Q${s.id} [${s.question || ''}]: ${multiAnswers[s.id].join(', ')}`);
+        qaArr.push(`Q${s.id}: ${multiAnswers[s.id].join(', ')}`);
     });
     if (checkedWords.size > 0)
-      qaArr.push(`Відомі слова (${checkedWords.size}): ${Array.from(checkedWords).join(', ')}`);
+      qaArr.push(`Q_Words: ${Array.from(checkedWords).join(', ')}`);
 
     const urlParams = new URLSearchParams(window.location.search);
     const payload = {
@@ -142,7 +142,7 @@ export default function App() {
       utm_campaign: urlParams.get('utm_campaign'),
       utm_term: urlParams.get('utm_term'),
       utm_content: urlParams.get('utm_content'),
-      utm_subject: 'English Adult Quiz Plan',
+      utm_subject: 'English',
     };
 
     try {
