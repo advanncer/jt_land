@@ -164,12 +164,16 @@ export default function App() {
           quiz_name: 'eng-adult-quiz-plan',
         });
         const result = await res.json();
+        alert("DEBUG SUCCESS: " + JSON.stringify(result, null, 2));
         window.location.href =
           result.redirectUri || 'https://justschool.me/uk/onboarding';
       } else {
+        const errText = await res.text();
+        alert("DEBUG SERVER ERROR: " + res.status + " " + errText);
         window.location.href = 'https://justschool.me/uk/onboarding';
       }
-    } catch {
+    } catch (e: any) {
+      alert("DEBUG NETWORK ERROR: " + e.message);
       window.location.href = 'https://justschool.me/uk/onboarding';
     }
   };
