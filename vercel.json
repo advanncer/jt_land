@@ -146,6 +146,14 @@
       "destination": "/eng-child/quiz-bo-v1-white/:path*"
     },
     {
+      "source": "/eng-adult/quiz-plan",
+      "destination": "/eng-adult/quiz-plan/index.html"
+    },
+    {
+      "source": "/eng-adult/quiz-plan/:path*",
+      "destination": "/eng-adult/quiz-plan/:path*"
+    },
+    {
       "source": "/eng-adult/120-days",
       "destination": "/eng-adult/120-days/index.html"
     },
