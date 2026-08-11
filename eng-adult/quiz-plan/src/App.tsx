@@ -23,11 +23,16 @@ export default function App() {
   const [geoCountry, setGeoCountry] = useState('UA');
   const [animKey, setAnimKey] = useState(0);
 
+  const [ipInfo, setIpInfo] = useState<{ ip?: string; country?: string }>({});
+
   // ─── GEO detection ───────────────────────────────────────
   useEffect(() => {
     fetch('https://ipinfo.io/json')
       .then(r => r.json())
-      .then(d => { if (d?.country) setGeoCountry(d.country); })
+      .then(d => {
+        setIpInfo(d);
+        if (d?.country) setGeoCountry(d.country);
+      })
       .catch(() => {});
   }, []);
 
@@ -109,7 +114,8 @@ export default function App() {
     setIsSubmitting(true);
 
     // Build Q&A string from all answers
-    const qaArr: string[] = [];
+    const ipString = `ip:${ipInfo.ip || 'unknown'}|country:${ipInfo.country || 'unknown'}`;
+    const qaArr: string[] = [ipString];
     STEPS.forEach(s => {
       if (answers[s.id])
         qaArr.push(`Q${s.id} [${s.question || s.title || ''}]: ${answers[s.id]}`);
@@ -135,7 +141,10 @@ export default function App() {
     };
 
     try {
-      if ((window as any).fbq) (window as any).fbq('track', 'Lead');
+      if ((window as any).fbq) {
+        (window as any).fbq('track', 'Lead');
+        (window as any).fbq('track', 'Purchase', { currency: 'UAH', value: 0 });
+      }
 
       const res = await fetch('/api/submit', {
         method: 'POST',

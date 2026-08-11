@@ -11,6 +11,7 @@
     "redeploy": "echo 'Forcing Vercel to rebuild'"
   },
   "dependencies": {
+    "@rollup/rollup-darwin-arm64": "^4.62.4",
     "clsx": "^2.1.1",
     "framer-motion": "^12.4.7",
     "lucide-react": "^0.479.0",

@@ -20,6 +20,13 @@ const COUNTRIES: Country[] = [
 ];
 
 function formatForCountry(digits: string, country: Country): string {
+  if (!digits) return '';
+
+  // If user is typing the country prefix, don't format it as a full mask yet
+  if (digits.length <= country.dial.length) {
+    return '+' + digits;
+  }
+
   switch (country.code) {
     case 'UA': {
       const raw = digits.startsWith('380') ? digits.slice(3) : digits;
@@ -134,6 +141,13 @@ export default function PhoneInput({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let raw = e.target.value.replace(/\D/g, '');
 
+    // Allow deleting down to empty string
+    if (!raw) {
+      setDisplay('');
+      onChange('', false);
+      return;
+    }
+
     // Leading 0 → prepend UA dial code
     if (raw.startsWith('0') && country.code === 'UA') {
       raw = '380' + raw.slice(1);
@@ -172,8 +186,8 @@ export default function PhoneInput({
 
   const selectCountry = (c: Country) => {
     setCountry(c);
-    setDisplay('');
-    onChange('', false);
+    setDisplay('+' + c.dial + ' ');
+    onChange('+' + c.dial, false);
     setIsOpen(false);
   };
 
