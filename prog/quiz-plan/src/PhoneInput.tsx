@@ -86,8 +86,14 @@ function detectCountry(digits: string): Country | null {
 
 function checkValidity(digits: string, country: Country): boolean {
   switch (country.code) {
-    case 'UA':
-      return digits.length === 12 && digits.startsWith('380');
+    case 'UA': {
+      if (digits.length !== 12 || !digits.startsWith('380')) return false;
+      const carrier = digits.slice(3, 5);
+      const validCarriers = [
+        '50', '63', '66', '67', '68', '73', '91', '92', '93', '94', '95', '96', '97', '98', '99'
+      ];
+      return validCarriers.includes(carrier);
+    }
     case 'PL':
       return digits.length === 11 && digits.startsWith('48');
     case 'US':

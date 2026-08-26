@@ -13,6 +13,7 @@ export default function App() {
   const [multiAnswers, setMultiAnswers] = useState<Record<number, string[]>>({});
 
   const [name, setName] = useState('');
+  const [childName, setChildName] = useState('');
   const [email, setEmail] = useState('');
   const [rawPhone, setRawPhone] = useState('');
   const [isPhoneValid, setIsPhoneValid] = useState(false);
@@ -116,6 +117,9 @@ export default function App() {
       if (multiAnswers[s.id]?.length)
         qaArr.push(`Q${s.id}: ${multiAnswers[s.id].join(', ')}`);
     });
+    if (childName.trim()) {
+      qaArr.push(`Q99: Ім'я дитини: ${childName.trim()}`);
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const payload = {
@@ -125,7 +129,7 @@ export default function App() {
       qa: qaArr.join('|||'),
       dialogueUrl: window.location.href,
       dialogueName: "JustSchool Quiz",
-      dialogueId: "unknown",
+      dialogueId: "",
       utm_source: urlParams.get('utm_source'),
       utm_medium: urlParams.get('utm_medium'),
       utm_campaign: urlParams.get('utm_campaign'),
@@ -468,16 +472,16 @@ export default function App() {
             <input
               type="text"
               placeholder="Введіть вашу відповідь"
-              value={name}
-              onChange={e => setName(e.target.value)}
+              value={childName}
+              onChange={e => setChildName(e.target.value)}
               className="w-full p-4 rounded-2xl border-2 border-violet-200 outline-none focus:border-violet-500 transition-all font-semibold text-violet-950 bg-white mb-6"
               autoFocus
             />
 
             <button
               id="name-confirm"
-              onClick={() => name.trim().length > 0 && advance()}
-              disabled={name.trim().length === 0}
+              onClick={() => childName.trim().length > 0 && advance()}
+              disabled={childName.trim().length === 0}
               className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-black text-base uppercase tracking-wide shadow-lg shadow-orange-200 disabled:opacity-30 active:scale-95 transition-all"
             >
               {s.cta}
