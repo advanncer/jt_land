@@ -54,6 +54,10 @@ export default defineConfig({
           __dirname,
           "eng-adult/120-days/index.html",
         ),
+        progQuizPlan: resolve(
+          __dirname,
+          "prog/quiz-plan/index.html",
+        ),
       },
     },
   },
