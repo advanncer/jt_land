@@ -8,6 +8,11 @@ export type StepType =
   | 'lead_name'
   | 'lead_form';
 
+import roblox3Vid from './assets/videos/roblox3.mp4';
+import python3Vid from './assets/videos/python3.mp4';
+import websites4Vid from './assets/videos/websites4.mp4';
+import gamedesign4Vid from './assets/videos/gamedesign4.mp4';
+
 export interface StepOption {
   label: string;
   value: string;
@@ -18,9 +23,9 @@ export interface StepOption {
 export interface QuizStep {
   id: number;
   type: StepType;
-  question?: string;
-  subtitle?: string;
   title?: string;
+  subtitle?: string;
+  question?: string;
   social_proof?: string;
   cta?: string;
   options?: StepOption[];
@@ -34,28 +39,25 @@ export const STEPS: QuizStep[] = [
   {
     id: 1,
     type: 'hero',
-    title: 'Дізнайся, який напрям програмування підходить твоїй дитині — та отримай персональний план',
+    social_proof: '🔥 Більше 17 000 студентів',
+    title: 'Який напрям програмування підходить вашій дитині?',
     subtitle:
-      'Пройди 2-хвилинний тест — підберемо курс, рівень і безкоштовний пробний урок з викладачем',
-    cta: 'ПОЧАТИ ТЕСТ →',
-    social_proof: '🎓 ВИБІР 17 000+ БАТЬКІВ',
+      'Пройдіть тест за 2 хвилини, щоб отримати персональний план навчання та безкоштовний урок',
+    cta: 'ПОЧАТИ ТЕСТ',
     stats: [
-      { value: '17 000+', label: 'студентів' },
-      { value: '3.8M+', label: 'занять' },
-      { value: '1 700+', label: 'викладачів' },
-      { value: '95%', label: 'рекомендують' },
+      { value: '7-17', label: 'років' },
+      { value: '1 на 1', label: 'з викладачем' },
     ],
   },
   {
     id: 2,
     type: 'choice',
-    question: 'Скільки років Вашій дитині?',
-    subtitle: 'Це допоможе підібрати відповідний курс програмування',
+    question: 'Скільки років вашій дитині?',
     options: [
-      { label: '6-7 років', value: '6-7', emoji: '🐥' },
-      { label: '8-9 років', value: '8-9', emoji: '🧩' },
-      { label: '10-13 років', value: '10-13', emoji: '🚀' },
-      { label: '14-17 років', value: '14-17', emoji: '💻' },
+      { label: '7-9 років', value: '7-9' },
+      { label: '10-12 років', value: '10-12' },
+      { label: '13-15 років', value: '13-15' },
+      { label: '16-17 років', value: '16-17' },
     ],
   },
   {
@@ -87,10 +89,10 @@ export const STEPS: QuizStep[] = [
     title: 'Ось так виглядають проєкти наших учнів',
     cta: 'ПРОДОВЖИТИ →',
     projects: [
-      { id: '/projects/roblox3.mp4', title: 'Roblox' },
-      { id: '/projects/python3.mp4', title: 'Python' },
-      { id: '/projects/websites4.mp4', title: 'Створення сайтів' },
-      { id: '/projects/gamedesign4.mp4', title: 'Game Design' }
+      { id: roblox3Vid, title: 'Roblox' },
+      { id: python3Vid, title: 'Python' },
+      { id: websites4Vid, title: 'Створення сайтів' },
+      { id: gamedesign4Vid, title: 'Game Design' }
     ]
   },
   {
