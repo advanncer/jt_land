@@ -391,15 +391,21 @@ export default function App() {
               <div className="grid grid-cols-2 gap-3 mb-6">
                 {s.projects.map(proj => (
                   <div key={proj.id} className="bg-white p-2 rounded-2xl border border-violet-100 shadow-sm flex flex-col">
-                    <div className="w-full relative rounded-xl overflow-hidden aspect-video bg-black">
+                    <div className="w-full relative rounded-xl overflow-hidden aspect-video bg-violet-950">
                       <video 
-                        src={proj.id}
                         className="absolute inset-0 w-full h-full object-cover"
                         autoPlay
                         loop
                         muted
                         playsInline
-                      />
+                        preload="auto"
+                        onLoadedData={e => {
+                          e.currentTarget.muted = true;
+                          e.currentTarget.play().catch(() => {});
+                        }}
+                      >
+                        <source src={proj.id} type="video/mp4" />
+                      </video>
                     </div>
                     <div className="text-center text-[11px] font-bold text-violet-950 mt-2 truncate">
                       {proj.title}
