@@ -87,7 +87,7 @@ export const STEPS: QuizStep[] = [
     title: 'Ось так виглядають проєкти наших учнів',
     cta: 'ПРОДОВЖИТИ →',
     projects: [
-      { id: 'PnbuMjyAjSI', title: 'Roblox 2' },
+      { id: 'PnbuMjyAjSI', title: 'Scratch 4' },
       { id: 'ueIsBXKliNE', title: 'Roblox 1' },
       { id: 'JK7b_OtfkIk', title: 'Створення сайтів 4' },
       { id: '0m2PoN1gOxI', title: 'Game Design 4' }
