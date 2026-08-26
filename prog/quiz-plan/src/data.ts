@@ -25,6 +25,7 @@ export interface QuizStep {
   cta?: string;
   options?: StepOption[];
   stats?: { value: string; label: string }[];
+  projects?: { id: string; title: string }[];
   points?: string[];
   reviews?: { name: string; text: string; emoji: string }[];
 }
@@ -85,12 +86,12 @@ export const STEPS: QuizStep[] = [
     type: 'interstitial',
     title: 'Ось так виглядають проєкти наших учнів',
     cta: 'ПРОДОВЖИТИ →',
-    stats: [
-      { value: '17 000+', label: 'активних студентів' },
-      { value: '3 800 000+', label: 'успішних занять' },
-      { value: '1 700+', label: 'досвідчених викладачів' },
-      { value: '95%', label: 'рекомендують нас' },
-    ],
+    projects: [
+      { id: 'SjGMdETg8_8', title: 'Roblox 2' },
+      { id: 'ueIsBXKliNE', title: 'Roblox 1' },
+      { id: 'JK7b_OtfkIk', title: 'Створення сайтів 4' },
+      { id: '0m2PoN1gOxI', title: 'Game Design 4' }
+    ]
   },
   {
     id: 6,

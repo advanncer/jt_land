@@ -373,35 +373,37 @@ export default function App() {
         )}
 
         {/* ════════════════════════════════════
-            INTERSTITIAL (stats)
+            INTERSTITIAL (stats / projects)
         ════════════════════════════════════ */}
         {s.type === 'interstitial' && (
           <div className="w-full">
-            {/* Dark hero card */}
-            <div className="bg-violet-950 rounded-3xl p-6 text-center text-white mb-6 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 left-4 w-28 h-28 bg-violet-600/40 rounded-full blur-2xl pointer-events-none" />
-              <div className="relative z-10">
-                <div className="text-4xl mb-3">🏆</div>
-                <h2 className="text-xl font-black mb-2 leading-tight">{s.title}</h2>
-                <p className="text-violet-400 text-sm font-medium">{s.subtitle}</p>
-              </div>
+            <div className="text-center mb-6">
+              <div className="text-4xl mb-3">🚀</div>
+              <h2 className="text-2xl font-black text-violet-950 mb-2 leading-tight">
+                {s.title}
+              </h2>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              {s.stats?.map(stat => (
-                <div
-                  key={stat.label}
-                  className="bg-white rounded-2xl p-4 text-center border border-violet-100 shadow-sm"
-                >
-                  <div className="text-xl font-black text-violet-950">{stat.value}</div>
-                  <div className="text-xs text-violet-400 font-semibold mt-1 leading-tight">
-                    {stat.label}
+            {/* Projects Previews */}
+            {s.projects && (
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                {s.projects.map(proj => (
+                  <div key={proj.id} className="bg-white p-2 rounded-2xl border border-violet-100 shadow-sm flex flex-col">
+                    <div className="w-full relative rounded-xl overflow-hidden aspect-video bg-black">
+                      <iframe 
+                        src={`https://www.youtube.com/embed/${proj.id}?autoplay=1&mute=1&loop=1&playlist=${proj.id}&controls=0&modestbranding=1&playsinline=1`}
+                        className="absolute inset-0 w-full h-full pointer-events-none scale-150"
+                        frameBorder="0"
+                        allow="autoplay; encrypted-media"
+                      />
+                    </div>
+                    <div className="text-center text-[11px] font-bold text-violet-950 mt-2 truncate">
+                      {proj.title}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
             <button
               id="interstitial-cta"
