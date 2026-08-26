@@ -392,14 +392,14 @@ export default function App() {
                 {s.projects.map(proj => (
                   <div key={proj.id} className="bg-white p-2 rounded-2xl border border-violet-100 shadow-sm flex flex-col">
                     <div className="w-full relative rounded-xl overflow-hidden aspect-video bg-black">
-                      <iframe 
-                        src={`https://www.youtube.com/embed/${proj.id}?autoplay=1&mute=1&loop=1&playlist=${proj.id}&controls=0&modestbranding=1&playsinline=1&disablekb=1&rel=0&iv_load_policy=3&start=10`}
-                        className="absolute inset-0 w-full h-full pointer-events-none scale-[1.02]"
-                        frameBorder="0"
-                        allow="autoplay; encrypted-media"
+                      <video 
+                        src={proj.id}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
                       />
-                      {/* Transparent overlay to block ALL touches/clicks from reaching the iframe */}
-                      <div className="absolute inset-0 z-10 bg-transparent" />
                     </div>
                     <div className="text-center text-[11px] font-bold text-violet-950 mt-2 truncate">
                       {proj.title}
