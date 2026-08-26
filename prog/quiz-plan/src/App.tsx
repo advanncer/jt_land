@@ -135,8 +135,8 @@ export default function App() {
       utm_campaign: urlParams.get('utm_campaign'),
       utm_term: urlParams.get('utm_term'),
       utm_content: urlParams.get('utm_content'),
-      utm_subject: 'Програмування',
-      subject: 'Програмування',
+      utm_subject: 'programming',
+      subject: 'programming',
       Lead_type: 'child',
     };
 
