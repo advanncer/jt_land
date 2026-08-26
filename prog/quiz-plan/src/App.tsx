@@ -25,7 +25,7 @@ export default function App() {
 
   const [ipInfo, setIpInfo] = useState<{ ip?: string; country?: string }>({});
 
-  // ─── GEO detection ───────────────────────────────────────
+  // ─── GEO detection & Background Video Preload ────────────
   useEffect(() => {
     fetch('https://ipinfo.io/json')
       .then(r => r.json())
@@ -34,6 +34,16 @@ export default function App() {
         if (d?.country) setGeoCountry(d.country);
       })
       .catch(() => {});
+
+    // Preload project videos in background so Step 5 renders instantly
+    const interstitialStep = STEPS.find(s => s.type === 'interstitial');
+    if (interstitialStep?.projects) {
+      interstitialStep.projects.forEach(proj => {
+        const v = document.createElement('video');
+        v.preload = 'auto';
+        v.src = proj.id;
+      });
+    }
   }, []);
 
   const currentStepData = STEPS.find(s => s.id === step);
