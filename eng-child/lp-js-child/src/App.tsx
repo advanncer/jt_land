@@ -29,6 +29,15 @@ const formatPhoneNumber = (value: string) => {
 export default function App() {
   const [step, setStep] = useState(1);
   useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has('leadType')) {
+        url.searchParams.set('leadType', 'english-for-children');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch {}
+  }, []);
+  useEffect(() => {
     const dl = (window as any).dataLayer || [];
     (window as any).dataLayer = dl;
     dl.push({

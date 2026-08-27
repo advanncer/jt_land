@@ -25,8 +25,17 @@ export default function App() {
 
   const [ipInfo, setIpInfo] = useState<{ ip?: string; country?: string }>({});
 
-  // ─── GEO detection ───────────────────────────────────────
+  // ─── GEO detection & URL leadType ────────────────────────
   useEffect(() => {
+    // Automatically add leadType=english-for-adults to address bar URL if not present
+    try {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has('leadType')) {
+        url.searchParams.set('leadType', 'english-for-adults');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch {}
+
     fetch('https://ipinfo.io/json')
       .then(r => r.json())
       .then(d => {

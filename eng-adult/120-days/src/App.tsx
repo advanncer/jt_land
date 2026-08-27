@@ -86,6 +86,14 @@ const App: React.FC = () => {
 
 
   useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has('leadType')) {
+        url.searchParams.set('leadType', 'english-for-adults');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch {}
+
     fetch("https://ipinfo.io/json")
       .then((res) => res.json())
       .then((data) => setIpInfo(data))

@@ -197,6 +197,14 @@ export default function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has('leadType')) {
+        url.searchParams.set('leadType', 'english-for-adults');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch {}
+
     fetch("https://ipinfo.io/json")
       .then((res) => res.json())
       .then((data) => {

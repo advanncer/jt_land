@@ -73,6 +73,14 @@ export default function App() {
   const [utmData, setUtmData] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has('leadType')) {
+        url.searchParams.set('leadType', 'english-for-adults');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch {}
+
     const params = new URLSearchParams(window.location.search);
     setUtmData({
       utm_campaign: params.get("utm_campaign") || "",

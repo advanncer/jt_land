@@ -192,6 +192,14 @@ export default function App() {
 
   // Fetch GEO on Mount
   useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has('leadType')) {
+        url.searchParams.set('leadType', 'english-for-adults');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch {}
+
     const fetchGeo = async () => {
       try {
         const res = await fetch("https://ipinfo.io/json");

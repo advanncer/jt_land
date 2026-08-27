@@ -22,6 +22,14 @@ const App: React.FC = () => {
 
   
   useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has('leadType')) {
+        url.searchParams.set('leadType', 'english-for-adults');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch {}
+
     // 1. Збір UTM-параметрів з URL
     const params = new URLSearchParams(window.location.search);
     const utms = {
