@@ -58,6 +58,10 @@ export default defineConfig({
           __dirname,
           "prog/quiz-plan/index.html",
         ),
+        engChildQuizPlan: resolve(
+          __dirname,
+          "eng-child/quiz-plan/index.html",
+        ),
       },
     },
   },
