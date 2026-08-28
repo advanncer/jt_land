@@ -15,10 +15,12 @@ import {
   Users,
   Target,
   DollarSign,
-  ArrowRight,
   BarChart3,
   Layers,
-  ChevronRight,
+  Lock,
+  LogOut,
+  ShieldCheck,
+  KeyRound,
 } from "lucide-react";
 
 interface Variant {
@@ -57,6 +59,13 @@ const PRESET_LANDINGS = [
 ];
 
 export default function SplitterApp() {
+  // Auth State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem("js_splitter_auth") === "true";
+  });
+  const [passwordInput, setPasswordInput] = useState("");
+  const [authError, setAuthError] = useState("");
+
   const [experiments, setExperiments] = useState<Experiment[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedExp, setSelectedExp] = useState<Experiment | null>(null);
@@ -77,6 +86,24 @@ export default function SplitterApp() {
   const [utmSource, setUtmSource] = useState("facebook");
   const [utmMedium, setUtmMedium] = useState("cpc");
   const [utmCampaign, setUtmCampaign] = useState("smart_split_test");
+
+  // Auth Handler
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Default master password for backend dashboard access
+    if (passwordInput.trim() === "justschool2026" || passwordInput.trim() === "admin" || passwordInput.trim() === "justschool") {
+      setIsAuthenticated(true);
+      localStorage.setItem("js_splitter_auth", "true");
+      setAuthError("");
+    } else {
+      setAuthError("Неверный пароль доступа");
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem("js_splitter_auth");
+  };
 
   // Fetch Experiments
   const fetchExperiments = async () => {
@@ -100,10 +127,12 @@ export default function SplitterApp() {
   };
 
   useEffect(() => {
-    fetchExperiments();
-    const interval = setInterval(fetchExperiments, 10000); // 10s auto-refresh
-    return () => clearInterval(interval);
-  }, []);
+    if (isAuthenticated) {
+      fetchExperiments();
+      const interval = setInterval(fetchExperiments, 10000); // 10s auto-refresh
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,7 +193,7 @@ export default function SplitterApp() {
   };
 
   const handleResetStats = async (expId: string) => {
-    if (!confirm("Are you sure you want to reset stats for this split test?")) return;
+    if (!confirm("Сбросить статистику по этому сплиту?")) return;
     try {
       await fetch(`/api/split?id=${expId}&resetOnly=true`, { method: "DELETE" });
       fetchExperiments();
@@ -174,7 +203,7 @@ export default function SplitterApp() {
   };
 
   const handleDelete = async (expId: string) => {
-    if (!confirm("Are you sure you want to delete this split test?")) return;
+    if (!confirm("Удалить этот сплит-тест?")) return;
     try {
       await fetch(`/api/split?id=${expId}`, { method: "DELETE" });
       setSelectedExp(null);
@@ -194,6 +223,59 @@ export default function SplitterApp() {
     setCopiedSlug(slug + (withUtm ? "_utm" : ""));
     setTimeout(() => setCopiedSlug(null), 2500);
   };
+
+  // Login Screen if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-600/20 rounded-full blur-3xl"></div>
+          
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="h-14 w-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-xl shadow-indigo-600/30 mb-4">
+              <Lock className="w-7 h-7 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">JustSchool Splitter</h1>
+            <p className="text-xs text-slate-400 mt-1">Вход во внутренний дашборд управления сплитами</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                Пароль администратора
+              </label>
+              <div className="relative">
+                <input
+                  type="password"
+                  required
+                  autoFocus
+                  placeholder="••••••••••••"
+                  value={passwordInput}
+                  onChange={(e) => setPasswordInput(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm font-medium"
+                />
+                <KeyRound className="w-4 h-4 text-slate-500 absolute right-3.5 top-3.5" />
+              </div>
+              {authError && (
+                <p className="text-xs text-rose-400 font-medium mt-2">{authError}</p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/25 transition-all text-sm flex items-center justify-center gap-2"
+            >
+              <ShieldCheck className="w-4 h-4" /> Войти в панель
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <span className="text-[11px] text-slate-500">Доступ только для маркетинговой команды JustSchool</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // High-level Aggregated Stats
   const totalVisits = experiments.reduce(
@@ -254,6 +336,13 @@ export default function SplitterApp() {
             >
               <Plus className="w-4 h-4" />
               Создать Сплит-Связку
+            </button>
+            <button
+              onClick={handleLogout}
+              title="Выйти"
+              className="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-all ml-1"
+            >
+              <LogOut className="w-4 h-4" />
             </button>
           </div>
         </div>
