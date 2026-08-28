@@ -62,6 +62,7 @@ export default defineConfig({
           __dirname,
           "eng-child/quiz-plan/index.html",
         ),
+        splitter: resolve(__dirname, "splitter/index.html"),
       },
     },
   },

@@ -1,3 +1,5 @@
+import { recordConversion } from "./split.js";
+
 // Helper to detect if a phone number is a dummy/fake number or has invalid carrier codes
 function isDummyPhone(phone) {
   if (!phone || typeof phone !== "string") return true;
@@ -117,6 +119,19 @@ export default async function handler(request, response) {
   const tableId = process.env.NOCODB_TABLE_ID || "mwyhw2a79xopbef";
 
   const promises = [];
+
+  // --- Track Smart Splitter Conversion if split_id is present ---
+  const splitId = data.split_id || (dialogueUrl.match(/[?&]split_id=([^&#]*)/) ? RegExp.$1 : "");
+  const splitVariant = data.split_variant || (dialogueUrl.match(/[?&]split_variant=([^&#]*)/) ? RegExp.$1 : "");
+
+  if (splitId && splitVariant) {
+    console.log("Recording Smart Splitter Conversion:", { splitId, splitVariant });
+    try {
+      recordConversion(splitId, splitVariant, "lead");
+    } catch (e) {
+      console.error("Error recording split conversion:", e);
+    }
+  }
 
   // --- Send to NocoDB ---
   if (nocoToken && tableId) {

@@ -30,6 +30,18 @@
   ],
   "rewrites": [
     {
+      "source": "/splitter",
+      "destination": "/splitter/index.html"
+    },
+    {
+      "source": "/splitter/:path*",
+      "destination": "/splitter/index.html"
+    },
+    {
+      "source": "/s/:slug",
+      "destination": "/api/s/[slug]"
+    },
+    {
       "source": "/eng-adult/main",
       "destination": "/eng-adult/main/index.html"
     },
