@@ -67,6 +67,15 @@ CATEGORIES = [
         "category": "👨‍💼 АНГЛІЙСЬКА ДЛЯ ДОРОСЛИХ (English for Adults)",
         "items": [
             {
+                "id": "eng-adult/quiz-plan-v2",
+                "product": "Англійська для дорослих (Design System v2)",
+                "audience": "Дорослі студенти (18+)",
+                "url": "https://lp.justschool.me/eng-adult/quiz-plan-v2/?leadType=english-for-adults",
+                "lead_type": "english-for-adults",
+                "description": "Новий дизайн за JustSchool Design System: 13-кроковий квіз-план з фірмовими шейпами, оновленою типографікою Montserrat, матрицею слів A1–C1 та безкоштовним пробним уроком.",
+                "analytics": "GA4: quiz_step_reach, form_success\nFB Pixel: Lead, Purchase\nCRM: qa, utm_subject=English"
+            },
+            {
                 "id": "eng-adult/quiz-plan",
                 "product": "Англійська для дорослих",
                 "audience": "Дорослі студенти (18+)",
