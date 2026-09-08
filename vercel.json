@@ -172,6 +172,22 @@
     {
       "source": "/eng-adult/120-days/:path*",
       "destination": "/eng-adult/120-days/:path*"
+    },
+    {
+      "source": "/eng-adult/quiz-plan-v2",
+      "destination": "/eng-adult/quiz-plan-v2/index.html"
+    },
+    {
+      "source": "/eng-adult/quiz-plan-v2/:path*",
+      "destination": "/eng-adult/quiz-plan-v2/:path*"
+    },
+    {
+      "source": "/eng-adult/main_page_copy",
+      "destination": "/eng-adult/main_page_copy/index.html"
+    },
+    {
+      "source": "/eng-adult/main_page_copy/:path*",
+      "destination": "/eng-adult/main_page_copy/:path*"
     }
   ],
   "redirects": [
