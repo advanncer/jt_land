@@ -1,0 +1,7 @@
+/* JustSchool ships a single family: Montserrat (400-800).
+   Source files were not provided with the brand kit, so the Google Fonts
+   distribution is used. Swap the @import for local @font-face rules if the
+   licensed binaries become available. */
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap");
+
+:root{--font-core:"Montserrat",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;--font-display:var(--font-core);--font-body:var(--font-core);--font-mono:ui-monospace,"SFMono-Regular","Menlo",monospace}

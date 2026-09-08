@@ -67,6 +67,15 @@ CATEGORIES = [
         "category": "👨‍💼 АНГЛІЙСЬКА ДЛЯ ДОРОСЛИХ (English for Adults)",
         "items": [
             {
+                "id": "eng-adult/main_page_copy",
+                "product": "Головний лендинг (Design System)",
+                "audience": "Усі вікові групи (дорослі, діти, підлітки)",
+                "url": "https://lp.justschool.me/eng-adult/main_page_copy/?leadType=english-for-adults",
+                "lead_type": "english-for-adults",
+                "description": "Сучасний лендинг за скріншотом та JustSchool Design System: Hero з плаваючими метриками, стрічка переваг, курси для всіх вікових груп, відгуки та модальна лід-форма.",
+                "analytics": "GA4: form_success\nFB Pixel: Lead, Purchase\nCRM: qa, utm_subject=English"
+            },
+            {
                 "id": "eng-adult/quiz-plan-v2",
                 "product": "Англійська для дорослих (Design System v2)",
                 "audience": "Дорослі студенти (18+)",

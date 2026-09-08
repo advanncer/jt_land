@@ -66,6 +66,10 @@ export default defineConfig({
           __dirname,
           "eng-adult/quiz-plan-v2/index.html",
         ),
+        engAdultMainCopy: resolve(
+          __dirname,
+          "eng-adult/main_page_copy/index.html",
+        ),
         splitter: resolve(__dirname, "splitter/index.html"),
       },
     },
