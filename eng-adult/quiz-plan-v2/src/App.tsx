@@ -1,31 +1,39 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import PhoneInput from './PhoneInput';
 import { STEPS, WORDS } from './data';
-import { PhoneInput } from './PhoneInput';
-import logoBlack from './assets/logo-horizontal-black.svg';
-import logoSticker from './assets/logo-sticker.svg';
-import burstSvg from './assets/brand/burst.svg';
-import ringsSvg from './assets/brand/rings.svg';
-import chevronSvg from './assets/brand/chevron.svg';
-import crossSvg from './assets/brand/cross.svg';
+import { Button } from './ds/components/core/Button';
+import { Badge } from './ds/components/core/Badge';
+import { Card } from './ds/components/core/Card';
+import { Tag } from './ds/components/core/Tag';
+import { BrandShape } from './ds/components/core/BrandShape';
+import logoBlack from './ds/assets/logo-horizontal-black.svg';
 
+// Steps shown in the progress counter (choice + multi + word_test)
 const PROGRESS_STEPS = [2, 3, 4, 5, 6, 8, 10, 11];
+const TOTAL_PROGRESS = PROGRESS_STEPS.length;
 
 export default function App() {
+  // ─── State ───────────────────────────────────────────────
   const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [multiAnswers, setMultiAnswers] = useState<Record<number, string[]>>({});
-  const [knownWords, setKnownWords] = useState<string[]>([]);
+  const [checkedWords, setCheckedWords] = useState<Set<string>>(new Set());
+
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [rawPhone, setRawPhone] = useState('');
   const [isPhoneValid, setIsPhoneValid] = useState(false);
-  const [email, setEmail] = useState('');
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loaderProgress, setLoaderProgress] = useState(0);
   const [geoCountry, setGeoCountry] = useState('UA');
   const [animKey, setAnimKey] = useState(0);
 
-  // ─── GEO detection & Auto leadType in URL ─────────────────
+  const [ipInfo, setIpInfo] = useState<{ ip?: string; country?: string }>({});
+
+  // ─── GEO detection & URL leadType ────────────────────────
   useEffect(() => {
+    // Automatically add leadType=english-for-adults to address bar URL if not present
     try {
       const url = new URL(window.location.href);
       if (!url.searchParams.has('leadType')) {
@@ -37,6 +45,7 @@ export default function App() {
     fetch('https://ipinfo.io/json')
       .then(r => r.json())
       .then(d => {
+        setIpInfo(d);
         if (d?.country) setGeoCountry(d.country);
       })
       .catch(() => {});
@@ -56,41 +65,40 @@ export default function App() {
     });
   }, [step, currentStepData]);
 
-  // ─── Loader step logic ───────────────────────────────────
+  // ─── Loader animation ────────────────────────────────────
   useEffect(() => {
-    if (step !== 12) return;
+    if (currentStepData?.type !== 'loader') return;
     setLoaderProgress(0);
     const interval = setInterval(() => {
       setLoaderProgress(prev => {
-        if (prev >= 99) {
+        if (prev >= 100) {
           clearInterval(interval);
           setTimeout(() => advance(), 600);
           return 100;
         }
-        return Math.min(prev + 1.25, 100);
+        return Math.min(prev + 1.2, 100);
       });
-    }, 32);
+    }, 35);
     return () => clearInterval(interval);
   }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ─── Progress Calculation ────────────────────────────────
+  // ─── Progress bar ────────────────────────────────────────
   const progressIdx = PROGRESS_STEPS.indexOf(step);
-  const progressPercent =
-    progressIdx >= 0 ? Math.round(((progressIdx + 1) / PROGRESS_STEPS.length) * 100) : 0;
 
-  // ─── Navigation Handlers ─────────────────────────────────
+  // ─── Navigation ──────────────────────────────────────────
   const advance = () => {
     setAnimKey(k => k + 1);
     setStep(s => s + 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   };
 
   const back = () => {
     setAnimKey(k => k + 1);
     setStep(s => s - 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   };
 
+  // ─── Handlers ────────────────────────────────────────────
   const handleChoice = (label: string) => {
     setAnswers(prev => ({ ...prev, [step]: label }));
     advance();
@@ -107,47 +115,32 @@ export default function App() {
   };
 
   const toggleWord = (word: string) => {
-    setKnownWords(prev =>
-      prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]
-    );
+    setCheckedWords(prev => {
+      const next = new Set(prev);
+      next.has(word) ? next.delete(word) : next.add(word);
+      return next;
+    });
   };
 
-  // ─── Word Test Level Calculator ──────────────────────────
-  const calculateWordLevel = () => {
-    const count = knownWords.length;
-    if (count <= 4) return 'Starter / A0-A1 (Початковий)';
-    if (count <= 10) return 'Elementary / A2 (Базовий)';
-    if (count <= 17) return 'Intermediate / B1 (Середній)';
-    if (count <= 23) return 'Upper-Intermediate / B2 (Вище середнього)';
-    return 'Advanced / C1 (Просунутий)';
-  };
-
-  // ─── Form Submission ─────────────────────────────────────
+  // ─── Form submit ─────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting) return;
-
-    if (!name.trim()) {
-      alert("Будь ласка, введіть ваше ім'я");
-      return;
-    }
-    if (!rawPhone || !isPhoneValid) {
-      alert('Будь ласка, введіть коректний номер телефону');
-      return;
-    }
+    if (isSubmitting) return; // double-submission guard
+    if (!isPhoneValid || !name.trim() || !email.trim()) return;
 
     setIsSubmitting(true);
 
-    const qaArr: string[] = [];
+    // Build Q&A string from all answers
+    const ipString = `ip:${ipInfo.ip || 'unknown'}|country:${ipInfo.country || 'unknown'}`;
+    const qaArr: string[] = [ipString];
     STEPS.forEach(s => {
-      if (s.type === 'choice' && answers[s.id]) {
-        qaArr.push(`Q${s.id} (${s.question}): ${answers[s.id]}`);
-      } else if (s.type === 'multi' && multiAnswers[s.id]?.length) {
-        qaArr.push(`Q${s.id} (${s.question}): ${multiAnswers[s.id].join(', ')}`);
-      } else if (s.type === 'word_test') {
-        qaArr.push(`Q8 (Слова): ${knownWords.length} слів відомо (${calculateWordLevel()})`);
-      }
+      if (answers[s.id])
+        qaArr.push(`Q${s.id}: ${answers[s.id]}`);
+      if (multiAnswers[s.id]?.length)
+        qaArr.push(`Q${s.id}: ${multiAnswers[s.id].join(', ')}`);
     });
+    if (checkedWords.size > 0)
+      qaArr.push(`Q100: ${Array.from(checkedWords).join(', ')}`);
 
     const urlParams = new URLSearchParams(window.location.search);
     const payload = {
@@ -156,8 +149,8 @@ export default function App() {
       email: email.trim(),
       qa: qaArr.join('|||'),
       dialogueUrl: window.location.href,
-      dialogueName: 'JustSchool Adult Quiz Plan v2',
-      dialogueId: '',
+      dialogueName: "JustSchool Quiz v2",
+      dialogueId: "unknown",
       utm_source: urlParams.get('utm_source'),
       utm_medium: urlParams.get('utm_medium'),
       utm_campaign: urlParams.get('utm_campaign'),
@@ -193,13 +186,9 @@ export default function App() {
           event: 'form_success',
           quiz_name: 'eng-adult-quiz-plan-v2',
         });
-        try {
-          const result = await res.json();
-          window.location.href =
-            result?.redirectUri || 'https://justschool.me/uk/onboarding';
-        } catch {
-          window.location.href = 'https://justschool.me/uk/onboarding';
-        }
+        const result = await res.json();
+        window.location.href =
+          result?.redirectUri || 'https://justschool.me/uk/onboarding';
       } else {
         window.location.href = 'https://justschool.me/uk/onboarding';
       }
@@ -208,594 +197,783 @@ export default function App() {
     }
   };
 
-  const s = currentStepData || STEPS[0];
+  // ─── Derived ─────────────────────────────────────────────
+  const s = currentStepData;
+  if (!s) return null;
 
+  const canGoBack =
+    step > 1 && !['loader', 'lead_form'].includes(s.type);
+  const multiSelected = multiAnswers[step] || [];
+  const progressPercent =
+    progressIdx >= 0
+      ? Math.round(((progressIdx + 1) / TOTAL_PROGRESS) * 100)
+      : 0;
+
+  // ─── Render ──────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#FDFCFB] text-[#141414] flex flex-col justify-between selection:bg-[#FFE0CA] selection:text-[#F56600]">
-      {/* ─── Header ────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#F0F0F0] px-4 py-3.5 transition-all">
-        <div className="max-w-xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src={logoBlack} alt="JustSchool" className="h-6 w-auto" />
-            <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider bg-[#FFF5EB] text-[#F56600] rounded-full border border-[#FFE0CA]">
-              Adult English
-            </span>
-          </div>
-
-          {/* Step Counter or Trust Badge */}
-          {progressIdx >= 0 ? (
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-[#808080]">
-                Крок <span className="text-[#F56600]">{progressIdx + 1}</span> з {PROGRESS_STEPS.length}
-              </span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5 text-xs font-bold text-[#585858]">
-              <span className="inline-block w-2 h-2 rounded-full bg-[#87D142] animate-pulse"></span>
-              17 000+ учнів
-            </div>
+    <div
+      className="min-h-[100dvh] flex flex-col"
+      style={{
+        backgroundColor: 'var(--surface-page-warm)',
+        fontFamily: 'var(--font-core)',
+        color: 'var(--text-body)',
+      }}
+    >
+      {/* ── Header ── */}
+      <header
+        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b h-14 flex items-center px-4 justify-between shrink-0"
+        style={{ borderColor: 'var(--border-subtle)' }}
+      >
+        <div className="w-10">
+          {canGoBack && (
+            <button
+              id="back-btn"
+              onClick={back}
+              aria-label="Назад"
+              className="p-2 -ml-2 transition-colors text-xl leading-none font-bold"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              ←
+            </button>
           )}
         </div>
 
-        {/* Dynamic Progress Bar */}
-        {progressIdx >= 0 && (
-          <div className="max-w-xl mx-auto mt-3">
-            <div className="w-full bg-[#F0F0F0] h-2 rounded-full overflow-hidden">
-              <div
-                className="bg-gradient-to-r from-[#FF7411] to-[#F56600] h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_12px_rgba(245,102,0,0.35)]"
-                style={{ width: `${progressPercent}%` }}
-              />
+        {/* Logo in Header */}
+        <div className="flex items-center gap-2">
+          <img src={logoBlack} alt="JustSchool" className="h-6 w-auto" />
+        </div>
+
+        {/* Step counter */}
+        <div
+          className="text-xs font-bold min-w-[40px] text-right uppercase tracking-widest"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          {progressIdx >= 0 ? `${progressIdx + 1}/${TOTAL_PROGRESS}` : ''}
+        </div>
+      </header>
+
+      {/* ── Progress bar ── */}
+      {progressIdx >= 0 && (
+        <div className="h-1 bg-[var(--base-200)] shrink-0">
+          <div
+            className="h-full transition-all duration-500 ease-out"
+            style={{
+              width: `${progressPercent}%`,
+              backgroundColor: 'var(--brand)',
+            }}
+          />
+        </div>
+      )}
+
+      {/* ── Main content — animated on step change ── */}
+      <main
+        key={animKey}
+        className="step-enter flex-1 flex flex-col items-center px-4 py-6 w-full max-w-lg mx-auto"
+      >
+        {/* ════════════════════════════════════
+            HERO
+        ════════════════════════════════════ */}
+        {s.type === 'hero' && (
+          <div className="flex flex-col items-center text-center w-full relative">
+            {/* Subtle decorative brand shapes */}
+            <div className="absolute -top-6 -right-8 pointer-events-none select-none opacity-20">
+              <BrandShape shape="burst" size={90} color="var(--element-orange)" />
+            </div>
+
+            {/* Social Proof Badge */}
+            <div className="mb-6">
+              <Badge tone="brand" size="md">
+                {s.social_proof}
+              </Badge>
+            </div>
+
+            <h1
+              className="text-3xl sm:text-4xl font-extrabold leading-tight tracking-tight mb-4"
+              style={{ color: 'var(--text-strong)', letterSpacing: '-0.02em' }}
+            >
+              {s.title}
+            </h1>
+            <p
+              className="text-sm sm:text-base font-medium leading-relaxed mb-8 max-w-sm"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              {s.subtitle}
+            </p>
+
+            {/* Stats grid */}
+            <div className="grid grid-cols-2 gap-3 w-full mb-8">
+              {[
+                { v: '17 000+', l: 'студентів' },
+                { v: '3.8M+', l: 'занять' },
+                { v: '1 700+', l: 'викладачів' },
+                { v: '95%', l: 'рекомендують' },
+              ].map(b => (
+                <Card
+                  key={b.l}
+                  variant="raised"
+                  padding="sm"
+                  style={{
+                    textAlign: 'center',
+                    border: 'var(--border-hairline) solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-xl)',
+                  }}
+                >
+                  <div
+                    className="text-2xl font-extrabold"
+                    style={{ color: 'var(--brand)' }}
+                  >
+                    {b.v}
+                  </div>
+                  <div
+                    className="text-xs font-semibold mt-1"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    {b.l}
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            <div className="w-full space-y-3">
+              <Button
+                variant="primary"
+                size="lg"
+                fullWidth
+                onClick={advance}
+                style={{
+                  height: 56,
+                  fontSize: 'var(--fs-body-lg)',
+                  borderRadius: 'var(--radius-pill)',
+                  boxShadow: 'var(--shadow-brand)',
+                }}
+              >
+                {s.cta} →
+              </Button>
+              <p
+                className="text-center text-xs font-semibold uppercase tracking-widest"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Безкоштовно • 5 хвилин
+              </p>
             </div>
           </div>
         )}
-      </header>
 
-      {/* ─── Main Content Container ────────────────────────── */}
-      <main className="flex-1 flex flex-col justify-center px-4 py-8 max-w-xl w-full mx-auto relative">
-        <div key={animKey} className="animate-fade-in w-full">
-          {/* Back Button */}
-          {step > 1 && step !== 12 && step !== 13 && (
-            <button
-              onClick={back}
-              type="button"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#808080] hover:text-[#141414] mb-6 transition-colors group"
+        {/* ════════════════════════════════════
+            SINGLE CHOICE
+        ════════════════════════════════════ */}
+        {s.type === 'choice' && (
+          <div className="w-full">
+            <h2
+              className="text-2xl font-extrabold mb-2 leading-tight text-center"
+              style={{ color: 'var(--text-strong)' }}
             >
-              <span className="transition-transform group-hover:-translate-x-1">←</span> Назад
-            </button>
-          )}
-
-          {/* ══════════════════════════════════════════════════
-              STEP 1: HERO
-          ══════════════════════════════════════════════════ */}
-          {s.type === 'hero' && (
-            <div className="relative overflow-hidden rounded-3xl bg-[#FFF5EB] border border-[#FFE0CA] p-6 sm:p-10 shadow-sm">
-              {/* Background Brand Shapes */}
-              <img
-                src={ringsSvg}
-                alt=""
-                aria-hidden="true"
-                className="absolute -right-12 -top-12 w-64 h-64 opacity-15 pointer-events-none select-none"
-              />
-              <img
-                src={burstSvg}
-                alt=""
-                aria-hidden="true"
-                className="absolute -left-10 -bottom-10 w-44 h-44 opacity-25 pointer-events-none select-none"
-              />
-              <img
-                src={crossSvg}
-                alt=""
-                aria-hidden="true"
-                className="absolute right-12 bottom-8 w-8 h-8 opacity-40 pointer-events-none select-none"
-              />
-
-              <div className="relative z-10 text-center">
-                {/* Badge */}
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#FBC59F] text-[#F56600] text-xs font-extrabold uppercase tracking-wide shadow-xs mb-6">
-                  {s.social_proof}
-                </div>
-
-                {/* Heading */}
-                <h1 className="text-2xl sm:text-4xl font-extrabold text-[#141414] leading-[1.15] tracking-tight mb-4">
-                  {s.title}
-                </h1>
-
-                {/* Subtitle */}
-                <p className="text-sm sm:text-base text-[#585858] font-medium leading-relaxed max-w-md mx-auto mb-8">
-                  {s.subtitle}
-                </p>
-
-                {/* Benefits Pill Badges */}
-                <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
-                  <span className="px-3 py-1.5 rounded-xl bg-white/80 border border-[#FFE0CA] text-xs font-semibold text-[#141414]">
-                    ⏱️ Всього 5 хвилин
-                  </span>
-                  <span className="px-3 py-1.5 rounded-xl bg-white/80 border border-[#FFE0CA] text-xs font-semibold text-[#141414]">
-                    🎯 Точний рівень знань
-                  </span>
-                  <span className="px-3 py-1.5 rounded-xl bg-white/80 border border-[#FFE0CA] text-xs font-semibold text-[#141414]">
-                    🎁 Урок у подарунок
-                  </span>
-                </div>
-
-                {/* CTA Button */}
-                <button
-                  type="button"
-                  onClick={advance}
-                  className="js-btn-primary w-full py-4 text-base sm:text-lg font-bold"
-                >
-                  {s.cta} →
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* ══════════════════════════════════════════════════
-              STEP TYPE: SINGLE CHOICE
-          ══════════════════════════════════════════════════ */}
-          {s.type === 'choice' && (
-            <div>
-              {/* Question Header */}
-              <div className="mb-6 text-center sm:text-left">
-                <h2 className="text-xl sm:text-3xl font-extrabold text-[#141414] leading-snug tracking-tight mb-2">
-                  {s.question}
-                </h2>
-                {s.subtitle && (
-                  <p className="text-xs sm:text-sm text-[#585858] font-medium">
-                    {s.subtitle}
-                  </p>
-                )}
-              </div>
-
-              {/* Options Grid */}
-              <div className="space-y-3">
-                {s.options?.map((opt, i) => {
-                  const isSelected = answers[s.id] === opt.label;
-                  return (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => handleChoice(opt.label)}
-                      className={`js-card js-card-interactive w-full p-4 sm:p-5 flex items-center justify-between text-left transition-all ${
-                        isSelected ? 'js-card-selected' : ''
-                      }`}
-                    >
-                      <div className="flex items-center gap-3.5">
-                        {opt.emoji && (
-                          <span className="text-2xl sm:text-3xl shrink-0 p-2 rounded-2xl bg-[#F8F8F8] border border-[#F0F0F0]">
-                            {opt.emoji}
-                          </span>
-                        )}
-                        <div>
-                          <div className="text-sm sm:text-base font-bold text-[#141414]">
-                            {opt.label}
-                          </div>
-                          {opt.desc && (
-                            <div className="text-xs text-[#585858] font-normal mt-0.5">
-                              {opt.desc}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-                          isSelected
-                            ? 'border-[#F56600] bg-[#F56600] text-white text-xs font-bold'
-                            : 'border-[#C8C8C8] bg-white'
-                        }`}
-                      >
-                        {isSelected && '✓'}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* ══════════════════════════════════════════════════
-              STEP TYPE: MULTIPLE CHOICE
-          ══════════════════════════════════════════════════ */}
-          {s.type === 'multi' && (
-            <div>
-              <div className="mb-6 text-center sm:text-left">
-                <h2 className="text-xl sm:text-3xl font-extrabold text-[#141414] leading-snug tracking-tight mb-2">
-                  {s.question}
-                </h2>
-                {s.subtitle && (
-                  <p className="text-xs sm:text-sm text-[#585858] font-medium">
-                    {s.subtitle}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-3 mb-6">
-                {s.options?.map((opt, i) => {
-                  const isChecked = multiAnswers[s.id]?.includes(opt.label);
-                  return (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => toggleMulti(opt.label)}
-                      className={`js-card js-card-interactive w-full p-4 sm:p-5 flex items-center justify-between text-left transition-all ${
-                        isChecked ? 'js-card-selected' : ''
-                      }`}
-                    >
-                      <div className="flex items-center gap-3.5">
-                        {opt.emoji && (
-                          <span className="text-2xl sm:text-3xl shrink-0 p-2 rounded-2xl bg-[#F8F8F8] border border-[#F0F0F0]">
-                            {opt.emoji}
-                          </span>
-                        )}
-                        <span className="text-sm sm:text-base font-bold text-[#141414]">
-                          {opt.label}
-                        </span>
-                      </div>
-
-                      <div
-                        className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all ${
-                          isChecked
-                            ? 'border-[#F56600] bg-[#F56600] text-white text-xs font-bold'
-                            : 'border-[#C8C8C8] bg-white'
-                        }`}
-                      >
-                        {isChecked && '✓'}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <button
-                type="button"
-                disabled={!multiAnswers[s.id] || multiAnswers[s.id].length === 0}
-                onClick={advance}
-                className="js-btn-primary w-full py-4 text-base font-bold"
+              {s.question}
+            </h2>
+            {s.subtitle ? (
+              <p
+                className="text-sm text-center mb-6 font-medium leading-relaxed"
+                style={{ color: 'var(--text-secondary)' }}
               >
-                {s.cta}
-              </button>
-            </div>
-          )}
+                {s.subtitle}
+              </p>
+            ) : (
+              <div className="mb-6" />
+            )}
 
-          {/* ══════════════════════════════════════════════════
-              STEP 7: INTERSTITIAL SOCIAL PROOF
-          ══════════════════════════════════════════════════ */}
-          {s.type === 'interstitial' && (
-            <div className="relative overflow-hidden rounded-3xl bg-[#141414] text-white p-6 sm:p-10 shadow-xl border border-[#303030]">
-              {/* Background brand elements */}
-              <img
-                src={ringsSvg}
-                alt=""
-                aria-hidden="true"
-                className="absolute -right-16 -bottom-16 w-60 h-60 opacity-15 pointer-events-none select-none filter invert"
-              />
-              <img
-                src={burstSvg}
-                alt=""
-                aria-hidden="true"
-                className="absolute -left-12 -top-12 w-48 h-48 opacity-20 pointer-events-none select-none"
-              />
-
-              <div className="relative z-10 text-center">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#FF7411] text-xs font-extrabold uppercase tracking-wider mb-5">
-                  🔥 JustSchool Community
-                </div>
-
-                <h2 className="text-xl sm:text-3xl font-extrabold text-white leading-tight tracking-tight mb-3">
-                  {s.title}
-                </h2>
-                <p className="text-xs sm:text-sm text-[#A8A8A8] font-normal leading-relaxed max-w-md mx-auto mb-8">
-                  {s.subtitle}
-                </p>
-
-                {/* Stats Matrix */}
-                <div className="grid grid-cols-2 gap-3 mb-8">
-                  {s.stats?.map((st, i) => (
+            <div className="grid gap-3">
+              {s.options?.map(opt => (
+                <button
+                  key={opt.value}
+                  id={`choice-${opt.value}`}
+                  onClick={() => handleChoice(opt.label)}
+                  className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group shadow-xs active:scale-[0.98]"
+                  style={{
+                    backgroundColor: 'var(--surface-card)',
+                    borderColor: 'var(--border-subtle)',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = 'var(--brand)';
+                    e.currentTarget.style.backgroundColor = 'var(--orange-25)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                    e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                  }}
+                >
+                  {opt.emoji && (
+                    <span
+                      className="text-2xl w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border"
+                      style={{
+                        backgroundColor: 'var(--base-100)',
+                        borderColor: 'var(--border-subtle)',
+                      }}
+                    >
+                      {opt.emoji}
+                    </span>
+                  )}
+                  <div className="flex-1">
                     <div
-                      key={i}
-                      className="p-4 rounded-2xl bg-white/5 border border-white/10 text-center backdrop-blur-xs"
+                      className="font-bold text-base leading-tight"
+                      style={{ color: 'var(--text-strong)' }}
                     >
-                      <div className="text-xl sm:text-2xl font-extrabold text-[#F56600]">
-                        {st.value}
-                      </div>
-                      <div className="text-xs text-[#C8C8C8] font-medium mt-1">
-                        {st.label}
-                      </div>
+                      {opt.label}
                     </div>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={advance}
-                  className="js-btn-primary w-full py-4 text-base font-bold"
-                >
-                  {s.cta}
+                    {opt.desc && (
+                      <div
+                        className="text-xs font-medium mt-0.5"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
+                        {opt.desc}
+                      </div>
+                    )}
+                  </div>
+                  <span
+                    className="text-lg shrink-0 font-bold transition-transform group-hover:translate-x-1"
+                    style={{ color: 'var(--brand)' }}
+                  >
+                    ›
+                  </span>
                 </button>
-              </div>
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* ══════════════════════════════════════════════════
-              STEP 8: WORD TEST MATRIX
-          ══════════════════════════════════════════════════ */}
-          {s.type === 'word_test' && (
-            <div>
-              <div className="mb-5 text-center sm:text-left">
-                <h2 className="text-xl sm:text-3xl font-extrabold text-[#141414] leading-snug tracking-tight mb-2">
-                  {s.question}
+        {/* ════════════════════════════════════
+            MULTI CHOICE
+        ════════════════════════════════════ */}
+        {s.type === 'multi' && (
+          <div className="w-full">
+            <h2
+              className="text-2xl font-extrabold mb-2 leading-tight text-center"
+              style={{ color: 'var(--text-strong)' }}
+            >
+              {s.question}
+            </h2>
+            {s.subtitle && (
+              <p
+                className="text-sm text-center mb-6 font-medium"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                {s.subtitle}
+              </p>
+            )}
+
+            <div className="grid gap-2.5 mb-6">
+              {s.options?.map(opt => {
+                const sel = multiSelected.includes(opt.label);
+                return (
+                  <button
+                    key={opt.value}
+                    id={`multi-${opt.value}`}
+                    onClick={() => toggleMulti(opt.label)}
+                    className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left active:scale-[0.98] shadow-xs"
+                    style={{
+                      backgroundColor: sel ? 'var(--orange-25)' : 'var(--surface-card)',
+                      borderColor: sel ? 'var(--brand)' : 'var(--border-subtle)',
+                    }}
+                  >
+                    <span
+                      className="text-xl w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border"
+                      style={{
+                        backgroundColor: 'var(--base-100)',
+                        borderColor: 'var(--border-subtle)',
+                      }}
+                    >
+                      {opt.emoji}
+                    </span>
+                    <span
+                      className="flex-1 font-bold text-sm leading-snug"
+                      style={{ color: 'var(--text-strong)' }}
+                    >
+                      {opt.label}
+                    </span>
+                    <div
+                      className="w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-all"
+                      style={{
+                        borderColor: sel ? 'var(--brand)' : 'var(--border-strong)',
+                        backgroundColor: sel ? 'var(--brand)' : 'transparent',
+                      }}
+                    >
+                      {sel && (
+                        <span className="text-white text-xs font-black leading-none">✓</span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <Button
+              id="multi-confirm"
+              variant="primary"
+              size="lg"
+              fullWidth
+              disabled={multiSelected.length === 0}
+              onClick={() => multiSelected.length > 0 && advance()}
+              style={{
+                height: 56,
+                fontSize: 'var(--fs-body-lg)',
+                borderRadius: 'var(--radius-pill)',
+                boxShadow: multiSelected.length > 0 ? 'var(--shadow-brand)' : 'none',
+              }}
+            >
+              {s.cta}
+            </Button>
+          </div>
+        )}
+
+        {/* ════════════════════════════════════
+            INTERSTITIAL (stats)
+        ════════════════════════════════════ */}
+        {s.type === 'interstitial' && (
+          <div className="w-full">
+            {/* Dark hero card */}
+            <div
+              className="rounded-3xl p-6 text-center text-white mb-6 relative overflow-hidden shadow-xl"
+              style={{
+                backgroundColor: 'var(--surface-inverse)',
+                border: 'var(--border-hairline) solid var(--base-800)',
+              }}
+            >
+              {/* Brand shape decoration in background */}
+              <div className="absolute -right-8 -bottom-8 pointer-events-none opacity-20 filter invert">
+                <BrandShape shape="rings" size={160} />
+              </div>
+              <div className="absolute -left-6 -top-6 pointer-events-none opacity-25">
+                <BrandShape shape="burst" size={120} color="var(--element-yellow)" />
+              </div>
+
+              <div className="relative z-10">
+                <div className="text-4xl mb-3">🏆</div>
+                <h2 className="text-xl font-extrabold mb-2 leading-tight">
+                  {s.title}
                 </h2>
-                <p className="text-xs sm:text-sm text-[#585858] font-medium">
+                <p
+                  className="text-sm font-medium"
+                  style={{ color: 'var(--base-400)' }}
+                >
                   {s.subtitle}
                 </p>
               </div>
+            </div>
 
-              {/* Live Knowledge Tracker Badge */}
-              <div className="flex items-center justify-between px-4 py-2.5 rounded-2xl bg-[#FFF5EB] border border-[#FFE0CA] mb-5">
-                <div className="text-xs font-bold text-[#F56600]">
-                  Обрано слів: <span className="text-base">{knownWords.length}</span> з {WORDS.length}
-                </div>
-                <div className="text-xs font-semibold text-[#585858]">
-                  Рівень: <span className="font-bold text-[#141414]">{calculateWordLevel().split(' ')[0]}</span>
-                </div>
-              </div>
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              {s.stats?.map(stat => (
+                <Card
+                  key={stat.label}
+                  variant="raised"
+                  padding="sm"
+                  style={{
+                    textAlign: 'center',
+                    border: 'var(--border-hairline) solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-xl)',
+                  }}
+                >
+                  <div
+                    className="text-2xl font-extrabold"
+                    style={{ color: 'var(--brand)' }}
+                  >
+                    {stat.value}
+                  </div>
+                  <div
+                    className="text-xs font-semibold mt-1 leading-tight"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    {stat.label}
+                  </div>
+                </Card>
+              ))}
+            </div>
 
-              {/* Words Matrix Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-6 max-h-[50vh] overflow-y-auto p-1">
-                {WORDS.map((item, idx) => {
-                  const isChecked = knownWords.includes(item.word);
-                  const levelColors: Record<string, { bg: string; text: string; badge: string }> = {
-                    a1: { bg: '#EAF5E0', text: '#5EA61B', badge: 'A1' },
-                    a2: { bg: '#FBE1AD', text: '#A87000', badge: 'A2' },
-                    b1: { bg: '#FFE0CA', text: '#D95B00', badge: 'B1' },
-                    b2: { bg: '#FBCCB9', text: '#DA3E00', badge: 'B2' },
-                    c1: { bg: '#E4E4FA', text: '#5959EF', badge: 'C1' },
-                  };
-                  const color = levelColors[item.level] || levelColors.a1;
+            <Button
+              id="interstitial-cta"
+              variant="primary"
+              size="lg"
+              fullWidth
+              onClick={advance}
+              style={{
+                height: 56,
+                fontSize: 'var(--fs-body-lg)',
+                borderRadius: 'var(--radius-pill)',
+                boxShadow: 'var(--shadow-brand)',
+              }}
+            >
+              {s.cta}
+            </Button>
+          </div>
+        )}
 
+        {/* ════════════════════════════════════
+            WORD TEST
+        ════════════════════════════════════ */}
+        {s.type === 'word_test' && (
+          <div className="w-full">
+            <h2
+              className="text-2xl font-extrabold mb-2 text-center leading-tight"
+              style={{ color: 'var(--text-strong)' }}
+            >
+              {s.question}
+            </h2>
+            <p
+              className="text-sm text-center mb-5 font-medium"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              {s.subtitle}
+            </p>
+
+            {/* Words grid */}
+            <Card
+              variant="raised"
+              padding="sm"
+              style={{
+                borderRadius: 'var(--radius-2xl)',
+                border: 'var(--border-hairline) solid var(--border-subtle)',
+                marginBottom: '1rem',
+              }}
+            >
+              <div className="grid grid-cols-3 gap-2">
+                {WORDS.map(({ word }) => {
+                  const checked = checkedWords.has(word);
                   return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => toggleWord(item.word)}
-                      className={`p-3 rounded-2xl border text-left transition-all flex items-center justify-between ${
-                        isChecked
-                          ? 'border-[#F56600] bg-[#FFF5EB] shadow-xs'
-                          : 'border-[#E0E0E0] bg-white hover:border-[#C8C8C8]'
-                      }`}
+                    <Tag
+                      key={word}
+                      selected={checked}
+                      onClick={() => toggleWord(word)}
+                      style={{
+                        justifyContent: 'center',
+                        height: 42,
+                        fontSize: 'var(--fs-body)',
+                        fontWeight: 'var(--fw-bold)',
+                        borderRadius: 'var(--radius-lg)',
+                      }}
                     >
-                      <span
-                        className={`text-sm font-bold truncate ${
-                          isChecked ? 'text-[#F56600]' : 'text-[#141414]'
-                        }`}
-                      >
-                        {item.word}
-                      </span>
-                      <span
-                        className="px-1.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase"
-                        style={{ backgroundColor: color.bg, color: color.text }}
-                      >
-                        {color.badge}
-                      </span>
-                    </button>
+                      {word}
+                    </Tag>
                   );
                 })}
               </div>
+            </Card>
 
-              <button
-                type="button"
-                onClick={advance}
-                className="js-btn-primary w-full py-4 text-base font-bold"
+            <p
+              className="text-center text-xs font-medium mb-5"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              Вибрано:{' '}
+              <strong style={{ color: 'var(--brand)' }}>
+                {checkedWords.size}
+              </strong>{' '}
+              із {WORDS.length} слів
+            </p>
+
+            <Button
+              id="word-test-confirm"
+              variant="primary"
+              size="lg"
+              fullWidth
+              onClick={advance}
+              style={{
+                height: 56,
+                fontSize: 'var(--fs-body-lg)',
+                borderRadius: 'var(--radius-pill)',
+                boxShadow: 'var(--shadow-brand)',
+              }}
+            >
+              {s.cta}
+            </Button>
+          </div>
+        )}
+
+        {/* ════════════════════════════════════
+            TESTIMONIALS
+        ════════════════════════════════════ */}
+        {s.type === 'testimonials' && (
+          <div className="w-full">
+            <div className="text-center mb-6">
+              <div className="text-4xl mb-3">🎉</div>
+              <h2
+                className="text-2xl font-extrabold mb-2 leading-tight"
+                style={{ color: 'var(--text-strong)' }}
               >
-                {s.cta}
-              </button>
-            </div>
-          )}
-
-          {/* ══════════════════════════════════════════════════
-              STEP 9: TESTIMONIALS
-          ══════════════════════════════════════════════════ */}
-          {s.type === 'testimonials' && (
-            <div>
-              <div className="mb-6 text-center">
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#EAF5E0] text-[#5EA61B] text-xs font-extrabold uppercase tracking-wide mb-3">
-                  ⭐ Реальні історії учнів
-                </div>
-                <h2 className="text-xl sm:text-3xl font-extrabold text-[#141414] leading-snug tracking-tight mb-2">
-                  {s.title}
-                </h2>
-                <p className="text-xs sm:text-sm text-[#585858] font-medium max-w-md mx-auto">
-                  {s.subtitle}
-                </p>
-              </div>
-
-              <div className="space-y-3.5 mb-6">
-                {s.reviews?.map((r, i) => (
-                  <div
-                    key={i}
-                    className="p-4 sm:p-5 rounded-2xl bg-white border border-[#E0E0E0] shadow-sm relative overflow-hidden"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-[#FFF5EB] text-[#F56600] flex items-center justify-center font-bold text-xs border border-[#FFE0CA]">
-                          {r.name.slice(0, 1)}
-                        </div>
-                        <div>
-                          <div className="text-sm font-bold text-[#141414]">{r.name}</div>
-                          {r.role && <div className="text-[11px] text-[#808080]">{r.role}</div>}
-                        </div>
-                      </div>
-                      <span className="text-xs">{r.emoji}</span>
-                    </div>
-                    <p className="text-xs sm:text-sm text-[#585858] font-normal leading-relaxed italic">
-                      "{r.text}"
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <button
-                type="button"
-                onClick={advance}
-                className="js-btn-primary w-full py-4 text-base font-bold"
-              >
-                {s.cta}
-              </button>
-            </div>
-          )}
-
-          {/* ══════════════════════════════════════════════════
-              STEP 12: LOADER
-          ══════════════════════════════════════════════════ */}
-          {s.type === 'loader' && (
-            <div className="text-center py-6">
-              <div className="relative w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-                <img
-                  src={burstSvg}
-                  alt=""
-                  className="absolute inset-0 w-full h-full animate-spin-slow opacity-80"
-                />
-                <span className="text-xl font-extrabold text-[#F56600]">
-                  {Math.round(loaderProgress)}%
-                </span>
-              </div>
-
-              <h2 className="text-xl sm:text-2xl font-extrabold text-[#141414] mb-3">
                 {s.title}
               </h2>
-
-              {/* Progress track */}
-              <div className="w-full bg-[#F0F0F0] h-2.5 rounded-full overflow-hidden mb-6 max-w-xs mx-auto">
-                <div
-                  className="bg-gradient-to-r from-[#FF7411] to-[#F56600] h-full rounded-full transition-all duration-300"
-                  style={{ width: `${loaderProgress}%` }}
-                />
-              </div>
-
-              {/* Analysis checklist */}
-              <div className="space-y-2 max-w-sm mx-auto text-left">
-                {s.points?.map((pt, i) => {
-                  const isDone = loaderProgress > (i + 1) * 16;
-                  return (
-                    <div
-                      key={i}
-                      className={`flex items-center gap-3 text-xs font-semibold p-2.5 rounded-xl transition-all ${
-                        isDone
-                          ? 'bg-[#EAF5E0] text-[#5EA61B]'
-                          : 'bg-[#F8F8F8] text-[#808080] opacity-60'
-                      }`}
-                    >
-                      <span className="text-sm">{isDone ? '✓' : '○'}</span>
-                      <span>{pt}</span>
-                    </div>
-                  );
-                })}
-              </div>
+              <p
+                className="text-sm font-medium leading-relaxed"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                {s.subtitle}
+              </p>
             </div>
-          )}
 
-          {/* ══════════════════════════════════════════════════
-              STEP 13: LEAD FORM
-          ══════════════════════════════════════════════════ */}
-          {s.type === 'lead_form' && (
-            <div className="relative overflow-hidden rounded-3xl bg-white border border-[#E0E0E0] p-6 sm:p-8 shadow-md">
-              {/* Header */}
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF5EB] text-[#F56600] text-xs font-extrabold uppercase tracking-wide mb-3 border border-[#FFE0CA]">
-                  ✨ Фінальний крок
-                </div>
-                <h2 className="text-xl sm:text-3xl font-extrabold text-[#141414] leading-tight mb-2">
-                  {s.title}
-                </h2>
-                <p className="text-xs sm:text-sm text-[#585858] font-medium">
-                  {s.subtitle}
-                </p>
-              </div>
-
-              {/* Free Trial Gift Banner */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#FFF5EB] to-[#FFE0CA] border border-[#FBC59F] flex items-center gap-3.5 mb-6 shadow-xs">
-                <div className="w-10 h-10 rounded-2xl bg-[#F56600] text-white flex items-center justify-center text-xl shrink-0 shadow-sm">
-                  🎁
-                </div>
-                <div>
-                  <div className="text-xs font-extrabold text-[#141414] uppercase tracking-wide">
-                    Безкоштовний урок у подарунок
-                  </div>
-                  <div className="text-[11px] text-[#585858] font-medium">
-                    Методист перевірить рівень та надасть покроковий план навчання
-                  </div>
-                </div>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <input
-                    type="text"
-                    required
-                    disabled={isSubmitting}
-                    placeholder="Ваше ім'я"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    autoComplete="name"
-                    className="w-full px-4 py-4 rounded-2xl border-2 border-[#E0E0E0] outline-none font-semibold text-base text-[#141414] placeholder:text-[#A8A8A8] focus:border-[#F56600] focus:ring-4 focus:ring-[#F56600]/15 transition-all bg-white disabled:opacity-50"
-                  />
-                </div>
-
-                <div>
-                  <PhoneInput
-                    onChange={(raw, valid) => {
-                      setRawPhone(raw);
-                      setIsPhoneValid(valid);
-                    }}
-                    initialCountry={geoCountry}
-                    disabled={isSubmitting}
-                  />
-                </div>
-
-                <div>
-                  <input
-                    type="email"
-                    disabled={isSubmitting}
-                    placeholder="Ваш Email (необов'язково)"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    autoComplete="email"
-                    className="w-full px-4 py-4 rounded-2xl border-2 border-[#E0E0E0] outline-none font-semibold text-base text-[#141414] placeholder:text-[#A8A8A8] focus:border-[#F56600] focus:ring-4 focus:ring-[#F56600]/15 transition-all bg-white disabled:opacity-50"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="js-btn-primary w-full py-4 text-base sm:text-lg font-bold mt-2"
+            <div className="space-y-3 mb-6">
+              {s.reviews?.map(rev => (
+                <Card
+                  key={rev.name}
+                  variant="raised"
+                  padding="sm"
+                  style={{
+                    borderRadius: 'var(--radius-xl)',
+                    border: 'var(--border-hairline) solid var(--border-subtle)',
+                  }}
                 >
-                  {isSubmitting ? 'Надсилаємо заявку...' : s.cta}
-                </button>
-
-                <p className="text-[11px] text-center text-[#808080] font-medium pt-2">
-                  🔒 Ваші дані захищені. Ми зв'яжемося тільки для узгодження часу пробного уроку.
-                </p>
-              </form>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center font-extrabold text-sm shrink-0 border"
+                      style={{
+                        backgroundColor: 'var(--orange-25)',
+                        color: 'var(--orange-700)',
+                        borderColor: 'var(--orange-100)',
+                      }}
+                    >
+                      {rev.name[0]}
+                    </div>
+                    <div>
+                      <div
+                        className="font-extrabold text-sm"
+                        style={{ color: 'var(--text-strong)' }}
+                      >
+                        {rev.name}
+                      </div>
+                      <div className="text-xs">{rev.emoji}</div>
+                    </div>
+                  </div>
+                  <p
+                    className="text-xs font-medium leading-relaxed italic"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    "{rev.text}"
+                  </p>
+                </Card>
+              ))}
             </div>
-          )}
-        </div>
-      </main>
 
-      {/* ─── Footer ────────────────────────────────────────── */}
-      <footer className="border-t border-[#F0F0F0] bg-white py-4 px-4 text-center text-xs text-[#808080] font-medium">
-        <div className="max-w-xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <img src={logoSticker} alt="JustSchool" className="w-5 h-5" />
-            <span>© {new Date().getFullYear()} JustSchool. Всі права захищені.</span>
+            <Button
+              id="testimonials-cta"
+              variant="primary"
+              size="lg"
+              fullWidth
+              onClick={advance}
+              style={{
+                height: 56,
+                fontSize: 'var(--fs-body-lg)',
+                borderRadius: 'var(--radius-pill)',
+                boxShadow: 'var(--shadow-brand)',
+              }}
+            >
+              {s.cta}
+            </Button>
           </div>
-          <div className="flex items-center gap-3 text-[11px]">
-            <span>Політика конфіденційності</span>
-            <span>•</span>
-            <span>Договір оферти</span>
+        )}
+
+        {/* ════════════════════════════════════
+            LOADER
+        ════════════════════════════════════ */}
+        {s.type === 'loader' && (
+          <div className="w-full flex flex-col items-center text-center py-6">
+            {/* Spinner with JustSchool styling */}
+            <div
+              className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 border"
+              style={{
+                backgroundColor: 'var(--orange-25)',
+                borderColor: 'var(--orange-100)',
+              }}
+            >
+              <div
+                className="w-10 h-10 border-4 rounded-full animate-spin"
+                style={{
+                  borderColor: 'var(--orange-100)',
+                  borderTopColor: 'var(--brand)',
+                }}
+              />
+            </div>
+
+            <h2
+              className="text-xl font-extrabold mb-8 leading-tight"
+              style={{ color: 'var(--text-strong)' }}
+            >
+              {s.title}
+            </h2>
+
+            {/* Progress bar */}
+            <div className="w-full bg-[var(--base-200)] rounded-full h-2.5 mb-3 overflow-hidden">
+              <div
+                className="h-full transition-all duration-300"
+                style={{
+                  width: `${loaderProgress}%`,
+                  backgroundColor: 'var(--brand)',
+                }}
+              />
+            </div>
+            <div
+              className="font-black text-2xl font-mono mb-10"
+              style={{ color: 'var(--brand)' }}
+            >
+              {Math.round(loaderProgress)}%
+            </div>
+
+            {/* Checklist */}
+            <div className="w-full space-y-3 text-left">
+              {s.points?.map((p, i) => {
+                const threshold = (i / (s.points?.length ?? 6)) * 100;
+                const active = loaderProgress > threshold;
+                return (
+                  <div
+                    key={p}
+                    className="flex items-center gap-3 text-sm font-semibold transition-all duration-500"
+                    style={{
+                      color: active ? 'var(--text-strong)' : 'var(--base-400)',
+                    }}
+                  >
+                    <div
+                      className="w-2.5 h-2.5 rounded-full shrink-0 transition-all duration-500"
+                      style={{
+                        backgroundColor: active ? 'var(--brand)' : 'var(--base-300)',
+                      }}
+                    />
+                    {p}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </footer>
+        )}
+
+        {/* ════════════════════════════════════
+            LEAD FORM
+        ════════════════════════════════════ */}
+        {s.type === 'lead_form' && (
+          <div className="w-full">
+            <div className="text-center mb-6">
+              <h2
+                className="text-2xl font-extrabold mb-2 leading-tight"
+                style={{ color: 'var(--text-strong)' }}
+              >
+                {s.title}
+              </h2>
+              <p
+                className="text-sm font-medium leading-relaxed"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                {s.subtitle}
+              </p>
+            </div>
+
+            {/* Gift banner */}
+            <div
+              className="rounded-2xl p-4 flex items-center gap-3 mb-6 border"
+              style={{
+                backgroundColor: 'var(--orange-25)',
+                borderColor: 'var(--orange-100)',
+              }}
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 text-white"
+                style={{ backgroundColor: 'var(--brand)' }}
+              >
+                🎁
+              </div>
+              <p
+                className="text-xs font-bold leading-tight"
+                style={{ color: 'var(--orange-700)' }}
+              >
+                Безкоштовне пробне заняття з методистом у подарунок! Отримай
+                персональну програму навчання.
+              </p>
+            </div>
+
+            <form id="lead-form" onSubmit={handleSubmit} className="space-y-4">
+              {/* Name */}
+              <input
+                id="lead-name"
+                type="text"
+                placeholder="Ваше ім'я"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                disabled={isSubmitting}
+                required
+                autoComplete="name"
+                className="w-full p-4 rounded-2xl border-2 outline-none transition-all font-semibold bg-white disabled:opacity-50"
+                style={{
+                  borderColor: 'var(--border-default)',
+                  color: 'var(--text-strong)',
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.borderColor = 'var(--brand)';
+                  e.currentTarget.style.boxShadow = 'var(--focus-ring)';
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.borderColor = 'var(--border-default)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              />
+
+              {/* Phone (multi-country) */}
+              <PhoneInput
+                onChange={(raw, valid) => {
+                  setRawPhone(raw);
+                  setIsPhoneValid(valid);
+                }}
+                initialCountry={geoCountry}
+                disabled={isSubmitting}
+              />
+
+              {/* Email */}
+              <input
+                id="lead-email"
+                type="email"
+                placeholder="Ваш e-mail"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                disabled={isSubmitting}
+                required
+                autoComplete="email"
+                className="w-full p-4 rounded-2xl border-2 outline-none transition-all font-semibold bg-white disabled:opacity-50"
+                style={{
+                  borderColor: 'var(--border-default)',
+                  color: 'var(--text-strong)',
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.borderColor = 'var(--brand)';
+                  e.currentTarget.style.boxShadow = 'var(--focus-ring)';
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.borderColor = 'var(--border-default)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              />
+
+              {/* Submit */}
+              <Button
+                id="lead-submit"
+                variant="primary"
+                size="lg"
+                fullWidth
+                type="submit"
+                disabled={
+                  isSubmitting || !isPhoneValid || !name.trim() || !email.trim()
+                }
+                style={{
+                  height: 56,
+                  fontSize: 'var(--fs-body-lg)',
+                  borderRadius: 'var(--radius-pill)',
+                  boxShadow: 'var(--shadow-brand)',
+                }}
+              >
+                {isSubmitting ? 'Надсилаємо заявку...' : s.cta}
+              </Button>
+
+              <p
+                className="text-center text-[10px] font-semibold uppercase tracking-widest"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Твої дані у безпеці • Без спаму
+              </p>
+            </form>
+          </div>
+        )}
+      </main>
     </div>
   );
 }

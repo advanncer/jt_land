@@ -1,211 +1,43 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "./ds/styles.css";
+@import "tailwindcss";
 
-:root {
-  /* JustSchool Design System: Colors */
-  --hot-orange-50: #FBCCB9;
-  --hot-orange-100: #FBB89E;
-  --hot-orange-200: #FCA482;
-  --hot-orange-300: #FD7C4A;
-  --hot-orange-400: #FF5411;
-  --hot-orange-500: #F54500;
-  --hot-orange-600: #DA3E00;
-
-  --orange-25: #FFF5EB;
-  --orange-50: #FFE0CA;
-  --orange-100: #FBC59F;
-  --orange-200: #FCB583;
-  --orange-300: #FD954A;
-  --orange-400: #FF7411;
-  --orange-500: #F56600;
-  --orange-600: #D95B00;
-  --orange-700: #A24400;
-
-  --green-50: #EAF5E0;
-  --green-100: #DCEECA;
-  --green-300: #B2E086;
-  --green-500: #87D142;
-  --green-700: #5EA61B;
-
-  --violet-50: #E4E4FA;
-  --violet-100: #DBDBF8;
-  --violet-300: #C0C0F3;
-  --violet-500: #A4A4EF;
-  --violet-900: #5959EF;
-  --violet-950: #4141F2;
-
-  --yellow-50: #FBE1AD;
-  --yellow-100: #FBD893;
-  --yellow-300: #FDBF44;
-  --yellow-500: #F5A300;
-  --yellow-600: #DB9200;
-
-  --base-50: #FFFFFF;
-  --base-100: #F8F8F8;
-  --base-200: #F0F0F0;
-  --base-300: #E0E0E0;
-  --base-400: #C8C8C8;
-  --base-500: #A8A8A8;
-  --base-600: #808080;
-  --base-700: #585858;
-  --base-800: #303030;
-  --base-900: #141414;
-  --base-950: #000000;
-
-  --brand: var(--orange-500);
-  --brand-hover: var(--orange-600);
-  --brand-active: var(--orange-700);
-  --brand-subtle: var(--orange-25);
-
-  --font-core: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-2xl: 32px;
-  --radius-pill: 999px;
-
-  --shadow-xs: 0 1px 2px rgba(20, 20, 20, 0.05);
-  --shadow-sm: 0 2px 8px rgba(20, 20, 20, 0.06);
-  --shadow-md: 0 6px 20px rgba(20, 20, 20, 0.08);
-  --shadow-lg: 0 16px 40px rgba(20, 20, 20, 0.10);
-  --shadow-brand: 0 10px 28px rgba(245, 102, 0, 0.28);
-  --shadow-brand-hover: 0 14px 34px rgba(245, 102, 0, 0.38);
-
-  --element-orange: #F46600;
-  --element-hot-orange: #F34500;
-  --element-yellow: #F6A500;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-core);
-  background-color: #FAFAFA;
-  color: var(--base-900);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Custom animations */
-@keyframes fadeInScale {
-  0% {
-    opacity: 0;
-    transform: translateY(12px) scale(0.99);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes pulseGlow {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 1;
-  }
-}
-
-@keyframes rotateSlow {
+/* Step transition animation */
+@keyframes fadeSlideIn {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(12px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-enter {
+  animation: fadeSlideIn 0.25s var(--ease-out) both;
+}
+
+/* Spinner */
+@keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
-
-.animate-fade-in {
-  animation: fadeInScale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.animate-spin {
+  animation: spin 0.9s linear infinite;
 }
 
-.animate-pulse-glow {
-  animation: pulseGlow 2.5s infinite ease-in-out;
-}
-
-.animate-spin-slow {
-  animation: rotateSlow 20s linear infinite;
-}
-
-/* Design System Button Primary */
-.js-btn-primary {
-  background-color: var(--orange-500);
-  color: #ffffff;
+/* Base */
+body {
   font-family: var(--font-core);
-  font-weight: 700;
-  border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-brand);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: none;
-  text-decoration: none;
+  background-color: var(--surface-page-warm);
+  overflow-x: hidden;
+  color: var(--text-body);
+  -webkit-font-smoothing: antialiased;
 }
 
-.js-btn-primary:hover:not(:disabled) {
-  background-color: var(--orange-600);
-  box-shadow: var(--shadow-brand-hover);
-  transform: translateY(-2px);
-}
-
-.js-btn-primary:active:not(:disabled) {
-  background-color: var(--orange-700);
-  transform: translateY(0) scale(0.98);
-}
-
-.js-btn-primary:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
-/* Design System Card styles */
-.js-card {
-  background: var(--base-50);
-  border-radius: var(--radius-2xl);
-  border: 1px solid var(--base-200);
-  box-shadow: var(--shadow-sm);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.js-card-interactive {
-  cursor: pointer;
-}
-
-.js-card-interactive:hover {
-  border-color: var(--orange-400);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-.js-card-selected {
-  border-color: var(--orange-500) !important;
-  background-color: var(--orange-25) !important;
-  box-shadow: 0 4px 16px rgba(245, 102, 0, 0.14) !important;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #E0E0E0;
-  border-radius: 999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #C8C8C8;
+input::placeholder {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 14px;
 }

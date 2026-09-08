@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface Country {
   code: string;
@@ -110,53 +110,51 @@ interface PhoneInputProps {
   disabled?: boolean;
 }
 
-export function PhoneInput({ onChange, initialCountry = 'UA', disabled = false }: PhoneInputProps) {
-  const [selectedCountry, setSelectedCountry] = useState<Country>(() => {
+export default function PhoneInput({
+  onChange,
+  initialCountry = 'UA',
+  disabled = false,
+}: PhoneInputProps) {
+  const [country, setCountry] = useState<Country>(() => {
     return COUNTRIES.find(c => c.code === initialCountry.toUpperCase()) || COUNTRIES[0];
   });
-  const [displayValue, setDisplayValue] = useState('');
+  const [display, setDisplay] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (initialCountry) {
-      const match = COUNTRIES.find(c => c.code === initialCountry.toUpperCase());
-      if (match && !displayValue) {
-        setSelectedCountry(match);
-      }
+      const found = COUNTRIES.find(c => c.code === initialCountry.toUpperCase());
+      if (found) setCountry(found);
     }
-  }, [initialCountry, displayValue]);
+  }, [initialCountry]);
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+    const handleDocClick = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    };
+    document.addEventListener('mousedown', handleDocClick);
+    return () => document.removeEventListener('mousedown', handleDocClick);
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawVal = e.target.value;
-    let digits = rawVal.replace(/\D/g, '');
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let raw = e.target.value;
+    let digits = raw.replace(/\D/g, '');
 
-    // Handle leading zero
-    if (digits.startsWith('0') && selectedCountry.code === 'UA') {
+    if (digits.startsWith('0') && country.code === 'UA') {
       digits = '380' + digits.slice(1);
-    } else if (digits.startsWith('0') && selectedCountry.code === 'PL') {
+    } else if (digits.startsWith('0') && country.code === 'PL') {
       digits = '48' + digits.slice(1);
     }
 
-    // Auto-detect country code on the fly
     const detected = detectCountry(digits);
-    const activeCountry = detected || selectedCountry;
-    if (detected && detected.code !== selectedCountry.code) {
-      setSelectedCountry(detected);
+    const activeCountry = detected || country;
+    if (detected && detected.code !== country.code) {
+      setCountry(detected);
     }
 
-    // Limit digits
     if (activeCountry.maxDigits && digits.length > activeCountry.maxDigits) {
       digits = digits.slice(0, activeCountry.maxDigits);
     } else if (digits.length > 15) {
@@ -164,115 +162,101 @@ export function PhoneInput({ onChange, initialCountry = 'UA', disabled = false }
     }
 
     const formatted = formatForCountry(digits, activeCountry);
-    setDisplayValue(formatted);
+    setDisplay(formatted);
 
     const fullRaw = digits ? '+' + digits : '';
-    const isValid = checkValidity(digits, activeCountry);
-    onChange(fullRaw, isValid);
-  };
-
-  const handleSelectCountry = (country: Country) => {
-    setSelectedCountry(country);
-    setIsOpen(false);
-
-    let digits = displayValue.replace(/\D/g, '');
-    const oldDial = selectedCountry.dial;
-    if (digits.startsWith(oldDial)) {
-      digits = country.dial + digits.slice(oldDial.length);
-    } else {
-      digits = country.dial;
-    }
-
-    if (country.maxDigits && digits.length > country.maxDigits) {
-      digits = digits.slice(0, country.maxDigits);
-    }
-
-    const formatted = formatForCountry(digits, country);
-    setDisplayValue(formatted);
-
-    const fullRaw = '+' + digits;
-    const isValid = checkValidity(digits, country);
-    onChange(fullRaw, isValid);
-    inputRef.current?.focus();
+    const valid = checkValidity(digits, activeCountry);
+    onChange(fullRaw, valid);
   };
 
   const handleFocus = () => {
-    if (!displayValue) {
-      const prefix = '+' + selectedCountry.dial + ' ';
-      setDisplayValue(prefix);
-      onChange('+' + selectedCountry.dial, false);
+    if (!display) {
+      const prefix = '+' + country.dial + ' ';
+      setDisplay(prefix);
+      onChange('+' + country.dial, false);
     }
   };
 
   const handleBlur = () => {
-    const digits = displayValue.replace(/\D/g, '');
-    if (digits === selectedCountry.dial || !digits) {
-      setDisplayValue('');
+    const digits = display.replace(/\D/g, '');
+    if (!digits || digits === country.dial) {
+      setDisplay('');
       onChange('', false);
     }
   };
 
+  const selectCountry = (c: Country) => {
+    setCountry(c);
+    setDisplay('+' + c.dial + ' ');
+    onChange('+' + c.dial, false);
+    setIsOpen(false);
+  };
+
   return (
-    <div className="relative w-full" ref={dropdownRef}>
+    <div className="relative" ref={wrapRef} style={{ fontFamily: 'var(--font-core)' }}>
       <div
-        className={`flex items-center w-full rounded-2xl border-2 bg-white transition-all overflow-hidden ${
-          disabled
-            ? 'border-gray-200 opacity-60 cursor-not-allowed bg-gray-50'
-            : 'border-[#E0E0E0] hover:border-[#C8C8C8] focus-within:border-[#F56600] focus-within:ring-4 focus-within:ring-[#F56600]/15'
-        }`}
+        className="flex items-center border-2 rounded-2xl bg-white transition-all shadow-xs"
+        style={{
+          borderColor: isOpen ? 'var(--brand)' : 'var(--border-default)',
+          boxShadow: isOpen ? 'var(--focus-ring)' : 'none',
+        }}
       >
-        {/* Country Selector Button */}
+        {/* Flag + dial code selector */}
         <button
           type="button"
+          id="phone-country-btn"
+          onClick={() => !disabled && setIsOpen(o => !o)}
           disabled={disabled}
-          onClick={() => setIsOpen(prev => !prev)}
-          aria-label="Оберіть країну"
-          className="flex items-center gap-1.5 px-4 py-4 bg-[#F8F8F8] border-r border-[#E0E0E0] hover:bg-[#F0F0F0] transition-colors shrink-0 text-base font-semibold text-[#141414]"
+          aria-label="Вибрати країну"
+          className="flex items-center gap-1 pl-4 pr-3 py-4 shrink-0 border-r hover:bg-[var(--base-100)] transition-colors disabled:opacity-50 rounded-l-2xl"
+          style={{ borderColor: 'var(--border-subtle)' }}
         >
-          <span className="text-xl leading-none">{selectedCountry.flag}</span>
-          <span className="text-xs text-[#808080]">▼</span>
+          <span className="text-xl leading-none">{country.flag}</span>
+          <span className="text-[10px] mt-0.5 font-bold" style={{ color: 'var(--text-muted)' }}>
+            ▼
+          </span>
         </button>
 
-        {/* Input */}
+        {/* Phone input */}
         <input
-          ref={inputRef}
+          id="phone-input"
           type="tel"
-          disabled={disabled}
-          placeholder={
-            selectedCountry.code === 'UA'
-              ? '+380 (XX) XXX-XX-XX'
-              : selectedCountry.code === 'PL'
-              ? '+48 (XXX) XXX-XXX'
-              : `+${selectedCountry.dial} ...`
-          }
-          value={displayValue}
-          onChange={handleInputChange}
+          value={display}
+          onChange={handleChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          required
+          disabled={disabled}
+          placeholder={'+' + country.dial + ' ...'}
           autoComplete="tel"
-          className="w-full px-4 py-4 outline-none font-semibold text-[#141414] placeholder:text-[#A8A8A8] text-base bg-transparent"
+          className="flex-1 px-3 py-4 text-base font-semibold bg-transparent outline-none disabled:opacity-50 min-w-0"
+          style={{ color: 'var(--text-strong)' }}
         />
       </div>
 
-      {/* Dropdown Menu */}
-      {isOpen && !disabled && (
-        <div className="absolute top-full left-0 mt-2 w-72 max-h-64 overflow-y-auto bg-white rounded-2xl shadow-xl border border-[#E0E0E0] z-50 p-1.5 animate-fade-in">
+      {/* Country dropdown */}
+      {isOpen && (
+        <div
+          className="absolute top-full left-0 right-0 mt-1.5 bg-white border rounded-2xl shadow-xl z-50 overflow-hidden animate-fade-in"
+          style={{ borderColor: 'var(--border-default)', boxShadow: 'var(--shadow-lg)' }}
+        >
           {COUNTRIES.map(c => (
             <button
               key={c.code}
               type="button"
-              onClick={() => handleSelectCountry(c)}
-              className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-left text-sm font-medium transition-colors ${
-                c.code === selectedCountry.code
-                  ? 'bg-[#FFF5EB] text-[#F56600] font-bold'
-                  : 'hover:bg-[#F8F8F8] text-[#141414]'
-              }`}
+              id={`country-${c.code}`}
+              onClick={() => selectCountry(c)}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors"
+              style={{
+                backgroundColor: c.code === country.code ? 'var(--orange-25)' : 'transparent',
+                color: c.code === country.code ? 'var(--orange-700)' : 'var(--text-body)',
+              }}
             >
-              <span className="text-lg">{c.flag}</span>
-              <span className="flex-1 truncate">{c.name}</span>
-              {c.code === selectedCountry.code && (
-                <span className="text-[#F56600] font-bold">✓</span>
+              <span className="text-xl">{c.flag}</span>
+              <span className="text-sm font-semibold">{c.name}</span>
+              {c.code === country.code && (
+                <span className="ml-auto text-xs font-bold" style={{ color: 'var(--brand)' }}>
+                  ✓
+                </span>
               )}
             </button>
           ))}
