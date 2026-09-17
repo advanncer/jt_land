@@ -70,6 +70,10 @@ export default defineConfig({
           __dirname,
           "eng-adult/main_page_copy/index.html",
         ),
+        engAdultB2bUkrsib: resolve(
+          __dirname,
+          "eng-adult/b2b_ukrsib/index.html",
+        ),
         splitter: resolve(__dirname, "splitter/index.html"),
       },
     },
@@ -83,3 +87,4 @@ export default defineConfig({
 // Force redeploy Thu Aug 27 15:52:45 +04 2026
 // Force redeploy Tue Sep 08 14:33:20 +04 2026
 // Force redeploy Tue Sep 08 14:41:40 +04 2026
+// Force redeploy Thu Sep 17 13:28:00 +04 2026

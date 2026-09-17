@@ -180,6 +180,43 @@ export default async function handler(request, response) {
     );
   }
 
+  // --- Send to Google Sheets (Apps Script Webhook for Excel/Spreadsheets) ---
+  const googleSheetWebhookUrl =
+    data.googleSheetsWebhookUrl ||
+    process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
+    "https://script.google.com/macros/s/AKfycbzjHz2H9Am5CfJ6dtrvu82h9Vr0bi_lc6eb6Ljm-jEuqHcz-UIdEXHcx4lhL-uDVjTmZA/exec";
+
+  if (googleSheetWebhookUrl && (data.saveToGoogleSheets || data.b2b)) {
+    console.log("Sending to Google Sheets webhook:", googleSheetWebhookUrl);
+    const qs = new URLSearchParams({
+      name: name || "",
+      phone: phone || "",
+      email: email || "",
+      qa: qa || "",
+      dialogueUrl: dialogueUrl || "",
+      dialogueName: data.dialogueName || "JustSchool B2B Quiz",
+      lead_type: data.lead_type || "english-for-adults-b2b",
+      company: data.company || "UKRSIBBANK",
+      utm_source: data.utm_source || "",
+      utm_medium: data.utm_medium || "",
+      utm_campaign: data.utm_campaign || "",
+    }).toString();
+
+    promises.push(
+      fetch(`${googleSheetWebhookUrl}?${qs}`, {
+        method: "GET",
+      })
+        .then(async (res) => {
+          console.log("Google Sheets response status:", res.status);
+          return { service: "GoogleSheets", success: true };
+        })
+        .catch((err) => {
+          console.error("Google Sheets Webhook Error:", err.message);
+          return { service: "GoogleSheets", success: false, error: err.message };
+        }),
+    );
+  }
+
   // --- Send to eSputnik ---
   const esputnikApiKey =
     process.env.ESPUTNIK_API_KEY || "47743228FB8260569CA855D42622CFD2";

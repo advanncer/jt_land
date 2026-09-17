@@ -188,6 +188,14 @@
     {
       "source": "/eng-adult/main_page_copy/:path*",
       "destination": "/eng-adult/main_page_copy/:path*"
+    },
+    {
+      "source": "/eng-adult/b2b_ukrsib",
+      "destination": "/eng-adult/b2b_ukrsib/index.html"
+    },
+    {
+      "source": "/eng-adult/b2b_ukrsib/:path*",
+      "destination": "/eng-adult/b2b_ukrsib/:path*"
     }
   ],
   "redirects": [

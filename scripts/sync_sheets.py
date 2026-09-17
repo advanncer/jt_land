@@ -67,6 +67,15 @@ CATEGORIES = [
         "category": "👨‍💼 АНГЛІЙСЬКА ДЛЯ ДОРОСЛИХ (English for Adults)",
         "items": [
             {
+                "id": "eng-adult/b2b_ukrsib",
+                "product": "B2B Англійська: UKRSIBBANK",
+                "audience": "Співробітники UKRSIBBANK BNP Paribas Group",
+                "url": "https://lp.justschool.me/eng-adult/b2b_ukrsib/?leadType=english-for-adults",
+                "lead_type": "english-for-adults-b2b",
+                "description": "Спеціальний корпоративний квіз для співробітників UKRSIBBANK BNP Paribas: визначення рівня, цілей, інтенсивності, викладача та графіка занять із збереженням в Excel/Google Sheets.",
+                "analytics": "GA4: quiz_step_reach, form_success\nFB Pixel: Lead, Purchase\nCRM: NocoDB (Excel), Google Sheets, eSputnik"
+            },
+            {
                 "id": "eng-adult/main_page_copy",
                 "product": "Головний лендинг (Design System)",
                 "audience": "Усі вікові групи (дорослі, діти, підлітки)",
