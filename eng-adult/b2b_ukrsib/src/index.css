@@ -39,7 +39,7 @@
 /* Base */
 body {
   font-family: var(--font-core);
-  background-color: #F7FAF8;
+  background-color: var(--surface-page-warm);
   overflow-x: hidden;
   color: var(--text-body);
   -webkit-font-smoothing: antialiased;

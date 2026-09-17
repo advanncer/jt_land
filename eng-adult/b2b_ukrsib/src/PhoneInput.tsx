@@ -215,8 +215,8 @@ export default function PhoneInput({
       <div
         className="flex items-center border-2 rounded-2xl bg-white transition-all shadow-xs"
         style={{
-          borderColor: isOpen ? '#00965E' : 'var(--border-default)',
-          boxShadow: isOpen ? '0 0 0 3px rgba(0, 150, 94, 0.25)' : 'none',
+          borderColor: isOpen ? 'var(--brand)' : 'var(--border-default)',
+          boxShadow: isOpen ? 'var(--focus-ring)' : 'none',
         }}
       >
         {/* Flag + dial code selector */}
@@ -226,7 +226,7 @@ export default function PhoneInput({
           onClick={() => !disabled && setIsOpen(o => !o)}
           disabled={disabled}
           aria-label="Вибрати країну"
-          className="flex items-center gap-1 pl-4 pr-3 py-3.5 shrink-0 border-r hover:bg-[#F3F8F5] transition-colors disabled:opacity-50 rounded-l-2xl"
+          className="flex items-center gap-1 pl-4 pr-3 py-3.5 shrink-0 border-r hover:bg-[var(--base-100)] transition-colors disabled:opacity-50 rounded-l-2xl"
           style={{ borderColor: 'var(--border-subtle)' }}
         >
           <span className="text-xl leading-none">{country.flag}</span>
@@ -262,16 +262,16 @@ export default function PhoneInput({
               type="button"
               id={`country-${c.code}`}
               onClick={() => selectCountry(c)}
-              className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#EBF7F1]"
+              className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--orange-25)]"
               style={{
-                backgroundColor: c.code === country.code ? '#EBF7F1' : 'transparent',
-                color: c.code === country.code ? '#006840' : 'var(--text-body)',
+                backgroundColor: c.code === country.code ? 'var(--orange-25)' : 'transparent',
+                color: c.code === country.code ? 'var(--orange-700)' : 'var(--text-body)',
               }}
             >
               <span className="text-xl">{c.flag}</span>
               <span className="text-sm font-semibold">{c.name}</span>
               {c.code === country.code && (
-                <span className="ml-auto text-xs font-bold text-[#00965E]">
+                <span className="ml-auto text-xs font-bold" style={{ color: 'var(--brand)' }}>
                   ✓
                 </span>
               )}

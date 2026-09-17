@@ -216,9 +216,12 @@ export default function App() {
       : Math.round((step / 11) * 100);
 
   return (
-    <div className="min-h-screen bg-[#F8FAF9] text-slate-900 flex flex-col items-center selection:bg-[#EBF7F1] selection:text-[#007A4D]">
+    <div
+      className="min-h-screen text-slate-900 flex flex-col items-center selection:bg-[var(--orange-100)] selection:text-[var(--orange-800)]"
+      style={{ backgroundColor: 'var(--surface-page-warm)' }}
+    >
       {/* ─── Sticky Header ─── */}
-      <header className="w-full sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+      <header className="w-full sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {step > 0 && !isSuccess && (
@@ -246,21 +249,21 @@ export default function App() {
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider hidden sm:inline">
                 Питання
               </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#EBF7F1] text-[#008050] border border-[#A3DBC1]">
+              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[var(--orange-25)] text-[var(--orange-700)] border border-[var(--orange-100)]">
                 {step} / 11
               </span>
             </div>
           )}
         </div>
 
-        {/* Emerald progress bar */}
+        {/* JustSchool Brand orange progress bar */}
         {step > 0 && !isSuccess && (
-          <div className="w-full h-1 bg-slate-100">
+          <div className="w-full h-1 bg-[var(--orange-100)]/60">
             <div
               className="h-full transition-all duration-300 ease-out"
               style={{
                 width: `${currentProgressPercent}%`,
-                backgroundColor: '#00965E',
+                backgroundColor: 'var(--brand)',
               }}
             />
           </div>
@@ -273,8 +276,8 @@ export default function App() {
           {/* ════ STEP 0: HERO ════ */}
           {step === 0 && (
             <div className="text-center space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF7F1] border border-[#A3DBC1] text-[#007A4D] text-xs md:text-sm font-bold">
-                <span className="w-2 h-2 rounded-full bg-[#00965E] animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--orange-25)] border border-[var(--orange-200)] text-[var(--orange-700)] text-xs md:text-sm font-bold shadow-xs">
+                <span className="w-2 h-2 rounded-full bg-[var(--brand)] animate-pulse" />
                 Корпоративна програма навчання англійської
               </div>
 
@@ -291,7 +294,7 @@ export default function App() {
 
               {/* Highlights cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-left">
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-[#A3DBC1] transition-colors">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:border-[var(--orange-300)] transition-all">
                   <div className="text-2xl mb-1.5">🎯</div>
                   <div className="font-bold text-slate-900 text-sm">Цільовий трек</div>
                   <div className="text-xs text-slate-500 mt-1">
@@ -299,7 +302,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-[#A3DBC1] transition-colors">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:border-[var(--orange-300)] transition-all">
                   <div className="text-2xl mb-1.5">🗓️</div>
                   <div className="font-bold text-slate-900 text-sm">Гнучкий графік</div>
                   <div className="text-xs text-slate-500 mt-1">
@@ -307,7 +310,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-[#A3DBC1] transition-colors">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:border-[var(--orange-300)] transition-all">
                   <div className="text-2xl mb-1.5">👨‍🏫</div>
                   <div className="font-bold text-slate-900 text-sm">Кращі викладачі</div>
                   <div className="text-xs text-slate-500 mt-1">
@@ -320,10 +323,10 @@ export default function App() {
                 <button
                   type="button"
                   onClick={advance}
-                  className="w-full sm:w-auto px-8 py-4 rounded-full text-white font-bold text-base shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                  className="w-full sm:w-auto px-8 py-4 rounded-full text-white font-bold text-base shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                   style={{
-                    backgroundColor: '#00965E',
-                    boxShadow: '0 8px 24px rgba(0, 150, 94, 0.3)',
+                    backgroundColor: 'var(--brand)',
+                    boxShadow: 'var(--shadow-brand)',
                   }}
                 >
                   Розпочати опитування →
@@ -355,7 +358,7 @@ export default function App() {
                     if (e.key === 'Enter' && name.trim().length >= 2) advance();
                   }}
                   placeholder={STEPS[1].placeholder}
-                  className="w-full px-4 py-3.5 text-base font-semibold rounded-2xl border-2 border-slate-300 focus:border-[#00965E] focus:ring-4 focus:ring-[#00965E]/20 outline-none bg-white transition-all shadow-xs"
+                  className="w-full px-4 py-3.5 text-base font-semibold rounded-2xl border-2 border-slate-300 focus:border-[var(--brand)] focus:ring-4 focus:ring-[var(--brand)]/20 outline-none bg-white transition-all shadow-xs"
                 />
               </div>
 
@@ -363,12 +366,12 @@ export default function App() {
                 type="button"
                 disabled={name.trim().length < 2}
                 onClick={advance}
-                className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md"
+                className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md cursor-pointer"
                 style={{
-                  backgroundColor: '#00965E',
+                  backgroundColor: 'var(--brand)',
                   boxShadow:
                     name.trim().length >= 2
-                      ? '0 6px 20px rgba(0, 150, 94, 0.28)'
+                      ? 'var(--shadow-brand)'
                       : 'none',
                 }}
               >
@@ -402,11 +405,11 @@ export default function App() {
                 type="button"
                 disabled={!isPhoneValid}
                 onClick={advance}
-                className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md"
+                className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md cursor-pointer"
                 style={{
-                  backgroundColor: '#00965E',
+                  backgroundColor: 'var(--brand)',
                   boxShadow: isPhoneValid
-                    ? '0 6px 20px rgba(0, 150, 94, 0.28)'
+                    ? 'var(--shadow-brand)'
                     : 'none',
                 }}
               >
@@ -436,7 +439,7 @@ export default function App() {
                       advance();
                   }}
                   placeholder={STEPS[3].placeholder}
-                  className="w-full px-4 py-3.5 text-base font-semibold rounded-2xl border-2 border-slate-300 focus:border-[#00965E] focus:ring-4 focus:ring-[#00965E]/20 outline-none bg-white transition-all shadow-xs"
+                  className="w-full px-4 py-3.5 text-base font-semibold rounded-2xl border-2 border-slate-300 focus:border-[var(--brand)] focus:ring-4 focus:ring-[var(--brand)]/20 outline-none bg-white transition-all shadow-xs"
                 />
               </div>
 
@@ -444,12 +447,12 @@ export default function App() {
                 type="button"
                 disabled={!email.includes('@') || !email.includes('.')}
                 onClick={advance}
-                className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md"
+                className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md cursor-pointer"
                 style={{
-                  backgroundColor: '#00965E',
+                  backgroundColor: 'var(--brand)',
                   boxShadow:
                     email.includes('@') && email.includes('.')
-                      ? '0 6px 20px rgba(0, 150, 94, 0.28)'
+                      ? 'var(--shadow-brand)'
                       : 'none',
                 }}
               >
@@ -478,8 +481,8 @@ export default function App() {
                       onClick={() => handleChoice(4, opt.label)}
                       className={`w-full flex items-center gap-4 p-4 rounded-2xl text-left border-2 transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-[#00965E] bg-[#EBF7F1] shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-[#A3DBC1] hover:bg-slate-50'
+                          ? 'border-[var(--brand)] bg-[var(--orange-25)] shadow-xs'
+                          : 'border-slate-200 bg-white hover:border-[var(--orange-200)] hover:bg-[var(--orange-25)]/40'
                       }`}
                     >
                       <span className="text-2xl shrink-0">{opt.emoji}</span>
@@ -496,7 +499,7 @@ export default function App() {
                       <div
                         className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
                           isSelected
-                            ? 'border-[#00965E] bg-[#00965E] text-white'
+                            ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                             : 'border-slate-300'
                         }`}
                       >
@@ -532,9 +535,9 @@ export default function App() {
                         key={d.value}
                         type="button"
                         onClick={() => toggleDay(d.label)}
-                        className={`px-3.5 py-2 rounded-xl text-sm font-semibold border-2 transition-all ${
+                        className={`px-3.5 py-2 rounded-xl text-sm font-semibold border-2 transition-all cursor-pointer ${
                           isSelected
-                            ? 'border-[#00965E] bg-[#EBF7F1] text-[#007A4D]'
+                            ? 'border-[var(--brand)] bg-[var(--orange-25)] text-[var(--orange-800)]'
                             : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                         }`}
                       >
@@ -558,22 +561,22 @@ export default function App() {
                         key={t.value}
                         type="button"
                         onClick={() => toggleTime(t.label)}
-                        className={`p-3.5 rounded-xl border-2 text-left transition-all ${
+                        className={`p-3.5 rounded-xl border-2 text-left transition-all cursor-pointer ${
                           isSelected
-                            ? 'border-[#00965E] bg-[#EBF7F1]'
+                            ? 'border-[var(--brand)] bg-[var(--orange-25)]'
                             : 'border-slate-200 bg-white hover:border-slate-300'
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <span
                             className={`font-bold text-sm ${
-                              isSelected ? 'text-[#007A4D]' : 'text-slate-900'
+                              isSelected ? 'text-[var(--orange-800)]' : 'text-slate-900'
                             }`}
                           >
                             {t.label}
                           </span>
                           {isSelected && (
-                            <span className="text-xs font-bold text-[#00965E]">
+                            <span className="text-xs font-bold text-[var(--brand)]">
                               ✓
                             </span>
                           )}
@@ -589,12 +592,12 @@ export default function App() {
                 type="button"
                 disabled={scheduleDays.length === 0 || scheduleTimes.length === 0}
                 onClick={advance}
-                className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md"
+                className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md cursor-pointer"
                 style={{
-                  backgroundColor: '#00965E',
+                  backgroundColor: 'var(--brand)',
                   boxShadow:
                     scheduleDays.length > 0 && scheduleTimes.length > 0
-                      ? '0 6px 20px rgba(0, 150, 94, 0.28)'
+                      ? 'var(--shadow-brand)'
                       : 'none',
                 }}
               >
@@ -623,8 +626,8 @@ export default function App() {
                       onClick={() => handleChoice(6, opt.label)}
                       className={`w-full flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl text-left border-2 transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-[#00965E] bg-[#EBF7F1] shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-[#A3DBC1] hover:bg-slate-50'
+                          ? 'border-[var(--brand)] bg-[var(--orange-25)] shadow-xs'
+                          : 'border-slate-200 bg-white hover:border-[var(--orange-200)] hover:bg-[var(--orange-25)]/40'
                       }`}
                     >
                       <span className="text-2xl shrink-0">{opt.emoji}</span>
@@ -641,7 +644,7 @@ export default function App() {
                       <div
                         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
                           isSelected
-                            ? 'border-[#00965E] bg-[#00965E] text-white'
+                            ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                             : 'border-slate-300'
                         }`}
                       >
@@ -677,8 +680,8 @@ export default function App() {
                       }}
                       className={`w-full flex items-center gap-3.5 p-3.5 rounded-2xl text-left border-2 transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-[#00965E] bg-[#EBF7F1] shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-[#A3DBC1] hover:bg-slate-50'
+                          ? 'border-[var(--brand)] bg-[var(--orange-25)] shadow-xs'
+                          : 'border-slate-200 bg-white hover:border-[var(--orange-200)] hover:bg-[var(--orange-25)]/40'
                       }`}
                     >
                       <span className="text-xl shrink-0">{opt.emoji}</span>
@@ -688,7 +691,7 @@ export default function App() {
                       <div
                         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
                           isSelected
-                            ? 'border-[#00965E] bg-[#00965E] text-white'
+                            ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                             : 'border-slate-300'
                         }`}
                       >
@@ -708,14 +711,14 @@ export default function App() {
                     value={otherGoal}
                     onChange={e => setOtherGoal(e.target.value)}
                     placeholder="Опишіть вашу мету..."
-                    className="w-full px-4 py-3 text-base rounded-xl border-2 border-slate-300 focus:border-[#00965E] outline-none bg-white"
+                    className="w-full px-4 py-3 text-base rounded-xl border-2 border-slate-300 focus:border-[var(--brand)] outline-none bg-white"
                   />
                   <button
                     type="button"
                     disabled={!otherGoal.trim()}
                     onClick={advance}
-                    className="w-full py-3.5 rounded-full text-white font-bold text-base transition-all disabled:opacity-40"
-                    style={{ backgroundColor: '#00965E' }}
+                    className="w-full py-3.5 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 cursor-pointer"
+                    style={{ backgroundColor: 'var(--brand)' }}
                   >
                     Продовжити →
                   </button>
@@ -744,8 +747,8 @@ export default function App() {
                       onClick={() => toggleMulti(8, opt.label)}
                       className={`w-full flex items-center gap-3.5 p-3.5 rounded-2xl text-left border-2 transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-[#00965E] bg-[#EBF7F1] shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-[#A3DBC1] hover:bg-slate-50'
+                          ? 'border-[var(--brand)] bg-[var(--orange-25)] shadow-xs'
+                          : 'border-slate-200 bg-white hover:border-[var(--orange-200)] hover:bg-[var(--orange-25)]/40'
                       }`}
                     >
                       <span className="text-xl shrink-0">{opt.emoji}</span>
@@ -755,7 +758,7 @@ export default function App() {
                       <div
                         className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${
                           isSelected
-                            ? 'border-[#00965E] bg-[#00965E] text-white'
+                            ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                             : 'border-slate-300'
                         }`}
                       >
@@ -770,12 +773,12 @@ export default function App() {
                 type="button"
                 disabled={(multiAnswers[8] || []).length === 0}
                 onClick={advance}
-                className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md"
+                className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md cursor-pointer"
                 style={{
-                  backgroundColor: '#00965E',
+                  backgroundColor: 'var(--brand)',
                   boxShadow:
                     (multiAnswers[8] || []).length > 0
-                      ? '0 6px 20px rgba(0, 150, 94, 0.28)'
+                      ? 'var(--shadow-brand)'
                       : 'none',
                 }}
               >
@@ -804,8 +807,8 @@ export default function App() {
                       onClick={() => toggleMulti(9, opt.label)}
                       className={`w-full flex items-center gap-3.5 p-3.5 rounded-2xl text-left border-2 transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-[#00965E] bg-[#EBF7F1] shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-[#A3DBC1] hover:bg-slate-50'
+                          ? 'border-[var(--brand)] bg-[var(--orange-25)] shadow-xs'
+                          : 'border-slate-200 bg-white hover:border-[var(--orange-200)] hover:bg-[var(--orange-25)]/40'
                       }`}
                     >
                       <span className="text-xl shrink-0">{opt.emoji}</span>
@@ -815,7 +818,7 @@ export default function App() {
                       <div
                         className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${
                           isSelected
-                            ? 'border-[#00965E] bg-[#00965E] text-white'
+                            ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                             : 'border-slate-300'
                         }`}
                       >
@@ -830,12 +833,12 @@ export default function App() {
                 type="button"
                 disabled={(multiAnswers[9] || []).length === 0}
                 onClick={advance}
-                className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md"
+                className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md cursor-pointer"
                 style={{
-                  backgroundColor: '#00965E',
+                  backgroundColor: 'var(--brand)',
                   boxShadow:
                     (multiAnswers[9] || []).length > 0
-                      ? '0 6px 20px rgba(0, 150, 94, 0.28)'
+                      ? 'var(--shadow-brand)'
                       : 'none',
                 }}
               >
@@ -864,8 +867,8 @@ export default function App() {
                       onClick={() => handleChoice(10, opt.label)}
                       className={`w-full flex items-center gap-4 p-4 rounded-2xl text-left border-2 transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-[#00965E] bg-[#EBF7F1] shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-[#A3DBC1] hover:bg-slate-50'
+                          ? 'border-[var(--brand)] bg-[var(--orange-25)] shadow-xs'
+                          : 'border-slate-200 bg-white hover:border-[var(--orange-200)] hover:bg-[var(--orange-25)]/40'
                       }`}
                     >
                       <span className="text-2xl shrink-0">{opt.emoji}</span>
@@ -882,7 +885,7 @@ export default function App() {
                       <div
                         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
                           isSelected
-                            ? 'border-[#00965E] bg-[#00965E] text-white'
+                            ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                             : 'border-slate-300'
                         }`}
                       >
@@ -920,8 +923,8 @@ export default function App() {
                       }}
                       className={`w-full flex items-center gap-4 p-4 rounded-2xl text-left border-2 transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-[#00965E] bg-[#EBF7F1] shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-[#A3DBC1] hover:bg-slate-50'
+                          ? 'border-[var(--brand)] bg-[var(--orange-25)] shadow-xs'
+                          : 'border-slate-200 bg-white hover:border-[var(--orange-200)] hover:bg-[var(--orange-25)]/40'
                       }`}
                     >
                       <span className="text-2xl shrink-0">{opt.emoji}</span>
@@ -938,7 +941,7 @@ export default function App() {
                       <div
                         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
                           isSelected
-                            ? 'border-[#00965E] bg-[#00965E] text-white'
+                            ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                             : 'border-slate-300'
                         }`}
                       >
@@ -954,7 +957,7 @@ export default function App() {
           {/* ════ STEP 12: АНІМОВАНИЙ ЛОАДЕР ════ */}
           {step === 12 && (
             <div className="text-center py-10 space-y-6">
-              <div className="w-16 h-16 mx-auto rounded-full border-4 border-slate-200 border-t-[#00965E] animate-spin" />
+              <div className="w-16 h-16 mx-auto rounded-full border-4 border-slate-200 border-t-[var(--brand)] animate-spin" />
 
               <div className="space-y-2">
                 <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
@@ -966,12 +969,12 @@ export default function App() {
               {/* Progress bar */}
               <div className="w-full max-w-sm mx-auto bg-slate-200 h-2 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#00965E] transition-all duration-150"
+                  className="h-full bg-[var(--brand)] transition-all duration-150"
                   style={{ width: `${loaderProgress}%` }}
                 />
               </div>
 
-              <div className="text-xs font-bold text-[#007A4D]">
+              <div className="text-xs font-bold text-[var(--orange-700)]">
                 {Math.round(loaderProgress)}% завершено
               </div>
 
@@ -990,7 +993,7 @@ export default function App() {
                       <span
                         className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${
                           isDone
-                            ? 'bg-[#EBF7F1] text-[#00965E] font-bold border border-[#A3DBC1]'
+                            ? 'bg-[var(--orange-25)] text-[var(--brand)] font-bold border border-[var(--orange-200)]'
                             : 'bg-slate-100 text-slate-300'
                         }`}
                       >
@@ -1008,7 +1011,7 @@ export default function App() {
           {step === 13 && (
             <div className="space-y-6">
               <div className="text-center space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EBF7F1] border border-[#A3DBC1] text-[#007A4D] text-xs font-bold">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--orange-25)] border border-[var(--orange-200)] text-[var(--orange-700)] text-xs font-bold">
                   <span>✨</span> Індивідуальну програму сформовано
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
@@ -1065,7 +1068,7 @@ export default function App() {
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="Прізвище, Ім'я, По батькові"
-                    className="w-full px-4 py-3.5 text-base font-semibold rounded-2xl border-2 border-slate-300 focus:border-[#00965E] outline-none bg-white transition-all disabled:opacity-50"
+                    className="w-full px-4 py-3.5 text-base font-semibold rounded-2xl border-2 border-slate-300 focus:border-[var(--brand)] focus:ring-4 focus:ring-[var(--brand)]/20 outline-none bg-white transition-all disabled:opacity-50"
                   />
                 </div>
 
@@ -1095,7 +1098,7 @@ export default function App() {
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="name@ukrsibbank.com"
-                    className="w-full px-4 py-3.5 text-base font-semibold rounded-2xl border-2 border-slate-300 focus:border-[#00965E] outline-none bg-white transition-all disabled:opacity-50"
+                    className="w-full px-4 py-3.5 text-base font-semibold rounded-2xl border-2 border-slate-300 focus:border-[var(--brand)] focus:ring-4 focus:ring-[var(--brand)]/20 outline-none bg-white transition-all disabled:opacity-50"
                   />
                 </div>
 
@@ -1103,10 +1106,10 @@ export default function App() {
                   <button
                     type="submit"
                     disabled={isSubmitting || !name.trim() || !isPhoneValid || !email.trim()}
-                    className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg"
+                    className="w-full py-4 rounded-full text-white font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg cursor-pointer"
                     style={{
-                      backgroundColor: '#00965E',
-                      boxShadow: '0 8px 24px rgba(0, 150, 94, 0.32)',
+                      backgroundColor: 'var(--brand)',
+                      boxShadow: 'var(--shadow-brand)',
                     }}
                   >
                     {isSubmitting ? 'Надсилаємо заявку...' : STEPS[13].cta}
@@ -1124,7 +1127,7 @@ export default function App() {
           {/* ════ STEP 14: SUCCESS / ДЯКУЄМО ════ */}
           {step === 14 && (
             <div className="text-center py-8 space-y-6">
-              <div className="w-20 h-20 mx-auto rounded-full bg-[#EBF7F1] border-2 border-[#A3DBC1] flex items-center justify-center text-4xl text-[#00965E]">
+              <div className="w-20 h-20 mx-auto rounded-full bg-[var(--orange-25)] border-2 border-[var(--orange-200)] flex items-center justify-center text-4xl text-[var(--brand)] shadow-xs">
                 ✓
               </div>
 
@@ -1138,7 +1141,7 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white border border-slate-200/80 max-w-md mx-auto text-left space-y-2">
+              <div className="p-4 rounded-2xl bg-white border border-slate-200/80 max-w-md mx-auto text-left space-y-2 shadow-xs">
                 <div className="font-bold text-slate-800 text-sm">
                   Що відбуватиметься далі:
                 </div>
@@ -1160,7 +1163,8 @@ export default function App() {
               <div className="pt-2">
                 <a
                   href="https://justschool.me/uk"
-                  className="inline-block px-8 py-3.5 rounded-full bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-colors shadow-sm"
+                  className="inline-block px-8 py-3.5 rounded-full bg-[var(--brand)] hover:bg-[var(--brand-hover)] text-white font-bold text-sm transition-all shadow-md"
+                  style={{ boxShadow: 'var(--shadow-brand)' }}
                 >
                   Перейти на головну JustSchool →
                 </a>
