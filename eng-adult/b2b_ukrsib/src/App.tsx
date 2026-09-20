@@ -172,6 +172,7 @@ export default function App() {
       company: 'UKRSIBBANK BNP Paribas Group',
       b2b: true,
       saveToGoogleSheets: true,
+      skipEsputnik: true,
       b2bData: {
         intensity: answers[4] || '',
         days: scheduleDays.length ? scheduleDays.join(', ') : '',

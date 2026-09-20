@@ -233,9 +233,21 @@ export default async function handler(request, response) {
   }
 
   // --- Send to eSputnik ---
+  const skipEsputnik = Boolean(
+    data.skipEsputnik ||
+      data.b2b ||
+      data.dialogueId === "b2b_ukrsib" ||
+      (dialogueUrl && dialogueUrl.includes("/b2b_ukrsib")),
+  );
+
   const esputnikApiKey =
     process.env.ESPUTNIK_API_KEY || "47743228FB8260569CA855D42622CFD2";
-  if (esputnikApiKey) {
+
+  if (skipEsputnik) {
+    console.log(
+      "eSputnik skipped: UkrSibbank B2B landing leads do not receive standard eSputnik campaigns.",
+    );
+  } else if (esputnikApiKey) {
     // Add custom fields and explicitly track their IDs
     const esputnikFields = [];
     const customFieldsIDs = [];
