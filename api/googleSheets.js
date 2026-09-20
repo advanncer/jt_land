@@ -119,7 +119,12 @@ export async function saveLeadToUkrSibSheet(data) {
 
     // Parse values from b2bData or fallback to qa string
     const name = data.name || data.Name || "";
-    const phone = data.phone || data.Phone || "";
+    let rawPhone = String(data.phone || data.Phone || "").trim();
+    let phone = rawPhone;
+    if (rawPhone) {
+      const digits = rawPhone.replace(/\D/g, "");
+      phone = `'${digits ? "+" + digits : rawPhone}`;
+    }
     const email = data.email || data.Email || "";
     const intensity =
       b2b.intensity || parseFromQa(qa, "Інтенсивність навчання:");
