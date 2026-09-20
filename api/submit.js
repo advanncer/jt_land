@@ -1,4 +1,5 @@
 import { recordConversion } from "./split.js";
+import { saveLeadToUkrSibSheet } from "./googleSheets.js";
 
 // Helper to detect if a phone number is a dummy/fake number or has invalid carrier codes
 function isDummyPhone(phone) {
@@ -181,6 +182,20 @@ export default async function handler(request, response) {
   }
 
   // --- Send to Google Sheets (Apps Script Webhook for Excel/Spreadsheets) ---
+  // If it's UkrSibbank B2B lead, save with dedicated column layout directly via Service Account
+  if (
+    data.dialogueId === "b2b_ukrsib" ||
+    data.b2b ||
+    (dialogueUrl && dialogueUrl.includes("/b2b_ukrsib"))
+  ) {
+    console.log("Processing direct Google Sheet insertion for UkrSibbank B2B...");
+    promises.push(
+      saveLeadToUkrSibSheet(data).then((res) => {
+        return { service: "UkrSibGoogleSheets", ...res };
+      }),
+    );
+  }
+
   const googleSheetWebhookUrl =
     data.googleSheetsWebhookUrl ||
     process.env.GOOGLE_SHEETS_WEBHOOK_URL ||

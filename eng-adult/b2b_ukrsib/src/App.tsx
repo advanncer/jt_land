@@ -172,6 +172,18 @@ export default function App() {
       company: 'UKRSIBBANK BNP Paribas Group',
       b2b: true,
       saveToGoogleSheets: true,
+      b2bData: {
+        intensity: answers[4] || '',
+        days: scheduleDays.length ? scheduleDays.join(', ') : '',
+        times: scheduleTimes.length ? scheduleTimes.join(', ') : '',
+        level: answers[6] || '',
+        goal: goalText,
+        situations: (multiAnswers[8] || []).join(', '),
+        skills: (multiAnswers[9] || []).join(', '),
+        teacher: answers[10] || '',
+        courseTrack: answers[11] || '',
+        company: 'UKRSIBBANK BNP Paribas Group',
+      },
     };
 
     try {
