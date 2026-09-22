@@ -74,11 +74,16 @@ export default defineConfig({
           __dirname,
           "eng-adult/b2b_ukrsib/index.html",
         ),
+        engAdultLpTest1: resolve(
+          __dirname,
+          "eng-adult/lp_test1/index.html",
+        ),
         splitter: resolve(__dirname, "splitter/index.html"),
       },
     },
   },
 });
+// Force redeploy Tue Sep 22 12:14:00 +04 2026
 // Trigger deploy
 // Force redeploy Wed Apr 15 21:50:33 +04 2026
 // Force redeploy Fri Apr 17 17:47:37 +04 2026

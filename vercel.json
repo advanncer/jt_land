@@ -196,6 +196,14 @@
     {
       "source": "/eng-adult/b2b_ukrsib/:path*",
       "destination": "/eng-adult/b2b_ukrsib/:path*"
+    },
+    {
+      "source": "/eng-adult/lp_test1",
+      "destination": "/eng-adult/lp_test1/index.html"
+    },
+    {
+      "source": "/eng-adult/lp_test1/:path*",
+      "destination": "/eng-adult/lp_test1/:path*"
     }
   ],
   "redirects": [
