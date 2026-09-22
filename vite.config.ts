@@ -30,6 +30,7 @@ export default defineConfig({
           __dirname,
           "eng-child/quiz-bo-v1-white/index.html",
         ),
+        engChildQuizBoV2: resolve(__dirname, "eng-child/quiz-bo-v2/index.html"),
         engChildLpJsChild: resolve(
           __dirname,
           "eng-child/lp-js-child/index.html",
@@ -83,7 +84,7 @@ export default defineConfig({
     },
   },
 });
-// Force redeploy Tue Sep 22 12:28:00 +04 2026
+// Force redeploy Tue Sep 22 12:38:00 +04 2026
 // Trigger deploy
 // Force redeploy Wed Apr 15 21:50:33 +04 2026
 // Force redeploy Fri Apr 17 17:47:37 +04 2026
