@@ -1,64 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  /* ---- brand orange (literal, as drawn) ---- */
-  --js-orange-ui: #f46600;
-  --js-orange-brand: #f56600;
-  --js-orange-link: #f16600;
-  --js-orange-hover: #f5ac72;
-  --js-orange-pressed: #bf6823;
-  --js-orange-link-hover: #ff8b36;
-  --js-hot-orange: #f34500;
-
-  /* ---- ink / neutrals ---- */
-  --js-black: #000000;
-  --js-ink: #09090a;
-  --js-ink-800: #181818;
-  --js-ink-slate: #454754;
-  --js-grey-700: #65676b;
-  --js-grey-600: #747474;
-  --js-grey-550: #858585;
-  --js-grey-500: #8f8f8f;
-  --js-grey-450: #9b9b9b;
-  --js-grey-350: #c7c9cb;
-  --js-grey-300: #cdcdcd;
-  --js-grey-250: #d9d9d9;
-  --js-grey-200: #e5e5e5;
-  --js-grey-100: #f4f5f6;
-  --js-grey-075: #f5f5f5;
-  --js-grey-050: #f8f8f8;
-  --js-white: #ffffff;
-
-  /* ---- warm tints ---- */
-  --js-cream: #fffaf7;
-  --js-peach-050: #fff5eb;
-  --js-peach-100: #ffe0ca;
-  --js-peach-200: #fcb583;
-
-  /* ---- gradients ---- */
-  --js-gradient-cta: linear-gradient(69.559deg, #f16600 -4.95%, #f34500 125.03%);
-
-  /* ---- semantic aliases ---- */
-  --text-primary: var(--js-ink);
-  --text-secondary: var(--js-grey-600);
-  --text-muted: var(--js-grey-500);
-  --text-inverse: var(--js-white);
-  --text-brand: var(--js-orange-brand);
-  --surface-page: var(--js-white);
-  --surface-card: var(--js-white);
-  --surface-muted: var(--js-grey-075);
-  --surface-icon: var(--js-peach-050);
-  --surface-warm: var(--js-cream);
-  --border-default: var(--js-grey-200);
-  --border-brand: var(--js-orange-ui);
-  --action-primary: var(--js-orange-ui);
-  --action-primary-hover: var(--js-orange-hover);
-  --action-primary-pressed: var(--js-orange-pressed);
-}
+@import "./ds/styles.css";
+@import "tailwindcss";
 
 html {
   scroll-behavior: smooth;
@@ -66,8 +7,158 @@ html {
 
 body {
   margin: 0;
+  padding: 0;
   background: #ffffff;
-  font-family: 'Montserrat', sans-serif;
   color: #09090a;
+  font-family: Montserrat, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: #f16600;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+a:hover {
+  color: #ff8b36;
+}
+
+input::placeholder {
+  color: #c7c9cb;
+}
+
+/* Primary CTA Button Styles from Design System */
+.js-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  cursor: pointer;
+  font-family: Montserrat, sans-serif;
+  font-weight: 600;
+  color: #ffffff;
+  background: #f46600;
+  white-space: nowrap;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0px 4px 32px 0px rgba(244, 102, 0, 0.28);
+}
+
+.js-btn-primary:hover:not(:disabled) {
+  background: #f5ac72;
+}
+
+.js-btn-primary:active:not(:disabled) {
+  background: #bf6823;
+}
+
+.js-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Input Fields matching Design System */
+.js-input {
+  height: 58px;
+  border-radius: 16px;
+  border: 0;
+  box-shadow: inset 0 0 0 1px #c7c9cb;
+  padding: 0 22px;
+  font-family: Montserrat, sans-serif;
+  font-size: 17px;
+  color: #09090a;
+  outline: none;
+  background: #ffffff;
+  transition: box-shadow 150ms ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.js-input:focus {
+  box-shadow: inset 0 0 0 2px #f46600;
+}
+
+/* Responsive container rules */
+@media (max-width: 1200px) {
+  .js-desktop-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .js-hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+    padding: 32px 24px 0 24px !important;
+  }
+  .js-hero-visual {
+    height: auto !important;
+    position: static !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  .js-hero-img-card {
+    position: static !important;
+    width: 100% !important;
+    max-width: 472px !important;
+    height: 380px !important;
+  }
+  .js-hero-form-card {
+    position: static !important;
+    width: 100% !important;
+    max-width: 472px !important;
+    margin-top: -60px !important;
+    z-index: 10 !important;
+  }
+  .js-section-pad {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+  .js-h1 {
+    font-size: 44px !important;
+  }
+  .js-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 24px !important;
+  }
+  .js-stats-box {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+    padding: 40px 24px !important;
+  }
+  .js-adv-row {
+    grid-template-columns: 60px 1fr !important;
+  }
+  .js-adv-row h3 {
+    grid-column: 2 !important;
+  }
+  .js-adv-row p {
+    grid-column: 2 !important;
+  }
+  .js-trial-grid {
+    grid-template-columns: 1fr !important;
+    gap: 48px !important;
+    padding: 48px 24px !important;
+  }
+  .js-teacher-grid {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+  .js-reviews-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .js-faq-box {
+    grid-template-columns: 1fr !important;
+    padding: 36px 24px !important;
+    gap: 32px !important;
+  }
+  .js-final-box {
+    grid-template-columns: 1fr !important;
+    padding: 40px 24px !important;
+    gap: 40px !important;
+  }
+  .js-bar-inner {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
 }

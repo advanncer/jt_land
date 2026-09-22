@@ -1,0 +1,6 @@
+/* JustSchool — minimal element defaults. */
+:root{color-scheme:light}
+body{font-family:var(--font-core);color:var(--text-primary);background:var(--surface-page)}
+a{color:var(--text-link);text-decoration:none}
+a:hover{color:var(--text-link-hover);text-decoration:underline}
+*{text-wrap:pretty}

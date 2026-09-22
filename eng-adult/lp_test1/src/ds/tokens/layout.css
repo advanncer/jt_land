@@ -1,0 +1,39 @@
+/* JustSchool — spacing, radii, shadows, layout.
+   Spacing steps are the gap/padding values actually used across the
+   homepage and UI-Kit frames; the file is not on a strict 4px grid. */
+:root{
+  --space-1:4px;--space-2:8px;--space-2-5:10px;--space-3:12px;--space-4:16px;
+  --space-5:20px;--space-6:24px;--space-7:28px;--space-8:32px;--space-8-5:33px;
+  --space-10:40px;--space-10-5:42px;--space-12:48px;--space-20:80px;--space-32:128px;
+
+  /* radii, verbatim */
+  --radius-xs:5px;--radius-sm:8px;--radius-md:10px;--radius-lg:12px;
+  --radius-xl:16px;--radius-2xl:20px;--radius-3xl:24px;--radius-4xl:32px;
+  --radius-pill:100px;--radius-circle:50%;
+  --radius-icon-wrap:22px;--radius-step-badge:32px;--radius-social:25px;
+
+  /* elevation, verbatim */
+  --shadow-card:-2px 4px 9px 1px rgba(0,0,0,0.09);
+  --shadow-header:0px 4px 32px 0px rgba(0,0,0,0.04);
+  --shadow-soft:0px 2px 8px 0px rgba(0,0,0,0.08);
+  --shadow-lifted:0px 4px 8px 0px rgba(0,0,0,0.08);
+  --shadow-cta:0px 4px 32px 0px rgba(0,0,0,0.09);
+  --shadow-chip-inner:inset 0px 0px 15.9px 0px rgba(255,255,255,0.7412);
+
+  /* hairlines */
+  --hairline:1px;--hairline-half:0.5px;
+
+  /* page layout */
+  --page-width-desktop:1440px;
+  --page-width-macbook:1280px;
+  --page-width-mobile:390px;
+  --page-gutter-desktop:140px;
+  --page-gutter-teachers:120px;
+  --content-width:1152px;
+  --header-height:123px;
+
+  /* motion */
+  --ease-standard:cubic-bezier(0.4,0,0.2,1); /* @kind other */
+  --duration-fast:120ms; /* @kind other */
+  --duration-base:200ms; /* @kind other */
+}

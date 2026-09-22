@@ -211,12 +211,13 @@ export default function PhoneInput({
   };
 
   return (
-    <div className="relative" ref={wrapRef} style={{ fontFamily: 'var(--font-core)' }}>
+    <div className="relative" ref={wrapRef} style={{ fontFamily: 'Montserrat, sans-serif' }}>
       <div
-        className="flex items-center border-2 rounded-2xl bg-white transition-all shadow-xs"
+        className="flex items-center bg-white transition-all"
         style={{
-          borderColor: isOpen ? 'var(--brand)' : 'var(--border-default)',
-          boxShadow: isOpen ? 'var(--focus-ring)' : 'none',
+          height: '58px',
+          borderRadius: '16px',
+          boxShadow: isOpen ? 'inset 0 0 0 2px #f46600' : 'inset 0 0 0 1px #c7c9cb',
         }}
       >
         {/* Flag + dial code selector */}
@@ -226,11 +227,11 @@ export default function PhoneInput({
           onClick={() => !disabled && setIsOpen(o => !o)}
           disabled={disabled}
           aria-label="Вибрати країну"
-          className="flex items-center gap-1 pl-4 pr-3 py-3.5 shrink-0 border-r hover:bg-[var(--base-100)] transition-colors disabled:opacity-50 rounded-l-2xl"
-          style={{ borderColor: 'var(--border-subtle)' }}
+          className="flex items-center gap-1.5 pl-4 pr-3 shrink-0 border-r hover:bg-[#fff5eb] transition-colors disabled:opacity-50 rounded-l-2xl cursor-pointer h-full"
+          style={{ borderColor: '#e5e5e5' }}
         >
           <span className="text-xl leading-none">{country.flag}</span>
-          <span className="text-[10px] mt-0.5 font-bold text-slate-400">
+          <span className="text-[10px] font-bold text-[#747474]">
             ▼
           </span>
         </button>
@@ -246,7 +247,8 @@ export default function PhoneInput({
           disabled={disabled}
           placeholder={'+' + country.dial + ' ...'}
           autoComplete="tel"
-          className="flex-1 px-3 py-3.5 text-base font-semibold bg-transparent outline-none disabled:opacity-50 min-w-0 text-slate-900"
+          className="flex-1 px-4 text-[17px] font-medium bg-transparent outline-none disabled:opacity-50 min-w-0 text-[#09090a] h-full"
+          style={{ fontFamily: 'Montserrat, sans-serif' }}
         />
       </div>
 

@@ -1,0 +1,68 @@
+/* JustSchool — type scale. 32 named styles from the UI-Kit / Typography frame
+   (node 382:20364), all Montserrat. Roboto and Inter appear only in legacy
+   UI-Kit chrome labels and micro-copy respectively. "LH: Auto" in the source
+   is rendered here as line-height:normal. */
+:root{
+  --font-core:"Montserrat",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-ui:"Roboto",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  /* Inter is not supplied as a file; micro-copy falls back to the system stack. */
+  --font-micro:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+
+  --fw-regular:400; /* @kind font */
+  --fw-medium:500; /* @kind font */
+  --fw-semibold:600; /* @kind font */
+  --fw-bold:700; /* @kind font */
+  --fw-extrabold:800; /* @kind font */
+
+  /* desktop headings */
+  --fs-desktop-h1:56px;--lh-desktop-h1:110%;
+  --fs-desktop-h2:42px;--lh-desktop-h2:110%;
+  --fs-desktop-h3:32px;
+  /* mobile headings */
+  --fs-mobile-h1:40px;--fs-mobile-h2:26px;--fs-mobile-h3:24px;--fs-mobile-h4:22px;--fs-mobile-h5:20px;
+  /* subtitle / button / body / label / caption / micro / nano */
+  --fs-subtitle-lg:20px;--fs-subtitle:18px;--lh-subtitle-regular:135%;
+  --fs-button:15px;
+  --fs-body-lg:16px;--lh-body-lg-regular:135%;
+  --fs-body:14px;--lh-body-regular:135%;
+  --fs-label:12px;
+  --fs-caption:10px;
+  --fs-micro:11px;
+  --fs-nano:8px;
+  --ls-eyebrow:0.12em;
+}
+
+/* --- specimen / utility classes, one per named style --- */
+.js-desktop-h1{font-family:var(--font-core);font-weight:700;font-size:56px;line-height:110%}
+.js-desktop-h2{font-family:var(--font-core);font-weight:700;font-size:42px;line-height:110%}
+.js-desktop-h3{font-family:var(--font-core);font-weight:700;font-size:32px;line-height:normal}
+.js-mobile-h1{font-family:var(--font-core);font-weight:700;font-size:40px;line-height:normal}
+.js-mobile-h2{font-family:var(--font-core);font-weight:700;font-size:26px;line-height:normal}
+.js-mobile-h3{font-family:var(--font-core);font-weight:700;font-size:24px;line-height:normal}
+.js-mobile-h4{font-family:var(--font-core);font-weight:700;font-size:22px;line-height:normal}
+.js-mobile-h5{font-family:var(--font-core);font-weight:700;font-size:20px;line-height:normal}
+.js-subtitle-bold{font-family:var(--font-core);font-weight:700;font-size:18px;line-height:normal}
+.js-subtitle-semibold{font-family:var(--font-core);font-weight:600;font-size:20px;line-height:normal}
+.js-subtitle-medium{font-family:var(--font-core);font-weight:500;font-size:18px;line-height:normal}
+.js-subtitle-regular{font-family:var(--font-core);font-weight:400;font-size:18px;line-height:135%}
+.js-button-bold{font-family:var(--font-core);font-weight:700;font-size:15px;line-height:normal}
+.js-body-lg-bold{font-family:var(--font-core);font-weight:700;font-size:16px;line-height:normal}
+.js-body-lg-semibold{font-family:var(--font-core);font-weight:600;font-size:16px;line-height:normal}
+.js-body-lg-medium{font-family:var(--font-core);font-weight:500;font-size:16px;line-height:normal}
+.js-body-lg-regular{font-family:var(--font-core);font-weight:400;font-size:16px;line-height:135%}
+.js-body-bold{font-family:var(--font-core);font-weight:700;font-size:14px;line-height:normal}
+.js-body-semibold{font-family:var(--font-core);font-weight:600;font-size:14px;line-height:135%}
+.js-body-medium{font-family:var(--font-core);font-weight:500;font-size:14px;line-height:normal}
+.js-body-regular{font-family:var(--font-core);font-weight:400;font-size:14px;line-height:135%}
+.js-label-bold{font-family:var(--font-core);font-weight:700;font-size:12px;line-height:normal}
+.js-label-semibold{font-family:var(--font-core);font-weight:600;font-size:12px;line-height:normal}
+.js-label-medium{font-family:var(--font-core);font-weight:500;font-size:12px;line-height:normal}
+.js-label-regular{font-family:var(--font-core);font-weight:400;font-size:12px;line-height:normal}
+.js-caption-bold{font-family:var(--font-core);font-weight:700;font-size:10px;line-height:normal}
+.js-caption-semibold{font-family:var(--font-core);font-weight:600;font-size:10px;line-height:normal}
+.js-caption-medium{font-family:var(--font-core);font-weight:500;font-size:10px;line-height:normal}
+.js-caption-regular{font-family:var(--font-core);font-weight:400;font-size:10px;line-height:normal}
+.js-micro-semibold{font-family:var(--font-core);font-weight:600;font-size:11px;line-height:normal}
+.js-micro-regular{font-family:var(--font-core);font-weight:400;font-size:11px;line-height:normal}
+.js-nano-medium{font-family:var(--font-core);font-weight:500;font-size:8px;line-height:normal}
+.js-eyebrow{font-family:var(--font-core);font-weight:700;font-size:10px;line-height:100%;letter-spacing:0.12em;text-transform:uppercase}
