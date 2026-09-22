@@ -76,6 +76,15 @@ CATEGORIES = [
                 "analytics": "GA4: quiz_step_reach, form_success\nFB Pixel: Lead, Purchase\nCRM: NocoDB (Excel), Google Sheets, eSputnik"
             },
             {
+                "id": "eng-adult/lp_test1",
+                "product": "Англійська для дорослих (LP Test 1)",
+                "audience": "Дорослі студенти (18+)",
+                "url": "https://lp.justschool.me/eng-adult/lp_test1/?leadType=english-for-adults",
+                "lead_type": "english-for-adults",
+                "description": "Новий презентаційний лендинг за офіційною JustSchool Design System: Hero з персоналізованою формою та гарантіями, блок довіри з метриками, 4 переваги, дорожня карта уроку, викладачі з реальними відгуками, FAQ та плаваючий закріплений бар.",
+                "analytics": "GA4: form_success, cta_click, faq_toggle\nFB Pixel: Lead, Purchase\nGTM: GTM-P6BDRT25"
+            },
+            {
                 "id": "eng-adult/main_page_copy",
                 "product": "Головний лендинг (Design System)",
                 "audience": "Усі вікові групи (дорослі, діти, підлітки)",
