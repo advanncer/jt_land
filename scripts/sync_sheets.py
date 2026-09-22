@@ -39,6 +39,15 @@ CATEGORIES = [
                 "analytics": "GA4: quiz_step_reach, form_success\nFB Pixel: Lead"
             },
             {
+                "id": "eng-child/quiz-bo-v2",
+                "product": "Англійська для дітей",
+                "audience": "Батьки дітей 5–17 років (JustSchool Design System)",
+                "url": "https://lp.justschool.me/eng-child/quiz-bo-v2/?leadType=english-for-children",
+                "lead_type": "english-for-children",
+                "description": "Оновлений 13-кроковий квіз у фірмовій дизайн-системі JustSchool з екранами переваг, статистики, порівняння, вибором інтересів та PDF-подарунком.",
+                "analytics": "GTM: quiz_step_reach, form_success\nFB Pixel: PageView, Lead, Purchase\nGoogle Ads: AW-11192598375\nCRM: /api/submit"
+            },
+            {
                 "id": "eng-child/lp-js-child",
                 "product": "Англійська для дітей",
                 "audience": "Батьки школярів",

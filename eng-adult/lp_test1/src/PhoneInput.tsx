@@ -211,9 +211,9 @@ export default function PhoneInput({
   };
 
   return (
-    <div className="relative" ref={wrapRef} style={{ fontFamily: 'Montserrat, sans-serif' }}>
+    <div className="relative w-full box-border" ref={wrapRef} style={{ fontFamily: 'Montserrat, sans-serif' }}>
       <div
-        className="flex items-center bg-white transition-all"
+        className="flex items-center bg-white transition-all w-full box-border"
         style={{
           height: '58px',
           borderRadius: '16px',
