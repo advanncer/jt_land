@@ -1149,8 +1149,7 @@ export default function App() {
                   Дякуємо, {name.split(' ')[1] || name}!
                 </h2>
                 <p className="text-base text-slate-600 max-w-md mx-auto leading-relaxed">
-                  Вашу анкету успішно прийнято та зафіксовано в системі корпоративного
-                  навчання UKRSIBBANK BNP Paribas Group.
+                  Вашу анкету успішно прийнято та зафіксовано в системі корпоративного навчання.
                 </p>
               </div>
 
