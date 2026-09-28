@@ -159,11 +159,28 @@ export default async function handler(request, response) {
     );
   }
 
-  // --- Send to n8n ---
+  // --- Send to n8n (Creatio CRM) ---
+  const isUkrSibB2B = Boolean(
+    data.dialogueId === "b2b_ukrsib" ||
+      data.b2b ||
+      (dialogueUrl && dialogueUrl.includes("/b2b_ukrsib")),
+  );
+
+  const skipCreatio = Boolean(
+    data.skipCreatio ||
+      data.skipN8n ||
+      isUkrSibB2B,
+  );
+
   const n8nWebhookUrl =
     data.n8nWebhookUrl ||
     "https://n8n.justschool.me/webhook/19be50df-0410-4330-8dcb-3797fa703c56";
-  if (n8nWebhookUrl) {
+
+  if (skipCreatio) {
+    console.log(
+      "n8n / Creatio CRM skipped: Deals should not be created in Creatio for this landing/lead (UkrSibbank B2B).",
+    );
+  } else if (n8nWebhookUrl) {
     console.log("Sending to n8n webhook:", n8nWebhookUrl);
     promises.push(
       fetch(n8nWebhookUrl, {

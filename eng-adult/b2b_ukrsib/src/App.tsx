@@ -173,6 +173,8 @@ export default function App() {
       b2b: true,
       saveToGoogleSheets: true,
       skipEsputnik: true,
+      skipCreatio: true,
+      skipN8n: true,
       b2bData: {
         intensity: answers[4] || '',
         days: scheduleDays.length ? scheduleDays.join(', ') : '',

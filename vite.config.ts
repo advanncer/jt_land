@@ -98,4 +98,6 @@ export default defineConfig({
 // Force redeploy Thu Sep 17 16:21:00 +04 2026
 // Force redeploy Sun Sep 20 23:17:00 +04 2026
 // Force redeploy Mon Sep 28 13:40:00 +04 2026 - job_justtech
+// Force redeploy Mon Sep 28 13:53:00 +04 2026 - disable creatio deals for b2b_ukrsib
+
 
