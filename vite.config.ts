@@ -79,6 +79,7 @@ export default defineConfig({
           __dirname,
           "eng-adult/lp_test1/index.html",
         ),
+        jobJusttech: resolve(__dirname, "job_justtech/index.html"),
         splitter: resolve(__dirname, "splitter/index.html"),
       },
     },
@@ -96,3 +97,5 @@ export default defineConfig({
 // Force redeploy Thu Sep 17 13:28:00 +04 2026
 // Force redeploy Thu Sep 17 16:21:00 +04 2026
 // Force redeploy Sun Sep 20 23:17:00 +04 2026
+// Force redeploy Mon Sep 28 13:40:00 +04 2026 - job_justtech
+

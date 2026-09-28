@@ -4,6 +4,10 @@ const SPREADSHEET_ID =
   process.env.B2B_UKRSIB_SPREADSHEET_ID ||
   "1DMWMSXsTUtmoJ5kKV_N2Kbld56Y0IPbArRKwNypfu4Q";
 
+const JOB_JUSTTECH_SPREADSHEET_ID =
+  process.env.JOB_JUSTTECH_SPREADSHEET_ID ||
+  "1i1I_X7wIlFKqrHvMoHNbZytLy7wr32YVvVz-QZkNstE";
+
 const CLIENT_EMAIL =
   process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ||
   "adsoulx@silken-eye-503718-k1.iam.gserviceaccount.com";
@@ -221,3 +225,113 @@ export async function saveLeadToUkrSibSheet(data) {
     return { success: false, error: err.message };
   }
 }
+
+export async function saveLeadToJobJustTechSheet(data) {
+  try {
+    console.log("=== saveLeadToJobJustTechSheet called ===");
+    const token = await getAccessToken();
+
+    const now = new Date();
+    const kyivDateStr = now.toLocaleString("uk-UA", {
+      timeZone: "Europe/Kiev",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+
+    const qa = data.qa || "";
+    const name = data.name || data.Name || "";
+    let rawPhone = String(data.phone || data.Phone || "").trim();
+    let phone = rawPhone;
+    if (rawPhone) {
+      const digits = rawPhone.replace(/\D/g, "");
+      phone = `'${digits ? "+" + digits : rawPhone}`;
+    }
+
+    const telegram = data.telegram || parseFromQa(qa, "Telegram:") || "";
+    const age = data.age || parseFromQa(qa, "Скільки тобі років:") || "";
+    const occupation =
+      data.occupation || parseFromQa(qa, "Чим зараз займаєшся:") || "";
+    const timeCommitment =
+      data.timeCommitment ||
+      parseFromQa(qa, "Скільки часу готовий(а) приділяти:") ||
+      "";
+
+    // Parse IP and Country
+    let ip = "";
+    let country = "";
+    if (qa && typeof qa === "string") {
+      const matchIp = qa.match(/ip:(.*?)\|/);
+      const matchCountry = qa.match(/country:(.*?)(?:\|\|\||$)/);
+      if (matchIp) ip = matchIp[1].trim();
+      if (matchCountry) country = matchCountry[1].trim();
+    }
+    if (!ip) ip = data.ip || "";
+    if (!country) country = data.country || data.geo || "";
+
+    const utmSource = data.utm_source || "";
+    const utmMedium = data.utm_medium || "";
+    const utmCampaign = data.utm_campaign || "";
+    const utmContent = data.utm_content || "";
+    const utmTerm = data.utm_term || "";
+    const dialogueUrl = data.dialogueUrl || data.url || "";
+
+    const row = [
+      kyivDateStr,
+      name,
+      phone,
+      telegram,
+      age,
+      occupation,
+      timeCommitment,
+      ip,
+      country,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      utmContent,
+      utmTerm,
+      dialogueUrl,
+    ];
+
+    console.log("Appending row to Job JustTech Google Sheet:", JSON.stringify(row));
+
+    const sheetRange = encodeURIComponent("Аркуш1!A:O");
+    const appendUrl = `https://sheets.googleapis.com/v4/spreadsheets/${JOB_JUSTTECH_SPREADSHEET_ID}/values/${sheetRange}:append?valueInputOption=USER_ENTERED`;
+
+    const res = await fetch(appendUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        values: [row],
+      }),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error(
+        `Failed to append row to Job JustTech Google Sheet (${res.status}):`,
+        errBody,
+      );
+      return { success: false, error: errBody };
+    }
+
+    const resData = await res.json();
+    console.log(
+      "Successfully appended row to Job JustTech Google Sheet:",
+      resData.updates,
+    );
+    return { success: true, updates: resData.updates };
+  } catch (err) {
+    console.error("Error in saveLeadToJobJustTechSheet:", err);
+    return { success: false, error: err.message };
+  }
+}
+

@@ -1,0 +1,172 @@
+@import "./ds/styles.css";
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100vw;
+  background-color: #faf9f6;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #faf9f6;
+  color: #09090a;
+  font-family: Montserrat, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+a {
+  color: #f46600;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+a:hover {
+  color: #ff8b36;
+}
+
+/* Primary Button */
+.js-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  cursor: pointer;
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: #ffffff;
+  background: #f46600;
+  border-radius: 16px;
+  padding: 18px 28px;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0px 8px 24px 0px rgba(244, 102, 0, 0.32);
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.js-btn-primary:hover:not(:disabled) {
+  background: #f5771c;
+  transform: translateY(-1px);
+  box-shadow: 0px 10px 28px 0px rgba(244, 102, 0, 0.4);
+}
+
+.js-btn-primary:active:not(:disabled) {
+  background: #bf6823;
+  transform: translateY(0);
+}
+
+.js-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Secondary / Back Button */
+.js-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #65676b;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition: all 150ms ease;
+}
+
+.js-btn-secondary:hover {
+  background: #f0f0f2;
+  color: #09090a;
+}
+
+/* Card Option Choice Button */
+.js-option-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: #ffffff;
+  border: 2px solid #eaeaea;
+  border-radius: 18px;
+  padding: 20px 24px;
+  text-align: left;
+  cursor: pointer;
+  font-family: Montserrat, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #09090a;
+  transition: all 180ms ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.js-option-card:hover {
+  border-color: #f46600;
+  background: #fffdfb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(244, 102, 0, 0.12);
+}
+
+.js-option-card:active {
+  transform: translateY(0);
+}
+
+.js-option-card.selected {
+  border-color: #f46600;
+  background: #fff5eb;
+  color: #09090a;
+}
+
+/* Modern Input */
+.js-input {
+  height: 56px;
+  border-radius: 16px;
+  border: 1.5px solid #dcdcdc;
+  padding: 0 18px;
+  font-family: Montserrat, sans-serif;
+  font-size: 16px;
+  color: #09090a;
+  outline: none;
+  background: #ffffff;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.js-input:focus {
+  border-color: #f46600;
+  box-shadow: 0 0 0 3px rgba(244, 102, 0, 0.15);
+}
+
+.js-input::placeholder {
+  color: #9b9b9b;
+}
+
+/* Keyframes */
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInSlide 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

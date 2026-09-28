@@ -30,3 +30,6 @@ ignored_archive/
 # GA secrets & tools
 ga-credentials.json
 check_ga.py
+
+# Unpacked Design System archives
+JustSchool Design System*

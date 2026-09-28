@@ -1,0 +1,92 @@
+/* JustSchool — colour primitives + semantic aliases.
+   Values transcribed verbatim from Redesign_MainPage_JustSchool.fig.
+   The file carries three near-identical brand oranges (F46600 in the UI-Kit
+   buttons, F56600 as Figma variable orange-500, F16600 in links/tabs/socials).
+   All three are kept; do not collapse them. */
+:root{
+  /* ---- brand orange (literal, as drawn) ---- */
+  --js-orange-ui:#f46600;        /* rgb(244,102,0) — buttons, header CTA, tabs */
+  --js-orange-brand:#f56600;     /* rgb(245,102,0) — headings, icon glyphs */
+  --js-orange-link:#f16600;      /* rgb(241,102,0) — links, socials, pill tabs */
+  --js-orange-hover:#f5ac72;     /* rgb(245,172,114) — primary hover */
+  --js-orange-pressed:#bf6823;   /* rgb(191,104,35) — primary pressed */
+  --js-orange-link-hover:#ff8b36;/* rgb(255,139,54) */
+  --js-hot-orange:#f34500;       /* rgb(243,69,0) — CTA gradient end */
+
+  /* ---- ink / neutrals ---- */
+  --js-black:#000000;
+  --js-ink:#09090a;              /* rgb(9,9,10) — default text */
+  --js-ink-800:#181818;          /* rgb(24,24,24) */
+  --js-ink-slate:#454754;        /* rgb(69,71,84) — secondary button label */
+  --js-grey-700:#65676b;         /* rgb(101,103,107) */
+  --js-grey-600:#747474;         /* rgb(116,116,116) — Text/Secondary */
+  --js-grey-550:#858585;         /* rgb(133,133,133) */
+  --js-grey-500:#8f8f8f;         /* rgb(143,143,143) */
+  --js-grey-450:#9b9b9b;         /* rgb(155,155,155) — disabled label */
+  --js-grey-350:#c7c9cb;         /* rgb(199,201,203) — text-field idle */
+  --js-grey-300:#cdcdcd;         /* rgb(205,205,205) — secondary hover border */
+  --js-grey-250:#d9d9d9;
+  --js-grey-225:#dadada;
+  --js-grey-200:#e5e5e5;         /* rgb(229,229,229) — default border, disabled fill */
+  --js-grey-175:#e6e6e6;         /* checkbox border */
+  --js-grey-150:#e8e8e8;         /* specimen rules */
+  --js-grey-100:#f4f5f6;         /* tab track */
+  --js-grey-075:#f5f5f5;         /* FAQ panel */
+  --js-grey-050:#f8f8f8;         /* inverse CTA fill */
+  --js-white:#ffffff;
+
+  /* ---- warm tints ---- */
+  --js-cream:#fffaf7;            /* rgb(255,250,247) */
+  --js-peach-050:#fff5eb;        /* rgb(255,245,235) — icon wrapper */
+  --js-peach-100:#ffe0ca;        /* rgb(255,224,202) */
+  --js-peach-200:#fcb583;        /* rgb(252,181,131) */
+
+  /* ---- accent pastels (hero stat chips, numbers grid) ---- */
+  --js-mint:#dceeca;             /* rgb(220,238,202) */
+  --js-lilac:#dbdbf8;            /* rgb(219,219,248) */
+  --js-apricot:#fbb89e;          /* rgb(251,184,158) */
+  --js-butter:#fbd893;           /* rgb(251,216,147) */
+  --js-violet-mid:#c0c0f3;       /* rgb(192,192,243) */
+  --js-violet-deep:#43466b;      /* rgb(67,70,107) */
+  --js-violet-slate:#7b7d9e;     /* rgb(123,125,158) */
+  --js-periwinkle:#ccccff;       /* rgb(204,204,255) */
+  --js-periwinkle-deep:#b8b0f2;  /* rgb(184,176,242) */
+  --js-gold:#db9200;             /* rgb(219,146,0) */
+  --js-error:#ff3a44;            /* rgb(255,58,68) — helper text */
+
+  /* ---- gradients ---- */
+  --js-gradient-cta:linear-gradient(69.559deg, #f16600 -4.95%, #f34500 125.03%); /* @kind other */
+  --js-gradient-amber:linear-gradient(180deg, #ffc233 0%, #ffa500 100%); /* @kind other */
+
+  /* ---- semantic aliases ---- */
+  --text-primary:var(--js-ink);
+  --text-secondary:var(--js-grey-600);
+  --text-muted:var(--js-grey-500);
+  --text-inverse:var(--js-white);
+  --text-brand:var(--js-orange-brand);
+  --text-link:var(--js-orange-link);
+  --text-link-hover:var(--js-orange-link-hover);
+  --text-disabled:var(--js-grey-450);
+  --text-error:var(--js-error);
+
+  --surface-page:var(--js-white);
+  --surface-card:var(--js-white);
+  --surface-muted:var(--js-grey-075);
+  --surface-inverse-cta:var(--js-grey-050);
+  --surface-icon:var(--js-peach-050);
+  --surface-track:var(--js-grey-100);
+  --surface-warm:var(--js-cream);
+
+  --border-default:var(--js-grey-200);
+  --border-hover:var(--js-grey-300);
+  --border-pressed:var(--js-grey-600);
+  --border-field:var(--js-grey-350);
+  --border-checkbox:var(--js-grey-175);
+  --border-brand:var(--js-orange-ui);
+
+  --action-primary:var(--js-orange-ui);
+  --action-primary-hover:var(--js-orange-hover);
+  --action-primary-pressed:var(--js-orange-pressed);
+  --action-disabled:var(--js-grey-200);
+  --action-cancel:var(--js-ink);
+}

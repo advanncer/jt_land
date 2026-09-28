@@ -1,5 +1,8 @@
 import { recordConversion } from "./split.js";
-import { saveLeadToUkrSibSheet } from "./googleSheets.js";
+import {
+  saveLeadToUkrSibSheet,
+  saveLeadToJobJustTechSheet,
+} from "./googleSheets.js";
 
 // Helper to detect if a phone number is a dummy/fake number or has invalid carrier codes
 function isDummyPhone(phone) {
@@ -181,8 +184,8 @@ export default async function handler(request, response) {
     );
   }
 
-  // --- Send to Google Sheets (Apps Script Webhook for Excel/Spreadsheets) ---
-  // If it's UkrSibbank B2B lead, save with dedicated column layout directly via Service Account
+  // --- Send to Google Sheets (Apps Script Webhook or direct Google Sheets API) ---
+  // 1. If it's UkrSibbank B2B lead, save with dedicated column layout directly via Service Account
   if (
     data.dialogueId === "b2b_ukrsib" ||
     data.b2b ||
@@ -192,6 +195,20 @@ export default async function handler(request, response) {
     promises.push(
       saveLeadToUkrSibSheet(data).then((res) => {
         return { service: "UkrSibGoogleSheets", ...res };
+      }),
+    );
+  }
+
+  // 2. If it's Job JustTech recruitment lead, save directly via Service Account
+  if (
+    data.dialogueId === "job_justtech" ||
+    data.job_justtech ||
+    (dialogueUrl && dialogueUrl.includes("/job_justtech"))
+  ) {
+    console.log("Processing direct Google Sheet insertion for Job JustTech recruitment...");
+    promises.push(
+      saveLeadToJobJustTechSheet(data).then((res) => {
+        return { service: "JobJustTechGoogleSheets", ...res };
       }),
     );
   }
@@ -237,7 +254,10 @@ export default async function handler(request, response) {
     data.skipEsputnik ||
       data.b2b ||
       data.dialogueId === "b2b_ukrsib" ||
-      (dialogueUrl && dialogueUrl.includes("/b2b_ukrsib")),
+      (dialogueUrl && dialogueUrl.includes("/b2b_ukrsib")) ||
+      data.dialogueId === "job_justtech" ||
+      data.job_justtech ||
+      (dialogueUrl && dialogueUrl.includes("/job_justtech")),
   );
 
   const esputnikApiKey =
@@ -245,7 +265,7 @@ export default async function handler(request, response) {
 
   if (skipEsputnik) {
     console.log(
-      "eSputnik skipped: UkrSibbank B2B landing leads do not receive standard eSputnik campaigns.",
+      "eSputnik skipped: Lead type (B2B or Job recruitment) excluded from standard eSputnik campaigns.",
     );
   } else if (esputnikApiKey) {
     // Add custom fields and explicitly track their IDs
