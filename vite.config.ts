@@ -99,5 +99,7 @@ export default defineConfig({
 // Force redeploy Sun Sep 20 23:17:00 +04 2026
 // Force redeploy Mon Sep 28 13:40:00 +04 2026 - job_justtech
 // Force redeploy Mon Sep 28 13:53:00 +04 2026 - disable creatio deals for b2b_ukrsib
+// Force redeploy Tue Sep 29 09:48:00 +04 2026 - update age range to 16-25 in job_justtech
+
 
 

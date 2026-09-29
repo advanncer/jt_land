@@ -17,7 +17,7 @@ export const QUIZ_STEPS: QuizStep[] = [
     question: "Скільки тобі років?",
     subtitle: "Обери свою вікову категорію",
     options: [
-      { label: "19-25" },
+      { label: "16-25" },
       { label: "26-35" },
     ],
   },
