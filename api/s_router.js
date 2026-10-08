@@ -14,7 +14,6 @@ function parseCookies(cookieHeader) {
 
 export default async function handler(req, res) {
   try {
-    // Slug can come from query.slug or parsed from req.url (/s/xyz or /api/s_router?slug=xyz)
     let slug = req.query.slug;
     if (!slug) {
       const match = req.url.match(/\/s\/([^/?#]+)/);
@@ -47,7 +46,7 @@ export default async function handler(req, res) {
       selectedVariant = experiment.variants.find((v) => v.id === cookies[cookieKey]);
     }
 
-    // 2. If new user, pick variant based on configured weights
+    // 2. Pick variant based on configured weights
     let isNewVisit = false;
     if (!selectedVariant) {
       isNewVisit = true;
@@ -64,7 +63,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3. Track visit asynchronously
+    // 3. Track visit
     if (isNewVisit) {
       try {
         recordVisit(experiment.id, selectedVariant.id);
@@ -90,7 +89,7 @@ export default async function handler(req, res) {
     destinationUrl.searchParams.set("split_id", experiment.slug);
     destinationUrl.searchParams.set("split_variant", selectedVariant.id);
 
-    // 5. Set Cookie for Sticky Session (30 days)
+    // 5. Sticky session cookie
     const cookieValue = `${cookieKey}=${encodeURIComponent(selectedVariant.id)}; Path=/; Max-Age=2592000; SameSite=Lax`;
     res.setHeader("Set-Cookie", cookieValue);
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -98,6 +97,6 @@ export default async function handler(req, res) {
     return res.redirect(307, destinationUrl.toString());
   } catch (err) {
     console.error("Router error:", err);
-    return res.status(500).json({ error: err.message, stack: err.stack });
+    return res.status(500).json({ error: err.message });
   }
 }

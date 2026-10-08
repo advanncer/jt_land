@@ -1,10 +1,38 @@
-// Persistent Split Experiments Store backed by NocoDB + in-memory fallback cache
+// Persistent Split Experiments Store backed by NocoDB System Record (Id: 2)
 const NOCO_TOKEN = process.env.NOCODB_TOKEN || "xKYg5pA_NAjvwAtnl9IGkJd---0F5BN8MFm992xO";
-const SPLIT_TABLE_ID = process.env.NOCODB_SPLIT_TABLE_ID || "mrik5svmgbviy0a";
+const MAIN_TABLE_ID = process.env.NOCODB_TABLE_ID || "mwyhw2a79xopbef";
 const NOCO_BASE_URL = "https://app.nocodb.com/api/v2/tables";
+const CONFIG_ROW_ID = 2; // System record storing split config & analytics in QA column
 
 // Default seed experiments
 const DEFAULT_EXPERIMENTS = [
+  {
+    id: "exp_1791461996672",
+    name: "JustClass GoodPromo VS SiteLP",
+    slug: "gp-stlp",
+    status: "active",
+    createdAt: new Date().toISOString(),
+    variants: [
+      {
+        id: "var_a",
+        name: "JustClass: Main Landing",
+        url: "https://justclass.com.ua/vseukrainski-olimpiady/?utm_source=facebook&utm_medium=paid&utm_campaign=Julia_10-07-2026_JustClass_Platform_Purchase_UA_Wide_FB-INST_AllGender_25-65_LC_Olympiad_Ad_Y26_W41_Static_JustClass_LesyaUkrainka_var1_4&utm_content={{ad.name}}&campaign_id={{campaign.id}}&adset_id={{adset.id}}&ad_id={{ad.id}}",
+        weight: 50,
+        visits: 0,
+        leads: 0,
+        paid: 0,
+      },
+      {
+        id: "var_b",
+        name: "JustClass: Interactive Quiz / Offer",
+        url: "https://quiz.justschool.me/justclass_olymp/",
+        weight: 50,
+        visits: 0,
+        leads: 0,
+        paid: 0,
+      },
+    ],
+  },
   {
     id: "exp_justclass_1",
     name: "JustClass: Основной сплиттер трафика",
@@ -63,9 +91,9 @@ const DEFAULT_EXPERIMENTS = [
 
 let memoryCache = [...DEFAULT_EXPERIMENTS];
 let lastCacheSync = 0;
-const CACHE_TTL_MS = 15000; // 15 seconds
+const CACHE_TTL_MS = 10000; // 10 seconds
 
-// Fetch all experiments from NocoDB
+// Fetch all experiments from NocoDB system record
 export async function fetchExperimentsFromDb() {
   const now = Date.now();
   if (memoryCache.length > 0 && now - lastCacheSync < CACHE_TTL_MS) {
@@ -73,127 +101,52 @@ export async function fetchExperimentsFromDb() {
   }
 
   try {
-    const res = await fetch(`${NOCO_BASE_URL}/${SPLIT_TABLE_ID}/records?limit=100`, {
+    const res = await fetch(`${NOCO_BASE_URL}/${MAIN_TABLE_ID}/records/${CONFIG_ROW_ID}`, {
       headers: { "xc-token": NOCO_TOKEN },
     });
 
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data.list) && data.list.length > 0) {
-        memoryCache = data.list.map((row) => {
-          let parsedConfig = {};
-          let parsedStats = {};
-          try {
-            parsedConfig = typeof row.Config === "string" ? JSON.parse(row.Config) : (row.config ? JSON.parse(row.config) : {});
-          } catch (e) {}
-          try {
-            parsedStats = typeof row.Stats === "string" ? JSON.parse(row.Stats) : (row.stats ? JSON.parse(row.stats) : {});
-          } catch (e) {}
-
-          const variants = (parsedConfig.variants || []).map((v) => {
-            const stat = (parsedStats[v.id] || {});
-            return {
-              ...v,
-              visits: stat.visits ?? v.visits ?? 0,
-              leads: stat.leads ?? v.leads ?? 0,
-              paid: stat.paid ?? v.paid ?? 0,
-            };
-          });
-
-          return {
-            id: String(row.Id || row.id || `exp_${row.Slug || row.slug}`),
-            nocoRowId: row.Id || row.id,
-            name: row.Name || row.name || "",
-            slug: row.Slug || row.slug || "",
-            status: row.Status || row.status || "active",
-            createdAt: row.CreatedAt || row.created_at || new Date().toISOString(),
-            variants,
-          };
-        });
-        lastCacheSync = now;
-        return memoryCache;
+      if (data && data.QA) {
+        const parsed = JSON.parse(data.QA);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          memoryCache = parsed;
+          lastCacheSync = now;
+          return memoryCache;
+        }
       }
     }
   } catch (err) {
-    console.error("NocoDB fetch error, using memory fallback:", err);
+    console.error("NocoDB fetch error, using memory cache:", err);
   }
 
   return memoryCache;
 }
 
-// Sync one experiment to NocoDB
-export async function saveExperimentToDb(exp) {
-  // Update memory first
-  const existingIdx = memoryCache.findIndex((e) => e.slug === exp.slug || e.id === exp.id);
-  if (existingIdx >= 0) {
-    memoryCache[existingIdx] = { ...memoryCache[existingIdx], ...exp };
-  } else {
-    memoryCache.unshift(exp);
-  }
-
-  // Extract config & stats
-  const config = {
-    variants: exp.variants.map((v) => ({
-      id: v.id,
-      name: v.name,
-      url: v.url,
-      weight: v.weight,
-    })),
-  };
-  const stats = {};
-  exp.variants.forEach((v) => {
-    stats[v.id] = {
-      visits: v.visits || 0,
-      leads: v.leads || 0,
-      paid: v.paid || 0,
-    };
-  });
-
-  const payload = {
-    Slug: exp.slug,
-    Name: exp.name,
-    Status: exp.status || "active",
-    Config: JSON.stringify(config),
-    Stats: JSON.stringify(stats),
-  };
+// Persist all experiments to NocoDB
+export async function saveExperimentsToDb(experimentsList) {
+  memoryCache = experimentsList;
+  lastCacheSync = Date.now();
 
   try {
-    // Check if record exists in NocoDB
-    const checkRes = await fetch(
-      `${NOCO_BASE_URL}/${SPLIT_TABLE_ID}/records?where=(Slug,eq,${encodeURIComponent(exp.slug)})&limit=1`,
-      { headers: { "xc-token": NOCO_TOKEN } }
-    );
-    if (checkRes.ok) {
-      const data = await checkRes.json();
-      if (data.list && data.list.length > 0) {
-        const rowId = data.list[0].Id || data.list[0].id;
-        await fetch(`${NOCO_BASE_URL}/${SPLIT_TABLE_ID}/records`, {
-          method: "PATCH",
-          headers: {
-            "xc-token": NOCO_TOKEN,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ Id: rowId, ...payload }),
-        });
-        return;
-      }
-    }
-
-    // Insert new
-    await fetch(`${NOCO_BASE_URL}/${SPLIT_TABLE_ID}/records`, {
-      method: "POST",
+    await fetch(`${NOCO_BASE_URL}/${MAIN_TABLE_ID}/records`, {
+      method: "PATCH",
       headers: {
         "xc-token": NOCO_TOKEN,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        Id: CONFIG_ROW_ID,
+        Title: "_SYSTEM_SPLIT_CONFIG_",
+        QA: JSON.stringify(experimentsList),
+      }),
     });
   } catch (err) {
     console.error("NocoDB save error:", err);
   }
 }
 
-// Record conversion (Lead or Paid)
+// Record conversion
 export async function recordConversion(splitId, variantId, type = "lead") {
   const experiments = await fetchExperimentsFromDb();
   const exp = experiments.find((e) => e.id === splitId || e.slug === splitId);
@@ -208,8 +161,7 @@ export async function recordConversion(splitId, variantId, type = "lead") {
     variant.paid = (variant.paid || 0) + 1;
   }
 
-  // Asynchronously sync stats to NocoDB
-  saveExperimentToDb(exp).catch((e) => console.error("Async conversion save error:", e));
+  saveExperimentsToDb(experiments).catch((e) => console.error("Async conversion save error:", e));
   return true;
 }
 
@@ -224,8 +176,7 @@ export async function recordVisit(splitId, variantId) {
 
   variant.visits = (variant.visits || 0) + 1;
 
-  // Asynchronously sync stats to NocoDB
-  saveExperimentToDb(exp).catch((e) => console.error("Async visit save error:", e));
+  saveExperimentsToDb(experiments).catch((e) => console.error("Async visit save error:", e));
   return true;
 }
 
@@ -248,7 +199,7 @@ export default async function handler(req, res) {
   try {
     const experiments = await fetchExperimentsFromDb();
 
-    // 1. GET: Return experiments
+    // 1. GET
     if (method === "GET") {
       if (query.slug) {
         const found = experiments.find(
@@ -267,7 +218,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 2. POST: Create, Update or Track
+    // 2. POST
     if (method === "POST") {
       const body = req.body || {};
 
@@ -291,7 +242,11 @@ export default async function handler(req, res) {
       }
 
       const cleanSlug = slug.trim().toLowerCase().replace(/[^a-z0-9-_]/g, "-");
-      const existing = experiments.find((e) => e.slug === cleanSlug || (body.id && e.id === body.id));
+      const existingIdx = experiments.findIndex(
+        (e) => e.slug === cleanSlug || (body.id && e.id === body.id)
+      );
+
+      const existing = existingIdx >= 0 ? experiments[existingIdx] : null;
 
       const formattedVariants = variants.map((v, i) => {
         const oldV = existing?.variants?.find((ov) => ov.id === v.id);
@@ -315,7 +270,13 @@ export default async function handler(req, res) {
         variants: formattedVariants,
       };
 
-      await saveExperimentToDb(updatedExp);
+      if (existingIdx >= 0) {
+        experiments[existingIdx] = updatedExp;
+      } else {
+        experiments.unshift(updatedExp);
+      }
+
+      await saveExperimentsToDb(experiments);
 
       return res.status(200).json({
         success: true,
@@ -324,7 +285,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 3. DELETE: Remove or Reset
+    // 3. DELETE
     if (method === "DELETE") {
       const { id, resetOnly } = query;
       if (!id) {
@@ -342,7 +303,7 @@ export default async function handler(req, res) {
           v.leads = 0;
           v.paid = 0;
         });
-        await saveExperimentToDb(exp);
+        await saveExperimentsToDb(experiments);
         return res.status(200).json({
           success: true,
           message: "Stats reset successfully",
@@ -350,31 +311,10 @@ export default async function handler(req, res) {
         });
       }
 
-      // Delete from memory and NocoDB
-      const idx = memoryCache.findIndex((e) => e.id === id || e.slug === id);
-      if (idx >= 0) memoryCache.splice(idx, 1);
-
-      try {
-        const checkRes = await fetch(
-          `${NOCO_BASE_URL}/${SPLIT_TABLE_ID}/records?where=(Slug,eq,${encodeURIComponent(exp.slug)})&limit=1`,
-          { headers: { "xc-token": NOCO_TOKEN } }
-        );
-        if (checkRes.ok) {
-          const data = await checkRes.json();
-          if (data.list && data.list.length > 0) {
-            const rowId = data.list[0].Id || data.list[0].id;
-            await fetch(`${NOCO_BASE_URL}/${SPLIT_TABLE_ID}/records`, {
-              method: "DELETE",
-              headers: {
-                "xc-token": NOCO_TOKEN,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ Id: rowId }),
-            });
-          }
-        }
-      } catch (err) {
-        console.error("NocoDB delete error:", err);
+      const idx = experiments.findIndex((e) => e.id === id || e.slug === id);
+      if (idx >= 0) {
+        experiments.splice(idx, 1);
+        await saveExperimentsToDb(experiments);
       }
 
       return res.status(200).json({
