@@ -114,6 +114,7 @@ export async function fetchExperimentsFromDb() {
           lastCacheSync = now;
           return memoryCache;
         }
+      }
     } else {
       console.error("NocoDB response not ok:", res.status);
     }
