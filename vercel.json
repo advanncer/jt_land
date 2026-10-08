@@ -39,7 +39,7 @@
     },
     {
       "source": "/s/:slug",
-      "destination": "/api/s/[slug]"
+      "destination": "/api/s_router?slug=:slug"
     },
     {
       "source": "/eng-adult/main",
