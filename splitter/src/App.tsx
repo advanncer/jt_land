@@ -43,6 +43,9 @@ interface Experiment {
 }
 
 const PRESET_LANDINGS = [
+  { name: "JustClass: Main Landing", url: "/justclass/main" },
+  { name: "JustClass: Interactive Quiz / Offer", url: "/justclass/quiz" },
+  { name: "JustClass: Teachers B2B / Pro", url: "/justclass/pro" },
   { name: "English Adult: Main LP", url: "/eng-adult/lp1" },
   { name: "English Adult: Pain Points LP", url: "/eng-adult/lp_pains" },
   { name: "English Adult: Telegram Funnel", url: "/eng-adult/lp1-tg" },
@@ -807,6 +810,20 @@ export default function SplitterApp() {
                           </>
                         )}
                       </button>
+                    </div>
+
+                    {/* Facebook Attribution & Pixel Status */}
+                    <div className="mt-4 p-3 bg-indigo-950/40 border border-indigo-500/20 rounded-2xl flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                        <span className="text-slate-300 font-medium">Facebook Pixel:</span>
+                        <span className="text-blue-300 font-mono bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
+                          9067851526565677
+                        </span>
+                      </div>
+                      <span className="text-slate-400 text-[11px]">
+                        Sticky Cookie: <span className="text-emerald-400 font-mono">js_split_{selectedExp.slug}</span>
+                      </span>
                     </div>
                   </div>
 
