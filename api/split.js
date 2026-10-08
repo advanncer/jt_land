@@ -89,14 +89,14 @@ const DEFAULT_EXPERIMENTS = [
   },
 ];
 
-let memoryCache = [...DEFAULT_EXPERIMENTS];
+let memoryCache = [];
 let lastCacheSync = 0;
 const CACHE_TTL_MS = 10000; // 10 seconds
 
 // Fetch all experiments from NocoDB system record
 export async function fetchExperimentsFromDb() {
   const now = Date.now();
-  if (memoryCache.length > 0 && now - lastCacheSync < CACHE_TTL_MS) {
+  if (memoryCache.length > 0 && lastCacheSync > 0 && now - lastCacheSync < CACHE_TTL_MS) {
     return memoryCache;
   }
 
@@ -114,10 +114,15 @@ export async function fetchExperimentsFromDb() {
           lastCacheSync = now;
           return memoryCache;
         }
-      }
+    } else {
+      console.error("NocoDB response not ok:", res.status);
     }
   } catch (err) {
     console.error("NocoDB fetch error, using memory cache:", err);
+  }
+
+  if (memoryCache.length === 0) {
+    memoryCache = [...DEFAULT_EXPERIMENTS];
   }
 
   return memoryCache;
