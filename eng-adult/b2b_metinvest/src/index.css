@@ -1,0 +1,59 @@
+@import "./ds/styles.css";
+@import "tailwindcss";
+
+:root {
+  --brand: #F85B46;
+  --brand-hover: #E44834;
+  --brand-active: #C63523;
+  --shadow-brand: 0 10px 25px -3px rgba(248, 91, 70, 0.35), 0 4px 6px -4px rgba(248, 91, 70, 0.2);
+  --metinvest-coral: #F85B46;
+  --metinvest-coral-hover: #E44834;
+  --metinvest-coral-dark: #C63523;
+  --metinvest-coral-subtle: #FFF4F2;
+  --metinvest-coral-border: #FDCBC4;
+  --metinvest-coral-glow: 0 6px 20px rgba(248, 91, 70, 0.25);
+  --metinvest-steel: #1A1D20;
+  --metinvest-steel-light: #2A2F35;
+  --metinvest-steel-muted: #5A6069;
+}
+
+/* Step transition animation */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-enter {
+  animation: fadeSlideIn 0.25s var(--ease-out) both;
+}
+
+/* Spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin {
+  animation: spin 0.9s linear infinite;
+}
+
+/* Base */
+body {
+  font-family: var(--font-core);
+  background-color: var(--surface-page-warm);
+  overflow-x: hidden;
+  color: var(--text-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+input::placeholder {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 14px;
+}

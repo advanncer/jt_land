@@ -1,6 +1,7 @@
 import { recordConversion } from "./split.js";
 import {
   saveLeadToUkrSibSheet,
+  saveLeadToMetinvestSheet,
   saveLeadToJobJustTechSheet,
 } from "./googleSheets.js";
 
@@ -160,16 +161,19 @@ export default async function handler(request, response) {
   }
 
   // --- Send to n8n (Creatio CRM) ---
-  const isUkrSibB2B = Boolean(
+  const isB2B = Boolean(
     data.dialogueId === "b2b_ukrsib" ||
+      data.dialogueId === "b2b_metinvest" ||
       data.b2b ||
-      (dialogueUrl && dialogueUrl.includes("/b2b_ukrsib")),
+      (dialogueUrl &&
+        (dialogueUrl.includes("/b2b_ukrsib") ||
+          dialogueUrl.includes("/b2b_metinvest"))),
   );
 
   const skipCreatio = Boolean(
     data.skipCreatio ||
       data.skipN8n ||
-      isUkrSibB2B,
+      isB2B,
   );
 
   const n8nWebhookUrl =
@@ -178,7 +182,7 @@ export default async function handler(request, response) {
 
   if (skipCreatio) {
     console.log(
-      "n8n / Creatio CRM skipped: Deals should not be created in Creatio for this landing/lead (UkrSibbank B2B).",
+      "n8n / Creatio CRM skipped: Deals should not be created in Creatio for this landing/lead (B2B corporate programs).",
     );
   } else if (n8nWebhookUrl) {
     console.log("Sending to n8n webhook:", n8nWebhookUrl);
@@ -202,8 +206,21 @@ export default async function handler(request, response) {
   }
 
   // --- Send to Google Sheets (Apps Script Webhook or direct Google Sheets API) ---
-  // 1. If it's UkrSibbank B2B lead, save with dedicated column layout directly via Service Account
+  // 1. If it's Metinvest B2B lead, save to Metinvest sheet directly via Service Account
   if (
+    data.dialogueId === "b2b_metinvest" ||
+    (dialogueUrl && dialogueUrl.includes("/b2b_metinvest")) ||
+    (data.company && data.company.includes("Метінвест"))
+  ) {
+    console.log("Processing direct Google Sheet insertion for Metinvest B2B...");
+    promises.push(
+      saveLeadToMetinvestSheet(data).then((res) => {
+        return { service: "MetinvestGoogleSheets", ...res };
+      }),
+    );
+  }
+  // 2. If it's UkrSibbank B2B lead, save with dedicated column layout directly via Service Account
+  else if (
     data.dialogueId === "b2b_ukrsib" ||
     data.b2b ||
     (dialogueUrl && dialogueUrl.includes("/b2b_ukrsib"))
@@ -216,7 +233,7 @@ export default async function handler(request, response) {
     );
   }
 
-  // 2. If it's Job JustTech recruitment lead, save directly via Service Account
+  // 3. If it's Job JustTech recruitment lead, save directly via Service Account
   if (
     data.dialogueId === "job_justtech" ||
     data.job_justtech ||
@@ -235,7 +252,14 @@ export default async function handler(request, response) {
     process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
     "https://script.google.com/macros/s/AKfycbzjHz2H9Am5CfJ6dtrvu82h9Vr0bi_lc6eb6Ljm-jEuqHcz-UIdEXHcx4lhL-uDVjTmZA/exec";
 
-  if (googleSheetWebhookUrl && (data.saveToGoogleSheets || data.b2b)) {
+  // Only trigger legacy webhook if not already saved to dedicated B2B sheets directly
+  const isDirectB2BSheetHandled = Boolean(
+    data.dialogueId === "b2b_metinvest" ||
+      data.dialogueId === "b2b_ukrsib" ||
+      (dialogueUrl && (dialogueUrl.includes("/b2b_metinvest") || dialogueUrl.includes("/b2b_ukrsib"))),
+  );
+
+  if (googleSheetWebhookUrl && (data.saveToGoogleSheets || data.b2b) && !isDirectB2BSheetHandled) {
     console.log("Sending to Google Sheets webhook:", googleSheetWebhookUrl);
     const qs = new URLSearchParams({
       name: name || "",
@@ -245,7 +269,7 @@ export default async function handler(request, response) {
       dialogueUrl: dialogueUrl || "",
       dialogueName: data.dialogueName || "JustSchool B2B Quiz",
       lead_type: data.lead_type || "english-for-adults-b2b",
-      company: data.company || "UKRSIBBANK",
+      company: data.company || "JustSchool B2B",
       utm_source: data.utm_source || "",
       utm_medium: data.utm_medium || "",
       utm_campaign: data.utm_campaign || "",
@@ -271,7 +295,10 @@ export default async function handler(request, response) {
     data.skipEsputnik ||
       data.b2b ||
       data.dialogueId === "b2b_ukrsib" ||
-      (dialogueUrl && dialogueUrl.includes("/b2b_ukrsib")) ||
+      data.dialogueId === "b2b_metinvest" ||
+      (dialogueUrl &&
+        (dialogueUrl.includes("/b2b_ukrsib") ||
+          dialogueUrl.includes("/b2b_metinvest"))) ||
       data.dialogueId === "job_justtech" ||
       data.job_justtech ||
       (dialogueUrl && dialogueUrl.includes("/job_justtech")),

@@ -75,6 +75,10 @@ export default defineConfig({
           __dirname,
           "eng-adult/b2b_ukrsib/index.html",
         ),
+        engAdultB2bMetinvest: resolve(
+          __dirname,
+          "eng-adult/b2b_metinvest/index.html",
+        ),
         engAdultLpTest1: resolve(
           __dirname,
           "eng-adult/lp_test1/index.html",

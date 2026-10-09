@@ -220,6 +220,22 @@
     {
       "source": "/job_justtech/:path*",
       "destination": "/job_justtech/:path*"
+    },
+    {
+      "source": "/eng-adult/b2b_metinvest",
+      "destination": "/eng-adult/b2b_metinvest/index.html"
+    },
+    {
+      "source": "/eng-adult/b2b_metinvest/:path*",
+      "destination": "/eng-adult/b2b_metinvest/index.html"
+    },
+    {
+      "source": "/b2b_metinvest",
+      "destination": "/eng-adult/b2b_metinvest/index.html"
+    },
+    {
+      "source": "/b2b_metinvest/:path*",
+      "destination": "/eng-adult/b2b_metinvest/index.html"
     }
   ],
   "redirects": [
