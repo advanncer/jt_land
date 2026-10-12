@@ -1,0 +1,8 @@
+/* Soft, generous rounding - nothing sharp above 4px scale. */
+:root{
+  --radius-xs:4px;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:24px;--radius-2xl:32px;
+  --radius-pill:999px;--radius-circle:50%;
+  --border-hairline:1px;/* @kind spacing */
+  --border-regular:1.5px;/* @kind spacing */
+  --border-thick:2px;/* @kind spacing */
+}

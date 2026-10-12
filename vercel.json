@@ -236,6 +236,22 @@
     {
       "source": "/b2b_metinvest/:path*",
       "destination": "/eng-adult/b2b_metinvest/index.html"
+    },
+    {
+      "source": "/eng-adult/b2b_brsm",
+      "destination": "/eng-adult/b2b_brsm/index.html"
+    },
+    {
+      "source": "/eng-adult/b2b_brsm/:path*",
+      "destination": "/eng-adult/b2b_brsm/index.html"
+    },
+    {
+      "source": "/b2b_brsm",
+      "destination": "/eng-adult/b2b_brsm/index.html"
+    },
+    {
+      "source": "/b2b_brsm/:path*",
+      "destination": "/eng-adult/b2b_brsm/index.html"
     }
   ],
   "redirects": [

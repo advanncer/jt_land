@@ -2,6 +2,7 @@ import { recordConversion } from "./split.js";
 import {
   saveLeadToUkrSibSheet,
   saveLeadToMetinvestSheet,
+  saveLeadToBrsmSheet,
   saveLeadToJobJustTechSheet,
 } from "./googleSheets.js";
 
@@ -164,10 +165,12 @@ export default async function handler(request, response) {
   const isB2B = Boolean(
     data.dialogueId === "b2b_ukrsib" ||
       data.dialogueId === "b2b_metinvest" ||
+      data.dialogueId === "b2b_brsm" ||
       data.b2b ||
       (dialogueUrl &&
         (dialogueUrl.includes("/b2b_ukrsib") ||
-          dialogueUrl.includes("/b2b_metinvest"))),
+          dialogueUrl.includes("/b2b_metinvest") ||
+          dialogueUrl.includes("/b2b_brsm"))),
   );
 
   const skipCreatio = Boolean(
@@ -206,8 +209,21 @@ export default async function handler(request, response) {
   }
 
   // --- Send to Google Sheets (Apps Script Webhook or direct Google Sheets API) ---
-  // 1. If it's Metinvest B2B lead, save to Metinvest sheet directly via Service Account
+  // 1. If it's BRSM-Nafta B2B lead, save to BRSM sheet directly via Service Account
   if (
+    data.dialogueId === "b2b_brsm" ||
+    (dialogueUrl && dialogueUrl.includes("/b2b_brsm")) ||
+    (data.company && data.company.includes("БРСМ"))
+  ) {
+    console.log("Processing direct Google Sheet insertion for BRSM-Nafta B2B...");
+    promises.push(
+      saveLeadToBrsmSheet(data).then((res) => {
+        return { service: "BrsmGoogleSheets", ...res };
+      }),
+    );
+  }
+  // 2. If it's Metinvest B2B lead, save to Metinvest sheet directly via Service Account
+  else if (
     data.dialogueId === "b2b_metinvest" ||
     (dialogueUrl && dialogueUrl.includes("/b2b_metinvest")) ||
     (data.company && data.company.includes("Метінвест"))
@@ -219,7 +235,7 @@ export default async function handler(request, response) {
       }),
     );
   }
-  // 2. If it's UkrSibbank B2B lead, save with dedicated column layout directly via Service Account
+  // 3. If it's UkrSibbank B2B lead, save with dedicated column layout directly via Service Account
   else if (
     data.dialogueId === "b2b_ukrsib" ||
     data.b2b ||
@@ -233,7 +249,7 @@ export default async function handler(request, response) {
     );
   }
 
-  // 3. If it's Job JustTech recruitment lead, save directly via Service Account
+  // 4. If it's Job JustTech recruitment lead, save directly via Service Account
   if (
     data.dialogueId === "job_justtech" ||
     data.job_justtech ||
@@ -254,9 +270,13 @@ export default async function handler(request, response) {
 
   // Only trigger legacy webhook if not already saved to dedicated B2B sheets directly
   const isDirectB2BSheetHandled = Boolean(
-    data.dialogueId === "b2b_metinvest" ||
+    data.dialogueId === "b2b_brsm" ||
+      data.dialogueId === "b2b_metinvest" ||
       data.dialogueId === "b2b_ukrsib" ||
-      (dialogueUrl && (dialogueUrl.includes("/b2b_metinvest") || dialogueUrl.includes("/b2b_ukrsib"))),
+      (dialogueUrl &&
+        (dialogueUrl.includes("/b2b_brsm") ||
+          dialogueUrl.includes("/b2b_metinvest") ||
+          dialogueUrl.includes("/b2b_ukrsib"))),
   );
 
   if (googleSheetWebhookUrl && (data.saveToGoogleSheets || data.b2b) && !isDirectB2BSheetHandled) {
@@ -296,9 +316,11 @@ export default async function handler(request, response) {
       data.b2b ||
       data.dialogueId === "b2b_ukrsib" ||
       data.dialogueId === "b2b_metinvest" ||
+      data.dialogueId === "b2b_brsm" ||
       (dialogueUrl &&
         (dialogueUrl.includes("/b2b_ukrsib") ||
-          dialogueUrl.includes("/b2b_metinvest"))) ||
+          dialogueUrl.includes("/b2b_metinvest") ||
+          dialogueUrl.includes("/b2b_brsm"))) ||
       data.dialogueId === "job_justtech" ||
       data.job_justtech ||
       (dialogueUrl && dialogueUrl.includes("/job_justtech")),

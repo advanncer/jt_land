@@ -1,0 +1,21 @@
+/* Color palette - 6 families, 11 steps each (orange adds a 25 tint).
+   Verbatim from the JustSchool "Colors - Full" brand sheet. */
+:root{
+  /* hot-orange */
+  --hot-orange-50:#FBCCB9;--hot-orange-100:#FBB89E;--hot-orange-200:#FCA482;--hot-orange-300:#FD7C4A;--hot-orange-400:#FF5411;--hot-orange-500:#F54500;--hot-orange-600:#DA3E00;--hot-orange-700:#A32E00;--hot-orange-800:#6C1F00;--hot-orange-900:#360F00;--hot-orange-950:#000000;
+  /* orange */
+  --orange-25:#FFF5EB;--orange-50:#FFE0CA;--orange-100:#FBC59F;--orange-200:#FCB583;--orange-300:#FD954A;--orange-400:#FF7411;--orange-500:#F56600;--orange-600:#D95B00;--orange-700:#A24400;--orange-800:#6B2D00;--orange-900:#341600;--orange-950:#000000;
+  /* green */
+  --green-50:#EAF5E0;--green-100:#DCEECA;--green-200:#CEE9B4;--green-300:#B2E086;--green-400:#95D758;--green-500:#87D142;--green-600:#79CE2A;--green-700:#5EA61B;--green-800:#437E0C;--green-900:#285003;--green-950:#0D1C00;
+  /* violet */
+  --violet-50:#E4E4FA;--violet-100:#DBDBF8;--violet-200:#D2D2F6;--violet-300:#C0C0F3;--violet-400:#ADADF1;--violet-500:#A4A4EF;--violet-600:#9A9AEF;--violet-700:#8686ED;--violet-800:#7070EE;--violet-900:#5959EF;--violet-950:#4141F2;
+  /* yellow */
+  --yellow-50:#FBE1AD;--yellow-100:#FBD893;--yellow-200:#FCD079;--yellow-300:#FDBF44;--yellow-400:#FFAF0F;--yellow-500:#F5A300;--yellow-600:#DB9200;--yellow-700:#A87000;--yellow-800:#754E00;--yellow-900:#422C00;--yellow-950:#0F0A00;
+  /* base */
+  --base-50:#FFFFFF;--base-100:#F8F8F8;--base-200:#F0F0F0;--base-300:#E0E0E0;--base-400:#C8C8C8;--base-500:#A8A8A8;--base-600:#808080;--base-700:#585858;--base-800:#303030;--base-900:#141414;--base-950:#000000;
+
+  /* Brand-element inks: the decorative shapes in "Brand elements.svg" ship at
+     these exact values, one notch off the palette 500s. Use the palette for UI,
+     these for 1:1 asset recreations. */
+  --element-orange:#F46600;--element-hot-orange:#F34500;--element-yellow:#F6A500;--element-tint:#FFFAF7;
+}

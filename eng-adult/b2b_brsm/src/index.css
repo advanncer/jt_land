@@ -1,0 +1,58 @@
+@import "./ds/styles.css";
+@import "tailwindcss";
+
+:root {
+  --brand: #FCAF17;
+  --brand-hover: #E59A08;
+  --brand-active: #C47900;
+  --shadow-brand: 0 10px 25px -3px rgba(252, 175, 23, 0.35), 0 4px 6px -4px rgba(252, 175, 23, 0.2);
+  --brsm-amber: #FCAF17;
+  --brsm-amber-hover: #E59A08;
+  --brsm-amber-dark: #C47900;
+  --brsm-amber-subtle: #FFF9ED;
+  --brsm-amber-border: #FCE09B;
+  --brsm-dark: #161717;
+  --brsm-dark-light: #2A2C2E;
+  --brsm-dark-muted: #5A6069;
+}
+
+/* Step transition animation */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-enter {
+  animation: fadeSlideIn 0.25s var(--ease-out) both;
+}
+
+/* Spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin {
+  animation: spin 0.9s linear infinite;
+}
+
+/* Base */
+body {
+  font-family: var(--font-core);
+  background-color: var(--surface-page-warm);
+  overflow-x: hidden;
+  color: var(--text-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+input::placeholder {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 14px;
+}
