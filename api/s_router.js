@@ -67,35 +67,61 @@ export default async function handler(req, res) {
       });
     }
 
-    // 1. Sticky Sessions: Check if user already visited this split
-    const cookies = parseCookies(req.headers.cookie);
     const cookieKey = `js_split_${cleanSlug}`;
+    const forceVariant = req.query.preview || req.query.variant || req.query.v;
+    const isReset = req.query.reset === "1" || req.query.clear === "1";
+
     let selectedVariant = null;
-
-    if (cookies[cookieKey]) {
-      selectedVariant = experiment.variants.find((v) => v.id === cookies[cookieKey]);
-    }
-
-    // 2. If new user, pick variant based on configured weights
     let isNewVisit = false;
-    if (!selectedVariant) {
-      isNewVisit = true;
-      const totalWeight = experiment.variants.reduce((sum, v) => sum + (v.weight || 0), 0);
-      let random = Math.random() * (totalWeight || 100);
-      selectedVariant = experiment.variants[0];
 
-      for (const variant of experiment.variants) {
-        if (random < variant.weight) {
-          selectedVariant = variant;
-          break;
-        }
-        random -= variant.weight;
+    // 1. Manual Variant Override (Allows acquisition managers to test specific variants)
+    // Example: /s/pains-custom?variant=var_b or ?preview=var_b
+    if (forceVariant) {
+      const cleanForce = String(forceVariant).toLowerCase().trim();
+      selectedVariant = experiment.variants.find(
+        (v) =>
+          v.id.toLowerCase() === cleanForce ||
+          v.id.toLowerCase() === `var_${cleanForce}` ||
+          v.name.toLowerCase().includes(cleanForce),
+      );
+      if (selectedVariant) {
+        console.log(`[Router Override] Forcing variant ${selectedVariant.id} for /s/${cleanSlug}`);
       }
     }
 
-    // 3. Track visit ONLY if it's a real human user (Filter out Facebook preview / Googlebot)
+    // 2. Sticky Sessions: Check if user already visited this split (unless ?reset=1 was passed)
+    if (!selectedVariant && !isReset) {
+      const cookies = parseCookies(req.headers.cookie);
+      if (cookies[cookieKey]) {
+        selectedVariant = experiment.variants.find((v) => v.id === cookies[cookieKey]);
+      }
+    }
+
+    // 3. If new user (or ?reset=1), pick variant based on configured weights using cumulative distribution
+    if (!selectedVariant) {
+      isNewVisit = true;
+      const variantsWithWeights = experiment.variants.map((v) => ({
+        ...v,
+        numWeight: Math.max(0, Number(v.weight) || 0),
+      }));
+
+      const totalWeight = variantsWithWeights.reduce((sum, v) => sum + v.numWeight, 0) || 100;
+      const random = Math.random() * totalWeight;
+
+      let cumulative = 0;
+      selectedVariant = variantsWithWeights[0];
+      for (const variant of variantsWithWeights) {
+        cumulative += variant.numWeight;
+        if (random < cumulative) {
+          selectedVariant = variant;
+          break;
+        }
+      }
+    }
+
+    // 4. Track visit ONLY if it's a real human user (Filter out Facebook preview / Googlebot)
     const isBot = isBotRequest(req);
-    if (isNewVisit && !isBot) {
+    if (isNewVisit && !isBot && !forceVariant) {
       try {
         recordVisit(experiment.id, selectedVariant.id);
       } catch (err) {
@@ -105,16 +131,17 @@ export default async function handler(req, res) {
       console.log(`[Bot Filter] Ignored visit for /s/${cleanSlug} from UA: ${req.headers["user-agent"]}`);
     }
 
-    // 4. Build destination URL
+    // 5. Build destination URL
     const targetBase = selectedVariant.url.startsWith("http")
       ? selectedVariant.url
       : `https://lp.justschool.me${selectedVariant.url.startsWith("/") ? "" : "/"}${selectedVariant.url}`;
 
     const destinationUrl = new URL(targetBase);
 
-    // Forward original query parameters
+    // Forward original query parameters (excluding router-internal controls)
+    const internalParams = ["slug", "reset", "clear", "preview", "variant", "v"];
     Object.keys(req.query).forEach((key) => {
-      if (key !== "slug") {
+      if (!internalParams.includes(key.toLowerCase())) {
         destinationUrl.searchParams.set(key, req.query[key]);
       }
     });
@@ -122,7 +149,7 @@ export default async function handler(req, res) {
     destinationUrl.searchParams.set("split_id", experiment.slug);
     destinationUrl.searchParams.set("split_variant", selectedVariant.id);
 
-    // 5. Sticky session cookie (30 days)
+    // 6. Sticky session cookie (30 days)
     const cookieValue = `${cookieKey}=${encodeURIComponent(selectedVariant.id)}; Path=/; Max-Age=2592000; SameSite=Lax`;
     res.setHeader("Set-Cookie", cookieValue);
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
