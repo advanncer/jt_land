@@ -1,5 +1,35 @@
 import { getExperiments, recordVisit } from "./split.js";
 
+// List of known crawlers and bot patterns
+const BOT_USER_AGENTS = [
+  "facebookexternalhit",
+  "Facebot",
+  "meta-externalagent",
+  "Googlebot",
+  "bingbot",
+  "Twitterbot",
+  "LinkedInBot",
+  "TelegramBot",
+  "WhatsApp",
+  "Slackbot",
+  "Discordbot",
+  "Bytespider",
+  "YandexBot",
+  "Applebot",
+  "crawler",
+  "spider",
+  "bot",
+  "headlesschrome",
+  "lighthouse",
+];
+
+// Determine if incoming request is from a crawler / preview bot
+function isBotRequest(req) {
+  const ua = (req.headers["user-agent"] || "").toLowerCase();
+  if (!ua) return true; // Empty user agent is almost always an automated scanner
+  return BOT_USER_AGENTS.some((pattern) => ua.includes(pattern.toLowerCase()));
+}
+
 function parseCookies(cookieHeader) {
   const cookies = {};
   if (!cookieHeader) return cookies;
@@ -46,7 +76,7 @@ export default async function handler(req, res) {
       selectedVariant = experiment.variants.find((v) => v.id === cookies[cookieKey]);
     }
 
-    // 2. Pick variant based on configured weights
+    // 2. If new user, pick variant based on configured weights
     let isNewVisit = false;
     if (!selectedVariant) {
       isNewVisit = true;
@@ -63,13 +93,16 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3. Track visit
-    if (isNewVisit) {
+    // 3. Track visit ONLY if it's a real human user (Filter out Facebook preview / Googlebot)
+    const isBot = isBotRequest(req);
+    if (isNewVisit && !isBot) {
       try {
         recordVisit(experiment.id, selectedVariant.id);
       } catch (err) {
         console.error("Error recording visit:", err);
       }
+    } else if (isBot) {
+      console.log(`[Bot Filter] Ignored visit for /s/${cleanSlug} from UA: ${req.headers["user-agent"]}`);
     }
 
     // 4. Build destination URL
@@ -89,7 +122,7 @@ export default async function handler(req, res) {
     destinationUrl.searchParams.set("split_id", experiment.slug);
     destinationUrl.searchParams.set("split_variant", selectedVariant.id);
 
-    // 5. Sticky session cookie
+    // 5. Sticky session cookie (30 days)
     const cookieValue = `${cookieKey}=${encodeURIComponent(selectedVariant.id)}; Path=/; Max-Age=2592000; SameSite=Lax`;
     res.setHeader("Set-Cookie", cookieValue);
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
