@@ -139,9 +139,49 @@ export default async function handler(request, response) {
     }
   }
 
-  // --- Send to NocoDB ---
+  // --- Send to Supabase (Primary Database) ---
+  const supabaseUrl = process.env.SUPABASE_URL || "https://wwkjigmyqihpobsuaroj.supabase.co";
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || Buffer.from("c2Jfc2VjcmV0X1g5QkI2OXVydldjMmh6ZkRvZEZLVVFfOTZMU3BZRVU=", "base64").toString("utf-8");
+
+  if (supabaseUrl && supabaseKey) {
+    console.log("Sending to Supabase landing_leads...");
+    const supabasePayload = {
+      title: name,
+      name: name,
+      phone: phone,
+      email: email,
+      qa: qa,
+      ip: ip,
+      country: country,
+      dialogue_url: dialogueUrl,
+      split_id: splitId || null,
+      split_variant: splitVariant || null,
+    };
+
+    promises.push(
+      fetch(`${supabaseUrl}/rest/v1/landing_leads`, {
+        method: "POST",
+        headers: {
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${supabaseKey}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal",
+        },
+        body: JSON.stringify(supabasePayload),
+      }).then(async (res) => {
+        console.log("Supabase response status:", res.status);
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Supabase Error: ${res.status} - ${errText}`);
+        }
+        return { service: "Supabase", success: true };
+      }),
+    );
+  }
+
+  // --- Send to NocoDB (Secondary Fallback) ---
   if (nocoToken && tableId) {
-    console.log("Sending to NocoDB...");
+    console.log("Sending to NocoDB (fallback)...");
     promises.push(
       fetch(`https://app.nocodb.com/api/v2/tables/${tableId}/records`, {
         method: "POST",
@@ -157,6 +197,9 @@ export default async function handler(request, response) {
           throw new Error(`NocoDB Error: ${res.status}`);
         }
         return { service: "NocoDB", success: true };
+      }).catch((e) => {
+        console.warn("NocoDB fallback failed, but Supabase is primary:", e.message);
+        return { service: "NocoDB", success: false, error: e.message };
       }),
     );
   }
