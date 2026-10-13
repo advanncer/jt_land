@@ -27,6 +27,7 @@ export default async function handler(req, res) {
 
     // If lead details were passed (e.g. from Good Promo or form interception), save to Supabase landing_leads
     const lead = req.body?.lead;
+    let dbLeadResult = null;
     if (lead && (lead.phone || lead.email || lead.name)) {
       try {
         let phone = lead.phone || "";
@@ -49,23 +50,26 @@ export default async function handler(req, res) {
           split_variant: splitVariant,
         };
 
-        await fetch(`${SUPABASE_URL}/rest/v1/landing_leads`, {
+        const dbRes = await fetch(`${SUPABASE_URL}/rest/v1/landing_leads`, {
           method: "POST",
           headers: {
             "apikey": SUPABASE_KEY,
             "Authorization": `Bearer ${SUPABASE_KEY}`,
             "Content-Type": "application/json",
-            "Prefer": "return=minimal",
+            "Prefer": "return=representation",
           },
           body: JSON.stringify(leadPayload),
         });
-        console.log("[Track-Conversion] Saved lead to Supabase landing_leads:", leadPayload.phone);
+        const dbText = await dbRes.text();
+        dbLeadResult = { status: dbRes.status, body: dbText };
+        console.log("[Track-Conversion] DB result:", dbRes.status, dbText);
       } catch (dbErr) {
+        dbLeadResult = { error: dbErr.message };
         console.error("[Track-Conversion] Error saving lead to Supabase:", dbErr);
       }
     }
 
-    return res.status(200).json({ success, splitId, splitVariant });
+    return res.status(200).json({ success, splitId, splitVariant, dbLeadResult });
   } catch (err) {
     console.error("Error tracking external conversion:", err);
     return res.status(500).json({ error: err.message });
