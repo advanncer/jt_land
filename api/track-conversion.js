@@ -36,6 +36,7 @@ export default async function handler(req, res) {
         }
 
         const leadPayload = {
+          id: Date.now(),
           title: lead.name || "GoodPromo Lead",
           name: lead.name || "",
           phone: phone,

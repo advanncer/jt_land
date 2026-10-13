@@ -146,6 +146,7 @@ export default async function handler(request, response) {
   if (supabaseUrl && supabaseKey) {
     console.log("Sending to Supabase landing_leads...");
     const supabasePayload = {
+      id: Date.now(),
       title: name,
       name: name,
       phone: phone,
