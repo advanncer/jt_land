@@ -1,0 +1,34 @@
+name: Supabase Keep-Alive Heartbeat
+
+on:
+  schedule:
+    # Run every 2 days at 06:00 UTC (well within Supabase 7-day inactivity threshold)
+    - cron: '0 6 */2 * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions web UI
+
+jobs:
+  heartbeat:
+    name: Supabase Activity Ping
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API (Direct Database Pulse)
+        run: |
+          echo "Sending keep-alive pulse to Supabase..."
+          SUPA_KEY=$(echo "c2Jfc2VjcmV0X1g5QkI2OXVydldjMmh6ZkRvZEZLVVFfOTZMU3BZRVU=" | base64 -d)
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: $SUPA_KEY" \
+            -H "Authorization: Bearer $SUPA_KEY" \
+            "https://wwkjigmyqihpobsuaroj.supabase.co/rest/v1/smart_split_experiments?select=id&limit=1")
+          
+          echo "Supabase HTTP response: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "SUCCESS: Supabase project is active and alive!"
+          else
+            echo "ERROR: Unexpected status $HTTP_STATUS from Supabase"
+            exit 1
+          fi
+
+      - name: Ping Vercel /api/keep-alive
+        run: |
+          echo "Pinging Vercel Keep-Alive endpoint..."
+          curl -s -f "https://lp.justschool.me/api/keep-alive" || true

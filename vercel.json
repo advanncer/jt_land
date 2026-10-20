@@ -280,5 +280,11 @@
       "destination": "/free-products/astro-english",
       "permanent": true
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/keep-alive",
+      "schedule": "0 7 * * *"
+    }
   ]
 }
