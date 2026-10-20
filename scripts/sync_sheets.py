@@ -85,6 +85,24 @@ CATEGORIES = [
                 "analytics": "GA4: quiz_step_reach, form_success\nFB Pixel: Lead, Purchase\nCRM: NocoDB (Excel), Google Sheets, eSputnik"
             },
             {
+                "id": "eng-adult/b2b_metinvest",
+                "product": "B2B Англійська: Метінвест",
+                "audience": "Співробітники компанії Метінвест",
+                "url": "https://lp.justschool.me/eng-adult/b2b_metinvest/?leadType=english-for-adults",
+                "lead_type": "english-for-adults-b2b",
+                "description": "Корпоративний квіз JustSchool × Метінвест: визначення рівня, цілей, інтенсивності занять без переходу в онбординг, збереження у вкладку 'Метінвест' Google Таблиці.",
+                "analytics": "FB Pixel: Lead, Purchase\nGTM: GTM-P6BDRT25\nCRM: Google Sheets (Метінвест)"
+            },
+            {
+                "id": "eng-adult/b2b_brsm",
+                "product": "B2B Англійська: БРСМ-Нафта",
+                "audience": "Співробітники мережі АЗК БРСМ-Нафта",
+                "url": "https://lp.justschool.me/b2b_brsm",
+                "lead_type": "english-for-adults-b2b",
+                "description": "Корпоративний квіз JustSchool × БРСМ-Нафта: фірмовий янтарно-чорний дизайн, опитування без редіректу в онбординг, збереження у вкладку 'БРСМ-Нафта' Google Таблиці.",
+                "analytics": "FB Pixel: Lead, Purchase\nGTM: GTM-P6BDRT25\nCRM: Google Sheets (БРСМ-Нафта)"
+            },
+            {
                 "id": "eng-adult/lp_test1",
                 "product": "Англійська для дорослих (LP Test 1)",
                 "audience": "Дорослі студенти (18+)",
@@ -207,6 +225,15 @@ CATEGORIES = [
         "category": "🎁 БЕЗКОШТОВНІ ПРОДУКТИ / СПЕЦПРОЄКТИ / ЛІД-МАГНІТИ",
         "items": [
             {
+                "id": "blogger/halloween",
+                "product": "🎃 Хелловін Sale до -50% (Блогери & Платний трафік)",
+                "audience": "Трафік від інфлюенсерів, блогерів та платний трафік (дорослі, діти, підлітки)",
+                "url": "https://lp.justschool.me/blogger",
+                "lead_type": "english-for-adults / english-for-children / programming-for-children / math-for-children",
+                "description": "Хелловінська інтерактивна мультинаправлена воронка за SMM-креативом (казан із зіллям, привиди, кажани) зі знижкою до -50% на всі курси (англійська для дорослих/дітей, програмування, математика). Автоматичний редірект в онбординг, GTM, FB Pixel.",
+                "analytics": "GTM: GTM-P6BDRT25 (quiz_step_reach, form_success)\nFB Pixel: 9067851526565677 (PageView, Lead, Purchase)\nCRM: /api/submit -> n8n -> Onboarding"
+            },
+            {
                 "id": "blogger/lp1",
                 "product": "Англійська (Блогери)",
                 "audience": "Трафік від інфлюенсерів",
@@ -232,6 +259,20 @@ CATEGORIES = [
                 "lead_type": "english-for-adults",
                 "description": "Лендинг роздачі комбо-паку безкоштовних навчальних гайдів та матеріалів в обмін на контакти.",
                 "analytics": "GA4, FB Pixel: Lead"
+            }
+        ]
+    },
+    {
+        "category": "💼 РЕКРУТИНГ ТА ВАКАНСІЇ (Recruitment)",
+        "items": [
+            {
+                "id": "job_justtech",
+                "product": "JustTech: Робота в чатах зі смартфона",
+                "audience": "Кандидати на вакансію чат-менеджера (16–35 років)",
+                "url": "https://lp.justschool.me/job_justtech",
+                "lead_type": "job_justtech",
+                "description": "Онбординг-воронка для пошуку кандидатів у команду чат-підтримки зі смартфона. Інтеграція з окремою Google Таблицею та Facebook Pixel.",
+                "analytics": "FB Pixel: 9067851526565677 (Lead, Purchase)\nCRM: Google Sheets, NocoDB"
             }
         ]
     }

@@ -88,6 +88,7 @@ export default defineConfig({
           "eng-adult/lp_test1/index.html",
         ),
         jobJusttech: resolve(__dirname, "job_justtech/index.html"),
+        bloggerHalloween: resolve(__dirname, "blogger/halloween/index.html"),
         splitter: resolve(__dirname, "splitter/index.html"),
       },
     },

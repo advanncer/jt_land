@@ -78,12 +78,24 @@
       "destination": "/free-products/combo-lead-magnit/:path*"
     },
     {
+      "source": "/blogger",
+      "destination": "/blogger/halloween/index.html"
+    },
+    {
+      "source": "/blogger/halloween",
+      "destination": "/blogger/halloween/index.html"
+    },
+    {
+      "source": "/blogger/halloween/:path*",
+      "destination": "/blogger/halloween/index.html"
+    },
+    {
       "source": "/blogger/lp1",
-      "destination": "/blogger/lp1/index.html"
+      "destination": "/blogger/halloween/index.html"
     },
     {
       "source": "/blogger/lp1/:path*",
-      "destination": "/blogger/lp1/:path*"
+      "destination": "/blogger/halloween/index.html"
     },
     {
       "source": "/eng-adult/lp_pains",
