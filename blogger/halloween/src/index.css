@@ -77,6 +77,18 @@ body {
   }
 }
 
+@keyframes spiderSwing {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(8deg);
+  }
+  75% {
+    transform: rotate(-8deg);
+  }
+}
+
 .animate-ghost {
   animation: floatGhost 4s ease-in-out infinite;
 }
@@ -87,6 +99,11 @@ body {
 
 .animate-bat {
   animation: batHover 3s ease-in-out infinite;
+}
+
+.animate-spider {
+  transform-origin: top center;
+  animation: spiderSwing 3.5s ease-in-out infinite;
 }
 
 .animate-bubble-1 {

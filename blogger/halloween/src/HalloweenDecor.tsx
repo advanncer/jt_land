@@ -184,3 +184,55 @@ export const WitchHat: React.FC<{ className?: string }> = ({ className = "" }) =
     <rect x="23" y="29.5" width="4" height="4" rx="1" fill="#FF7A00" />
   </svg>
 );
+
+// Cute Hanging Spider on a silk thread
+export const HangingSpider: React.FC<{ className?: string }> = ({ className = "" }) => (
+  <svg
+    viewBox="0 0 60 90"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={`w-10 h-16 ${className}`}
+  >
+    {/* Silk Thread */}
+    <line x1="30" y1="0" x2="30" y2="45" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" strokeDasharray="3 2" />
+
+    {/* Spider Body */}
+    <g transform="translate(0, 40)">
+      {/* Legs (Left) */}
+      <path d="M26 12 Q14 2 10 14" stroke="#161717" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M26 15 Q10 8 6 22" stroke="#161717" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M26 18 Q12 24 8 32" stroke="#161717" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M26 21 Q16 32 12 40" stroke="#161717" strokeWidth="2.5" strokeLinecap="round" />
+
+      {/* Legs (Right) */}
+      <path d="M34 12 Q46 2 50 14" stroke="#161717" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M34 15 Q50 8 54 22" stroke="#161717" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M34 18 Q48 24 52 32" stroke="#161717" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M34 21 Q44 32 48 40" stroke="#161717" strokeWidth="2.5" strokeLinecap="round" />
+
+      {/* Main Body (Abdomen) */}
+      <ellipse cx="30" cy="22" rx="10" ry="12" fill="#1A1E26" stroke="#8EE53F" strokeWidth="1.5" />
+
+      {/* Head */}
+      <circle cx="30" cy="11" r="6" fill="#161922" />
+
+      {/* Big Cute Eyes */}
+      <circle cx="27.5" cy="11" r="2.2" fill="#FFFFFF" />
+      <circle cx="32.5" cy="11" r="2.2" fill="#FFFFFF" />
+      <circle cx="28" cy="11" r="1.2" fill="#0B0E14" />
+      <circle cx="33" cy="11" r="1.2" fill="#0B0E14" />
+
+      {/* Eye highlights */}
+      <circle cx="27.5" cy="10.2" r="0.6" fill="#8EE53F" />
+      <circle cx="32.5" cy="10.2" r="0.6" fill="#8EE53F" />
+
+      {/* Little smile */}
+      <path d="M28 14 Q30 16 32 14" stroke="#FF7A00" strokeWidth="1" strokeLinecap="round" fill="none" />
+
+      {/* Back spots */}
+      <circle cx="30" cy="20" r="2" fill="#FF7A00" opacity="0.8" />
+      <circle cx="27" cy="25" r="1.2" fill="#8EE53F" opacity="0.8" />
+      <circle cx="33" cy="25" r="1.2" fill="#8EE53F" opacity="0.8" />
+    </g>
+  </svg>
+);

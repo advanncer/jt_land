@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Quiz from './Quiz';
 import { QUIZ_QUESTIONS } from './data';
-import { CuteGhost, FlyingBat, SpiderWeb, WitchCauldron, WitchHat } from './HalloweenDecor';
+import { CuteGhost, FlyingBat, SpiderWeb, WitchCauldron, WitchHat, HangingSpider } from './HalloweenDecor';
 import './index.css';
 
 const logoWhite = '/assets/logo-horizontal-white.svg';
@@ -202,7 +202,20 @@ export default function App() {
       </div>
 
       {/* --- Main App Container (Mobile & Desktop Phone Simulator) --- */}
-      <div className="w-full max-w-[560px] bg-[#0e131d]/90 relative z-10 min-h-screen shadow-2xl flex flex-col border-x border-white/10 backdrop-blur-md">
+      <div className="w-full max-w-[560px] bg-[#0e131d]/90 relative z-10 min-h-screen shadow-2xl flex flex-col border-x border-white/10 backdrop-blur-md overflow-hidden">
+        {/* Corner Spiderwebs in container */}
+        <div className="absolute top-0 right-0 pointer-events-none z-10">
+          <SpiderWeb className="w-14 h-14 sm:w-16 sm:h-16 opacity-40 -scale-x-100" />
+        </div>
+        <div className="absolute top-0 left-0 pointer-events-none z-10">
+          <SpiderWeb className="w-14 h-14 sm:w-16 sm:h-16 opacity-40" />
+        </div>
+
+        {/* Cute Hanging Spider on Silk Thread - VISIBLE ON MOBILE */}
+        <div className="absolute top-0 right-3 sm:right-5 z-30 animate-spider pointer-events-none drop-shadow-[0_2px_10px_rgba(142,229,63,0.4)]">
+          <HangingSpider className="w-8 h-14 sm:w-10 sm:h-16" />
+        </div>
+
         {/* Progress Bar */}
         {!isRedirecting && (
           <div className="sticky top-0 w-full h-[5px] bg-white/5 backdrop-blur-md z-30">
@@ -240,25 +253,30 @@ export default function App() {
             </div>
           </div>
 
-          {/* Halloween Sale Mini Badge */}
-          <div className="flex items-center justify-end">
-            <span className="px-2.5 py-1 rounded-full bg-[#8ee53f]/20 border border-[#8ee53f]/40 text-[#8ee53f] text-xs font-bold font-halloween tracking-wider uppercase">
+          {/* Halloween Sale Mini Badge (positioned to leave room for hanging spider) */}
+          <div className="flex items-center justify-end pr-6 sm:pr-8">
+            <span className="px-2.5 py-1 rounded-full bg-[#8ee53f]/20 border border-[#8ee53f]/40 text-[#8ee53f] text-xs font-bold font-halloween tracking-wider uppercase shadow-[0_0_10px_rgba(142,229,63,0.3)]">
               SALE -50%
             </span>
           </div>
         </header>
 
-        {/* Promo Top Strip (Matching SMM Creative) */}
+        {/* Promo Top Strip (Matching SMM Creative) with Mobile-Visible Cute Ghost */}
         {!isRedirecting && (
-          <div className="w-full px-5 pt-4 pb-2">
-            <div className="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-[#1f0e30] via-[#122312] to-[#251508] border border-[#8ee53f]/30 flex items-center justify-between gap-2 shadow-[0_0_15px_rgba(142,229,63,0.15)]">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">🎃</span>
-                <span className="text-xs sm:text-sm font-bold text-white uppercase tracking-wide">
-                  SPECIAL OFFER: <span className="text-[#8ee53f] font-halloween text-base">HALLOWEEN SALE</span>
+          <div className="w-full px-4 sm:px-5 pt-5 pb-2 relative z-20">
+            {/* Cute Ghost floating visibly on mobile right above the promo banner */}
+            <div className="absolute -top-4 left-2 sm:left-3 z-30 animate-ghost pointer-events-none drop-shadow-[0_0_15px_rgba(142,229,63,0.5)]">
+              <CuteGhost className="w-12 h-14 sm:w-16 sm:h-20" />
+            </div>
+
+            <div className="w-full py-2.5 pl-12 sm:pl-16 pr-3.5 rounded-2xl bg-gradient-to-r from-[#1f0e30] via-[#122312] to-[#251508] border border-[#8ee53f]/30 flex items-center justify-between gap-2 shadow-[0_0_15px_rgba(142,229,63,0.15)] relative overflow-hidden">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-base sm:text-xl">🎃</span>
+                <span className="text-[11px] sm:text-sm font-bold text-white uppercase tracking-wide">
+                  SPECIAL OFFER: <span className="text-[#8ee53f] font-halloween text-sm sm:text-base">HALLOWEEN SALE</span>
                 </span>
               </div>
-              <span className="text-xs text-[#ff9e3b] font-bold whitespace-nowrap">
+              <span className="text-[10px] sm:text-xs text-[#ff9e3b] font-bold whitespace-nowrap bg-[#ff7a00]/15 px-2 py-0.5 rounded-full border border-[#ff7a00]/30">
                 на усі курси
               </span>
             </div>
