@@ -113,11 +113,8 @@ export default function App() {
     if (isSubmitting || isRedirecting) return;
     setIsSubmitting(true);
 
-    // Track Facebook Lead event
-    if (window.fbq) {
-      window.fbq('track', 'Lead');
-      window.fbq('track', 'Purchase', { currency: 'UAH', value: 0 });
-    }
+    // Client-side fbq Purchase/Lead disabled to match GoodPromo (GP) standard:
+    // Conversions are sent server-side via n8n CAPI on /api/submit.
 
     // Build QA formatted string
     const ipString = `ip:${ipInfo.ip || 'unknown'}|country:${ipInfo.country || 'unknown'}`;

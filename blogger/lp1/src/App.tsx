@@ -122,10 +122,8 @@ const App: React.FC = () => {
     }
 
     if (step === 9) {
-      if (window.fbq) {
-        // Use 'Purchase' for both funnels now
-        window.fbq("track", "Purchase", { currency: "UAH", value: 0 });
-      }
+      // Client-side fbq Purchase disabled to match GoodPromo (GP) standard:
+      // Conversions are sent server-side via n8n CAPI on /api/submit.
       submitToCRM(newAnswers);
     }
 

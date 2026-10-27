@@ -141,17 +141,8 @@ export default function App() {
     };
 
     try {
-      if (window.fbq) {
-        window.fbq('trackSingle', '9067851526565677', 'Purchase', {
-          currency: 'UAH',
-          value: 0,
-        });
-        window.fbq('trackSingle', '1033701209166819', 'Purchase', {
-          currency: 'UAH',
-          value: 0,
-        });
-        window.fbq('track', 'Lead');
-      }
+      // Client-side fbq Purchase/Lead disabled to match GoodPromo (GP) standard:
+      // Conversions are sent server-side via n8n CAPI on /api/submit.
       if (typeof window.gtag === 'function') {
         window.gtag('event', 'conversion', {
           send_to: 'AW-11192598375/F6HqCOzpsMEcEOf-hdkp',

@@ -334,9 +334,8 @@ export default function App() {
           quiz_name: "lp-check-up",
         });
 
-        if (window.fbq) {
-          window.fbq("track", "Purchase", { currency: "UAH", value: 0 });
-        }
+        // Client-side fbq Purchase disabled to match GoodPromo (GP) standard:
+        // Conversions are sent server-side via n8n CAPI on /api/submit.
         const result = await response.json();
         if (result.redirectUri) {
           window.location.href = result.redirectUri;

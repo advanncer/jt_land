@@ -147,10 +147,8 @@ export default function App() {
     };
 
     try {
-      if ((window as any).fbq) {
-        (window as any).fbq('track', 'Lead');
-        (window as any).fbq('track', 'Purchase', { currency: 'UAH', value: 0 });
-      }
+      // Client-side fbq Purchase/Lead disabled to match GoodPromo (GP) standard:
+      // Conversions (Purchase) are sent server-side via n8n Conversions API (CAPI) on /api/submit.
 
       const res = await fetch('/api/submit', {
         method: 'POST',

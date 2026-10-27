@@ -18,12 +18,8 @@ function pushAnalytics(event: string, data: Record<string, any> = {}) {
 }
 
 function triggerFbLead() {
-  try {
-    if ((window as any).fbq) {
-      (window as any).fbq('track', 'Lead');
-      (window as any).fbq('track', 'Purchase', { currency: 'UAH', value: 0 });
-    }
-  } catch {}
+  // Client-side fbq Purchase/Lead disabled to match GoodPromo (GP) standard:
+  // Conversions (Purchase) are sent server-side via n8n Conversions API (CAPI) on /api/submit.
 }
 
 export default function App() {

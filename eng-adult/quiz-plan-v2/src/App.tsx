@@ -163,10 +163,9 @@ export default function App() {
     };
 
     try {
-      if ((window as any).fbq) {
-        (window as any).fbq('track', 'Lead');
-        (window as any).fbq('track', 'Purchase', { currency: 'UAH', value: 0 });
-      }
+      // Client-side fbq Purchase/Lead disabled to match GoodPromo (GP) standard:
+      // Conversions (Purchase) are sent server-side via n8n Conversions API (CAPI) on /api/submit.
+      // Sending it in browser without matching event_id caused 2x Purchase duplication in Meta Ads.
 
       const fallbackTimer = setTimeout(() => {
         window.location.href = 'https://justschool.me/uk/onboarding';
