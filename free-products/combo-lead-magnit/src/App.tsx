@@ -103,21 +103,16 @@ const App: React.FC = () => {
     };
 
     try {
-      
-      // Відправка даних у n8n
-      fetch("https://n8n.justschool.me/webhook/626983b2-94fe-4277-91fb-123aa3f6370d", {
+      // Маршрутизація через надійний бекенд /api/submit для запобігання втрати лідів через блокувальники реклами та CORS
+      await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }).catch(err => console.error("n8n Webhook Error:", err));
-
-      // Відправка GET запиту для обходу CORS і редиректів Google Apps Script
-      const queryParams = new URLSearchParams(payload as Record<string, string>).toString();
-      const urlWithParams = `${GOOGLE_SHEETS_WEBHOOK_URL}?${queryParams}`;
-      
-      await fetch(urlWithParams, {
-        method: "GET",
-        mode: "no-cors"
+        body: JSON.stringify({
+          ...payload,
+          n8nWebhookUrl: "https://n8n.justschool.me/webhook/626983b2-94fe-4277-91fb-123aa3f6370d",
+          googleSheetsWebhookUrl: GOOGLE_SHEETS_WEBHOOK_URL,
+          saveToGoogleSheets: true,
+        }),
       });
 
       if (window.fbq) {

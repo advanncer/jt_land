@@ -50,6 +50,7 @@ export default function App() {
   const [leadName, setLeadName] = useState("");
   const [leadPhone, setLeadPhone] = useState("");
   const [leadEmail, setLeadEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [loaderProgress, setLoaderProgress] = useState(0);
 
   const currentStep = quizData.find((s) => s.step === step);
@@ -84,6 +85,9 @@ export default function App() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     const qaArray = Object.entries(answers).map(([step, answer]) => `Q${step}: ${answer}`);
     const qaString = qaArray.join("|||");
     const urlParams = new URLSearchParams(window.location.search);
@@ -102,7 +106,8 @@ export default function App() {
     };
 
     try {
-      if ((window as any).fbq) (window as any).fbq("track", "Lead");
+      // Client-side fbq Purchase/Lead disabled to match GoodPromo (GP) standard:
+      // Conversions are sent server-side via n8n CAPI on /api/submit.
       const response = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -240,9 +245,9 @@ export default function App() {
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-4 w-full">
-                      <input type="email" placeholder={currentStep.form?.email_placeholder || "Ваш e-mail"} required className="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-lg font-black text-slate-900 bg-white shadow-sm text-center" value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} />
-                      <input type="tel" placeholder={currentStep.form?.phone_placeholder || "Твій номер телефону"} required className="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-lg font-black text-slate-900 bg-white shadow-sm text-center" value={leadPhone} onChange={(e) => setLeadPhone(formatPhoneNumber(e.target.value))} maxLength={19} />
-                      <button type="submit" disabled={leadPhone.replace(/\D/g, "").length !== 12} className="w-full py-5 bg-orange-500 text-white rounded-2xl font-black text-lg shadow-lg shadow-orange-200 active:scale-95 transition-all disabled:opacity-30 uppercase tracking-widest">{currentStep.form?.cta || "Відправити"}</button>
+                      <input type="email" placeholder={currentStep.form?.email_placeholder || "Ваш e-mail"} required disabled={isSubmitting} className="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-lg font-black text-slate-900 bg-white shadow-sm text-center disabled:opacity-50" value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} />
+                      <input type="tel" placeholder={currentStep.form?.phone_placeholder || "Твій номер телефону"} required disabled={isSubmitting} className="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-orange-500 transition-all text-lg font-black text-slate-900 bg-white shadow-sm text-center disabled:opacity-50" value={leadPhone} onChange={(e) => setLeadPhone(formatPhoneNumber(e.target.value))} maxLength={19} />
+                      <button type="submit" disabled={isSubmitting || leadPhone.replace(/\D/g, "").length !== 12} className="w-full py-5 bg-orange-500 text-white rounded-2xl font-black text-lg shadow-lg shadow-orange-200 active:scale-95 transition-all disabled:opacity-30 uppercase tracking-widest">{isSubmitting ? "Надсилаємо заявку..." : (currentStep.form?.cta || "Відправити")}</button>
                       {currentStep.guarantee_text && <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-4">{currentStep.guarantee_text}</p>}
                     </form>
                   )}

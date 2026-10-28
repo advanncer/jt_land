@@ -23,6 +23,7 @@ const App: React.FC = () => {
   const [answers, setAnswers] = useState<Record<number, string[]>>({});
   const [ipInfo, setIpInfo] = useState<{ ip?: string; country?: string }>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Check if we are on the Telegram Bot Funnel version
   const isTgVersion = true;
@@ -46,6 +47,8 @@ const App: React.FC = () => {
   const progress = step === 1 ? 0 : ((step - 1) / (totalSteps - 1)) * 100;
 
   const submitToCRM = async (finalAnswers: Record<number, string[]>) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     const formStepIndex = 15;
     const formDataJson = finalAnswers[formStepIndex]?.[0];
     if (!formDataJson) return;
@@ -116,6 +119,7 @@ const App: React.FC = () => {
   };
 
   const handleNextStep = (stepAnswers?: string[]) => {
+    if (isSubmitting) return;
     let newAnswers = answers;
     if (stepAnswers) {
       newAnswers = { ...answers, [step]: stepAnswers };
@@ -204,7 +208,7 @@ const App: React.FC = () => {
         )}
 
         {/* Content Area */}
-        <Quiz step={step} onNextStep={handleNextStep} />
+        <Quiz step={step} onNextStep={handleNextStep} isSubmitting={isSubmitting} />
       </div>
     </div>
   );

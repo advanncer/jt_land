@@ -134,15 +134,15 @@ export default function App() {
         Lead_type: "Astro_English_Quiz",
       };
 
-      fetch(N8N_WEBHOOK_URL, {
+      fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }).catch(() => {});
-      const qp = new URLSearchParams(payload as any).toString();
-      fetch(`${GOOGLE_SHEETS_WEBHOOK_URL}?${qp}`, {
-        method: "GET",
-        mode: "no-cors",
+        body: JSON.stringify({
+          ...payload,
+          n8nWebhookUrl: N8N_WEBHOOK_URL,
+          googleSheetsWebhookUrl: GOOGLE_SHEETS_WEBHOOK_URL,
+          saveToGoogleSheets: true,
+        }),
       }).catch(() => {});
 
       if (window.fbq) {

@@ -125,7 +125,8 @@ const App: React.FC = () => {
     };
 
     try {
-      if ((window as any).fbq) (window as any).fbq("track", "Lead");
+      // Client-side fbq Purchase/Lead disabled to match GoodPromo (GP) standard:
+      // Conversions are sent server-side via n8n CAPI on /api/submit.
       const response = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

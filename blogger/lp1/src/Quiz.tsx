@@ -30,6 +30,7 @@ const stepImages: { [key: number]: string } = {
 interface QuizProps {
   step: number;
   onNextStep: (answers?: string[]) => void;
+  isSubmitting?: boolean;
 }
 
 /* --- UI COMPONENTS --- */
@@ -107,7 +108,7 @@ const formatPhoneNumber = (value: string) => {
 
 /* --- MAIN COMPONENT --- */
 
-const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
+const Quiz: React.FC<QuizProps> = ({ step, onNextStep, isSubmitting = false }) => {
   const currentStepData = quizData.find((item) => item.step === step);
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
 
@@ -167,7 +168,7 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
 
   const isFirstStep = step === 1;
   let isButtonDisabled = false;
-  if (currentStepData.form) { isButtonDisabled = !isFormValid; }
+  if (currentStepData.form) { isButtonDisabled = !isFormValid || isSubmitting; }
   else if (currentStepData.multiselect) { isButtonDisabled = selectedAnswers.length === 0; }
 
   const currentImage = stepImages[step];
@@ -253,16 +254,16 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
               {currentStepData.form && (
                 <div className="flex flex-col gap-4 w-full mt-4">
                   <div className="space-y-4">
-                    <input type="text" placeholder="Ваше імʼя*" className="input-glass py-4 text-lg w-full" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                    <input type="text" placeholder="Ваше імʼя*" disabled={isSubmitting} className="input-glass py-4 text-lg w-full disabled:opacity-50" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
                     
                     <div className="relative w-full">
                       <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none gap-2">
                         <span className="text-xl">🇺🇦</span>
                       </div>
-                      <input type="tel" placeholder="+380 (XX) XXX-XX-XX" className="input-glass py-4 pl-12 text-lg w-full" value={formData.phone} onChange={handlePhoneChange} maxLength={19} />
+                      <input type="tel" placeholder="+380 (XX) XXX-XX-XX" disabled={isSubmitting} className="input-glass py-4 pl-12 text-lg w-full disabled:opacity-50" value={formData.phone} onChange={handlePhoneChange} maxLength={19} />
                     </div>
 
-                    <input type="email" placeholder="Ваш e-mail" className="input-glass py-4 text-lg w-full" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                    <input type="email" placeholder="Ваш e-mail" disabled={isSubmitting} className="input-glass py-4 text-lg w-full disabled:opacity-50" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
                   </div>
                 </div>
               )}
@@ -280,7 +281,7 @@ const Quiz: React.FC<QuizProps> = ({ step, onNextStep }) => {
       {currentStepData.cta && (
         <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 bg-gradient-to-t from-black via-black/95 to-transparent pt-6 px-6 pb-12 backdrop-blur-[2px]">
             <ShimmerButton onClick={handleNextClick} disabled={isButtonDisabled}>
-              {currentStepData.cta}
+              {currentStepData.form && isSubmitting ? "Надсилаємо заявку..." : currentStepData.cta}
             </ShimmerButton>
         </div>
       )}
