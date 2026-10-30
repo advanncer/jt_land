@@ -747,6 +747,17 @@ export default function App() {
                   <span>{currentZone.ctaText}</span>
                   <ArrowRight size={20} />
                 </button>
+                <a
+                  href="https://t.me/+L_g5QbqbbqsxYzU6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-4 bg-[#229ED9] hover:bg-[#1E8EC4] text-white font-black text-sm sm:text-base rounded-2xl shadow-md shadow-sky-500/20 transition-all flex items-center gap-2.5"
+                >
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                  </svg>
+                  <span>Перейти в наш Telegram →</span>
+                </a>
                 <button
                   type="button"
                   onClick={handleRestart}
@@ -804,6 +815,37 @@ export default function App() {
                   Розраховано за середньою ставкою HR-спеціаліста $12/год
                 </p>
               </div>
+            </div>
+
+            {/* Telegram Community Card */}
+            <div className="glass-panel-elevated rounded-3xl p-6 sm:p-7 shadow-xl border-2 border-sky-100/80 bg-gradient-to-r from-sky-50/60 via-white to-orange-50/30 flex flex-col sm:flex-row items-center justify-between gap-5">
+              <div className="flex items-start sm:items-center gap-4">
+                <div className="w-13 h-13 rounded-2xl bg-[#229ED9] text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/25">
+                  <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-wider text-[#0284c7] mb-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#0284c7]" />
+                    Офіційна спільнота JustSchool Business
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-snug">
+                    Спільнота HR & People Partners у Telegram
+                  </h3>
+                  <p className="text-xs sm:text-sm font-medium text-slate-600 mt-0.5 leading-relaxed">
+                    Обмін практиками, шаблони оптимізації рутини та поради щодо навчання команд без зайвої бюрократії.
+                  </p>
+                </div>
+              </div>
+              <a
+                href="https://t.me/+L_g5QbqbbqsxYzU6"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 w-full sm:w-auto px-7 py-4 bg-[#229ED9] hover:bg-[#1E8EC4] text-white font-black text-sm sm:text-base rounded-2xl shadow-lg shadow-sky-500/25 transition-all flex items-center justify-center gap-2.5"
+              >
+                <span>Перейти в Telegram →</span>
+              </a>
             </div>
 
             {/* Breakdown of Processes & Actionable recommendation */}
@@ -1004,13 +1046,26 @@ export default function App() {
                   Дякуємо! Наш B2B Account Director зв'яжеться з вами найближчим часом для узгодження
                   зручного часу онлайн-демо.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setIsDemoModalOpen(false)}
-                  className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl transition-colors"
-                >
-                  Зрозуміло
-                </button>
+                <div className="pt-2 flex flex-col gap-2.5">
+                  <a
+                    href="https://t.me/+L_g5QbqbbqsxYzU6"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-4 bg-[#229ED9] hover:bg-[#1E8EC4] text-white font-black text-base rounded-2xl shadow-lg shadow-sky-500/25 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
+                  >
+                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                    </svg>
+                    <span>Перейти в наш Telegram →</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setIsDemoModalOpen(false)}
+                    className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl transition-colors cursor-pointer"
+                  >
+                    Закрити вікно
+                  </button>
+                </div>
               </div>
             )}
           </div>

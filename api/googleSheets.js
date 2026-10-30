@@ -595,3 +595,125 @@ export async function saveLeadToJobJustTechSheet(data) {
   }
 }
 
+export async function saveLeadToB2bCalcSheet(data) {
+  try {
+    console.log("=== saveLeadToB2bCalcSheet called ===");
+    const token = await getAccessToken();
+
+    const now = new Date();
+    const kyivDateStr = now.toLocaleString("uk-UA", {
+      timeZone: "Europe/Kiev",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+
+    const name = data.name || data.Name || "";
+    let rawPhone = String(data.phone || data.Phone || "").trim();
+    let phone = rawPhone;
+    if (rawPhone) {
+      const digits = rawPhone.replace(/\D/g, "");
+      phone = `'${digits ? "+" + digits : rawPhone}`;
+    }
+    const email = data.email || data.Email || "";
+    const company = data.company || "Не вказано";
+    const companySize = data.companySize || parseFromQa(data.qa, "Розмір компанії:") || "";
+    const weekHours = data.totalHoursWeek !== undefined && data.totalHoursWeek !== null ? String(data.totalHoursWeek) : parseFromQa(data.qa, "Втрати на тиждень:");
+    const monthHours = data.totalHoursMonth !== undefined && data.totalHoursMonth !== null ? String(data.totalHoursMonth) : parseFromQa(data.qa, "Втрати на місяць:");
+    const monthMoney = data.totalMoneyMonth !== undefined && data.totalMoneyMonth !== null ? `$${data.totalMoneyMonth}` : parseFromQa(data.qa, "Фінансові збитки:");
+    const zone = data.zone || parseFromQa(data.qa, "Зона автоматизації:") || "";
+    const topProcess = data.topProcess || "";
+
+    const isDemo = data.dialogueId === "b2b_calc_demo" || (data.qa && data.qa.includes("[DEMO REQUEST]"));
+    const leadType = isDemo ? "Запис на Демо" : "Аудит рутини";
+    let comment = "";
+    if (isDemo && data.qa) {
+      comment = parseFromQa(data.qa, "[DEMO REQUEST] Примітка / Зручний час:");
+    }
+
+    const qa = data.qa || "";
+    let qaDetails = "";
+    if (qa && typeof qa === "string") {
+      const parts = qa.split("|||");
+      const qParts = parts.filter((p) => p.trim().startsWith("Q"));
+      qaDetails = qParts.join("\n");
+    }
+
+    let ip = "";
+    let country = "";
+    if (qa && typeof qa === "string") {
+      const matchIp = qa.match(/ip:(.*?)\|/);
+      const matchCountry = qa.match(/country:(.*?)(?:\|\|\||$)/);
+      if (matchIp) ip = matchIp[1].trim();
+      if (matchCountry) country = matchCountry[1].trim();
+    }
+    if (!ip) ip = data.ip || "";
+    if (!country) country = data.country || data.geo || "";
+
+    const utmSource = data.utm_source || "";
+    const utmMedium = data.utm_medium || "";
+    const utmCampaign = data.utm_campaign || "";
+    const dialogueUrl = data.dialogueUrl || data.url || "";
+
+    const row = [
+      kyivDateStr,
+      name,
+      phone,
+      email,
+      company,
+      companySize,
+      weekHours,
+      monthHours,
+      monthMoney,
+      zone,
+      topProcess,
+      leadType,
+      comment,
+      qaDetails,
+      ip,
+      country,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      dialogueUrl,
+    ];
+
+    console.log("Appending row to HR-калькулятор Google Sheets:", JSON.stringify(row));
+
+    const sheetRange = encodeURIComponent("HR-калькулятор!A:T");
+    const appendUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${sheetRange}:append?valueInputOption=USER_ENTERED`;
+
+    const res = await fetch(appendUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        values: [row],
+      }),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error(
+        `Failed to append row to HR-калькулятор Google Sheet (${res.status}):`,
+        errBody,
+      );
+      return { success: false, error: errBody };
+    }
+
+    const resData = await res.json();
+    console.log("Successfully appended row to HR-калькулятор Google Sheet:", resData.updates);
+    return { success: true, updates: resData.updates };
+  } catch (err) {
+    console.error("Error in saveLeadToB2bCalcSheet:", err);
+    return { success: false, error: err.message };
+  }
+}
+
+

@@ -4,6 +4,7 @@ import {
   saveLeadToMetinvestSheet,
   saveLeadToBrsmSheet,
   saveLeadToJobJustTechSheet,
+  saveLeadToB2bCalcSheet,
 } from "./googleSheets.js";
 
 // Helper to detect if a phone number is a dummy/fake number or has invalid carrier codes
@@ -258,8 +259,24 @@ export default async function handler(request, response) {
   }
 
   // --- Send to Google Sheets (Apps Script Webhook or direct Google Sheets API) ---
-  // 1. If it's BRSM-Nafta B2B lead, save to BRSM sheet directly via Service Account
+  // 1. If it's B2B Calculator (HR Routine Calculator), save to HR-калькулятор sheet
   if (
+    data.dialogueId === "b2b_calc" ||
+    data.dialogueId === "b2b_calc_demo" ||
+    (dialogueUrl &&
+      (dialogueUrl.includes("/b2b_calc") ||
+        dialogueUrl.includes("/b2b-calc") ||
+        dialogueUrl.includes("/b2b-hr-calc")))
+  ) {
+    console.log("Processing direct Google Sheet insertion for B2B HR Calculator...");
+    promises.push(
+      saveLeadToB2bCalcSheet(data).then((res) => {
+        return { service: "B2bCalcGoogleSheets", ...res };
+      }),
+    );
+  }
+  // 2. If it's BRSM-Nafta B2B lead, save to BRSM sheet directly via Service Account
+  else if (
     data.dialogueId === "b2b_brsm" ||
     (dialogueUrl && dialogueUrl.includes("/b2b_brsm")) ||
     (data.company && data.company.includes("БРСМ"))
@@ -271,7 +288,7 @@ export default async function handler(request, response) {
       }),
     );
   }
-  // 2. If it's Metinvest B2B lead, save to Metinvest sheet directly via Service Account
+  // 3. If it's Metinvest B2B lead, save to Metinvest sheet directly via Service Account
   else if (
     data.dialogueId === "b2b_metinvest" ||
     (dialogueUrl && dialogueUrl.includes("/b2b_metinvest")) ||
@@ -284,10 +301,9 @@ export default async function handler(request, response) {
       }),
     );
   }
-  // 3. If it's UkrSibbank B2B lead, save with dedicated column layout directly via Service Account
+  // 4. If it's UkrSibbank B2B lead, save with dedicated column layout directly via Service Account
   else if (
     data.dialogueId === "b2b_ukrsib" ||
-    data.b2b ||
     (dialogueUrl && dialogueUrl.includes("/b2b_ukrsib"))
   ) {
     console.log("Processing direct Google Sheet insertion for UkrSibbank B2B...");
@@ -298,7 +314,7 @@ export default async function handler(request, response) {
     );
   }
 
-  // 4. If it's Job JustTech recruitment lead, save directly via Service Account
+  // 5. If it's Job JustTech recruitment lead, save directly via Service Account
   if (
     data.dialogueId === "job_justtech" ||
     data.job_justtech ||
@@ -322,10 +338,15 @@ export default async function handler(request, response) {
     data.dialogueId === "b2b_brsm" ||
       data.dialogueId === "b2b_metinvest" ||
       data.dialogueId === "b2b_ukrsib" ||
+      data.dialogueId === "b2b_calc" ||
+      data.dialogueId === "b2b_calc_demo" ||
       (dialogueUrl &&
         (dialogueUrl.includes("/b2b_brsm") ||
           dialogueUrl.includes("/b2b_metinvest") ||
-          dialogueUrl.includes("/b2b_ukrsib"))),
+          dialogueUrl.includes("/b2b_ukrsib") ||
+          dialogueUrl.includes("/b2b_calc") ||
+          dialogueUrl.includes("/b2b-calc") ||
+          dialogueUrl.includes("/b2b-hr-calc"))),
   );
 
   if (googleSheetWebhookUrl && (data.saveToGoogleSheets || data.b2b) && !isDirectB2BSheetHandled) {

@@ -1167,26 +1167,40 @@ export default function App() {
                 </div>
                 <div className="text-xs text-slate-600 space-y-1.5 leading-relaxed">
                   <div>
-                    1. Методист JustSchool зв’яжеться з вами за номером{' '}
+                    1. Перейдіть до нашого корпоративного Telegram-каналу для новин та швидкого зв'язку.
+                  </div>
+                  <div>
+                    2. Методист JustSchool зв’яжеться з вами за номером{' '}
                     <span className="font-bold text-slate-800">{rawPhone}</span> або через{' '}
                     <span className="font-bold text-slate-800">{email}</span>.
                   </div>
                   <div>
-                    2. Ми узгодимо точний розклад вступного уроку згідно з вашими побажаннями.
+                    3. Ми узгодимо точний розклад вступного уроку згідно з вашими побажаннями.
                   </div>
                   <div>
-                    3. Ви отримаєте доступ до інтерактивної навчальної платформи JustSchool.
+                    4. Ви отримаєте доступ до інтерактивної навчальної платформи JustSchool.
                   </div>
                 </div>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href="https://t.me/+L_g5QbqbbqsxYzU6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto px-8 py-4 rounded-full text-white font-black text-base transition-all shadow-lg flex items-center justify-center gap-2.5 bg-[#229ED9] hover:bg-[#1E8EC4] cursor-pointer"
+                  style={{ boxShadow: '0 10px 25px -5px rgba(34, 158, 217, 0.4)' }}
+                >
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                  </svg>
+                  <span>Перейти в наш Telegram →</span>
+                </a>
                 <a
                   href="https://justschool.me/uk"
-                  className="inline-block px-8 py-3.5 rounded-full bg-[var(--brand)] hover:bg-[var(--brand-hover)] text-slate-950 font-black text-sm transition-all shadow-md"
-                  style={{ boxShadow: 'var(--shadow-brand)' }}
+                  className="w-full sm:w-auto px-6 py-4 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-all text-center"
                 >
-                  Перейти на головну JustSchool →
+                  На головну JustSchool
                 </a>
               </div>
             </div>
