@@ -90,6 +90,7 @@ export default defineConfig({
         jobJusttech: resolve(__dirname, "job_justtech/index.html"),
         bloggerHalloween: resolve(__dirname, "blogger/halloween/index.html"),
         splitter: resolve(__dirname, "splitter/index.html"),
+        b2bCalc: resolve(__dirname, "b2b_calc/index.html"),
       },
     },
   },

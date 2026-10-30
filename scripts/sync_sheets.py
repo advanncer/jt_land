@@ -103,6 +103,15 @@ CATEGORIES = [
                 "analytics": "FB Pixel: Lead, Purchase\nGTM: GTM-P6BDRT25\nCRM: Google Sheets (БРСМ-Нафта)"
             },
             {
+                "id": "b2b_calc",
+                "product": "B2B HR-Калькулятор рутини",
+                "audience": "HRD, HR Generalist, People Partner, CEO, COO",
+                "url": "https://lp.justschool.me/b2b_calc",
+                "lead_type": "b2b-corporate",
+                "description": "Інтерактивний HR-калькулятор рутини за ТЗ: визначення масштабу компанії, 12 запитань по HR-рутині, динамічний підрахунок втрачених годин та бюджету щомісяця, розподіл на Червону/Жовту/Зелену зони, топ-5 вузьких місць і форма запису на демо B2B-кабінету JustSchool.",
+                "analytics": "GTM: GTM-P6BDRT25 (quiz_step_reach, form_success, cta_click)\nFB Pixel: 9067851526565677 (PageView, Lead)\nCRM: Supabase, NocoDB, Google Sheets"
+            },
+            {
                 "id": "eng-adult/lp_test1",
                 "product": "Англійська для дорослих (LP Test 1)",
                 "audience": "Дорослі студенти (18+)",

@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-orange: #FF5B09;
+    --brand-orange-hover: #E24A00;
+    --brand-orange-light: #FFF5EB;
+    --brand-orange-border: #FFCBA8;
+    --brand-dark: #0F172A;
+    --brand-slate: #334155;
+    --brand-muted: #64748B;
+    --font-heading: 'Manrope', 'Montserrat', system-ui, sans-serif;
+    --font-sans: 'Manrope', 'Montserrat', system-ui, sans-serif;
+  }
+
+  body {
+    background-color: #FAF6F0;
+    color: #0F172A;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+}
+
+/* Background ambient glows */
+.ambient-glow-1 {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  top: -160px;
+  left: -140px;
+  background: #FFB27D;
+  opacity: 0.28;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+}
+
+.ambient-glow-2 {
+  position: fixed;
+  width: 550px;
+  height: 550px;
+  bottom: -180px;
+  right: -160px;
+  background: #FFD3B3;
+  opacity: 0.35;
+  filter: blur(130px);
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+}
+
+/* Glass card styling */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 12px 36px -12px rgba(255, 91, 9, 0.12), 0 4px 16px -4px rgba(15, 23, 42, 0.05);
+}
+
+.glass-panel-elevated {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 1);
+  box-shadow: 0 20px 45px -15px rgba(255, 91, 9, 0.18), 0 8px 24px -6px rgba(15, 23, 42, 0.08);
+}
+
+/* Loss counter pill bounce */
+@keyframes bump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.animate-bump {
+  animation: bump 0.4s ease-out;
+}
+
+/* Subtle fade in for questions */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

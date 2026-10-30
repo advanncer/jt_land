@@ -210,11 +210,16 @@ export default async function handler(request, response) {
     data.dialogueId === "b2b_ukrsib" ||
       data.dialogueId === "b2b_metinvest" ||
       data.dialogueId === "b2b_brsm" ||
+      data.dialogueId === "b2b_calc" ||
+      data.dialogueId === "b2b_calc_demo" ||
       data.b2b ||
       (dialogueUrl &&
         (dialogueUrl.includes("/b2b_ukrsib") ||
           dialogueUrl.includes("/b2b_metinvest") ||
-          dialogueUrl.includes("/b2b_brsm"))),
+          dialogueUrl.includes("/b2b_brsm") ||
+          dialogueUrl.includes("/b2b_calc") ||
+          dialogueUrl.includes("/b2b-calc") ||
+          dialogueUrl.includes("/b2b-hr-calc"))),
   );
 
   const skipCreatio = Boolean(
@@ -361,10 +366,15 @@ export default async function handler(request, response) {
       data.dialogueId === "b2b_ukrsib" ||
       data.dialogueId === "b2b_metinvest" ||
       data.dialogueId === "b2b_brsm" ||
+      data.dialogueId === "b2b_calc" ||
+      data.dialogueId === "b2b_calc_demo" ||
       (dialogueUrl &&
         (dialogueUrl.includes("/b2b_ukrsib") ||
           dialogueUrl.includes("/b2b_metinvest") ||
-          dialogueUrl.includes("/b2b_brsm"))) ||
+          dialogueUrl.includes("/b2b_brsm") ||
+          dialogueUrl.includes("/b2b_calc") ||
+          dialogueUrl.includes("/b2b-calc") ||
+          dialogueUrl.includes("/b2b-hr-calc"))) ||
       data.dialogueId === "job_justtech" ||
       data.job_justtech ||
       (dialogueUrl && dialogueUrl.includes("/job_justtech")),

@@ -264,6 +264,38 @@
     {
       "source": "/b2b_brsm/:path*",
       "destination": "/eng-adult/b2b_brsm/index.html"
+    },
+    {
+      "source": "/b2b_calc",
+      "destination": "/b2b_calc/index.html"
+    },
+    {
+      "source": "/b2b_calc/:path*",
+      "destination": "/b2b_calc/index.html"
+    },
+    {
+      "source": "/b2b-calc",
+      "destination": "/b2b_calc/index.html"
+    },
+    {
+      "source": "/b2b-calc/:path*",
+      "destination": "/b2b_calc/index.html"
+    },
+    {
+      "source": "/b2b-hr-calc",
+      "destination": "/b2b_calc/index.html"
+    },
+    {
+      "source": "/b2b-hr-calc/:path*",
+      "destination": "/b2b_calc/index.html"
+    },
+    {
+      "source": "/eng-adult/b2b_calc",
+      "destination": "/b2b_calc/index.html"
+    },
+    {
+      "source": "/eng-adult/b2b_calc/:path*",
+      "destination": "/b2b_calc/index.html"
     }
   ],
   "redirects": [
