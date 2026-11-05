@@ -296,6 +296,38 @@
     {
       "source": "/eng-adult/b2b_calc/:path*",
       "destination": "/b2b_calc/index.html"
+    },
+    {
+      "source": "/black-friday",
+      "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
+      "source": "/black-friday/:path*",
+      "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
+      "source": "/blackfriday",
+      "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
+      "source": "/blackfriday/:path*",
+      "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
+      "source": "/bf",
+      "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
+      "source": "/bf/:path*",
+      "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
+      "source": "/eng-adult/black-friday",
+      "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
+      "source": "/eng-adult/black-friday/:path*",
+      "destination": "/eng-adult/black-friday/index.html"
     }
   ],
   "redirects": [

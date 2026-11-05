@@ -91,6 +91,10 @@ export default defineConfig({
         bloggerHalloween: resolve(__dirname, "blogger/halloween/index.html"),
         splitter: resolve(__dirname, "splitter/index.html"),
         b2bCalc: resolve(__dirname, "b2b_calc/index.html"),
+        engAdultBlackFriday: resolve(
+          __dirname,
+          "eng-adult/black-friday/index.html",
+        ),
       },
     },
   },

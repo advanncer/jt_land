@@ -76,6 +76,15 @@ CATEGORIES = [
         "category": "👨‍💼 АНГЛІЙСЬКА ДЛЯ ДОРОСЛИХ (English for Adults)",
         "items": [
             {
+                "id": "eng-adult/black-friday",
+                "product": "🖤 Black Friday: Рік англійської (1 670 грн/міс)",
+                "audience": "Дорослі (18+) та батьки дітей (4–17 років)",
+                "url": "https://lp.justschool.me/black-friday",
+                "lead_type": "english-for-adults",
+                "description": "Спеціальна Black Friday воронка за емейл-розсилкою JustSchool: 48 уроків (1 670 грн/міс) + рік розмовних клубів у подарунок (вигода 26 000+ грн), інтерактивний розрахунковий чек, вибір аудиторії (для себе чи для дитини), динамічний квіз-підбір та перехід в онбординг.",
+                "analytics": "GA4: quiz_step_reach, form_success\nFB Pixel: 9067851526565677\nGTM: GTM-P6BDRT25\nCRM: Creatio, Supabase, NocoDB"
+            },
+            {
                 "id": "eng-adult/b2b_ukrsib",
                 "product": "B2B Англійська: UKRSIBBANK",
                 "audience": "Співробітники UKRSIBBANK BNP Paribas Group",
