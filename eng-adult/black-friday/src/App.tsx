@@ -16,6 +16,8 @@ import bannerDesk from './assets/banner-desk.png';
 import bannerMob from './assets/banner-mob.png';
 import bannerDeskV1 from './assets/banner-desk-v1.png';
 import bannerMobV1 from './assets/banner-mob-v1.png';
+import bannerChildDesk from './assets/banner-child-desk.jpg';
+import bannerChildMob from './assets/banner-child-mob.jpg';
 
 declare global {
   interface Window {
@@ -51,10 +53,19 @@ export default function App() {
     return 'v1'; // Default to V1 single-screen as requested!
   };
 
+  const getInitialAudience = (): Audience => {
+    try {
+      const url = new URL(window.location.href);
+      const lt = (url.searchParams.get('leadType') || '').toLowerCase();
+      if (lt.includes('child')) return 'child';
+    } catch {}
+    return 'adult';
+  };
+
   // ─── State ───────────────────────────────────────────────
   const [variant, setVariant] = useState<FunnelVariant>(getInitialVariant);
   const [step, setStep] = useState<number>(0); // 0 = Hero, 1 = Audience, 2..7 = Questions, 8 = Interstitial, 9 = Loader, 10 = LeadForm
-  const [audience, setAudience] = useState<Audience>('adult');
+  const [audience, setAudience] = useState<Audience>(getInitialAudience);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [multiAspects, setMultiAspects] = useState<string[]>([]);
   const [showV1Details, setShowV1Details] = useState<boolean>(false);
@@ -76,6 +87,10 @@ export default function App() {
   useEffect(() => {
     try {
       const url = new URL(window.location.href);
+      const lt = (url.searchParams.get('leadType') || '').toLowerCase();
+      if (lt.includes('child')) {
+        setAudience('child');
+      }
       if (!url.searchParams.has('leadType')) {
         url.searchParams.set(
           'leadType',
@@ -424,12 +439,15 @@ export default function App() {
 
             {/* Main Single-Screen Hero Card with Cropped Banner & Interactive Button */}
             <div className="w-full bg-[#1C160C] rounded-3xl overflow-hidden shadow-2xl border border-neutral-800 flex flex-col relative transition-all">
-              {/* Cropped Banner Image (fake button cleanly cut off at table level) */}
+              {/* Banner Image */}
               <div className="relative w-full bg-[#1C160C] select-none">
                 <picture>
-                  <source media="(min-width: 640px)" srcSet={bannerDeskV1} />
+                  <source
+                    media="(min-width: 640px)"
+                    srcSet={audience === 'child' ? bannerChildDesk : bannerDeskV1}
+                  />
                   <img
-                    src={bannerMobV1}
+                    src={audience === 'child' ? bannerChildMob : bannerMobV1}
                     alt="Black Friday JustSchool"
                     className="w-full h-auto object-cover block"
                   />
@@ -745,9 +763,12 @@ export default function App() {
             {/* Banner */}
             <div className="w-full mb-6 rounded-2xl overflow-hidden border shadow-sm">
               <picture>
-                <source media="(min-width: 640px)" srcSet={bannerDesk} />
+                <source
+                  media="(min-width: 640px)"
+                  srcSet={audience === 'child' ? bannerChildDesk : bannerDesk}
+                />
                 <img
-                  src={bannerMob}
+                  src={audience === 'child' ? bannerChildMob : bannerMob}
                   alt="Black Friday JustSchool"
                   className="w-full h-auto object-cover block"
                 />
