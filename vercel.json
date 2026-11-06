@@ -306,11 +306,23 @@
       "destination": "/eng-adult/black-friday/index.html"
     },
     {
+      "source": "/black-friday-v1",
+      "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
+      "source": "/black-friday-v1/:path*",
+      "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
       "source": "/blackfriday",
       "destination": "/eng-adult/black-friday/index.html"
     },
     {
       "source": "/blackfriday/:path*",
+      "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
+      "source": "/blackfriday-v1",
       "destination": "/eng-adult/black-friday/index.html"
     },
     {
@@ -322,11 +334,19 @@
       "destination": "/eng-adult/black-friday/index.html"
     },
     {
+      "source": "/bf-v1",
+      "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
       "source": "/eng-adult/black-friday",
       "destination": "/eng-adult/black-friday/index.html"
     },
     {
       "source": "/eng-adult/black-friday/:path*",
+      "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
+      "source": "/eng-adult/black-friday-v1",
       "destination": "/eng-adult/black-friday/index.html"
     }
   ],

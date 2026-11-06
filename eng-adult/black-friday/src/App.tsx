@@ -14,6 +14,8 @@ import { BrandShape } from './ds/components/core/BrandShape';
 import logoBlack from './ds/assets/logo-horizontal-black.svg';
 import bannerDesk from './assets/banner-desk.png';
 import bannerMob from './assets/banner-mob.png';
+import bannerDeskV1 from './assets/banner-desk-v1.png';
+import bannerMobV1 from './assets/banner-mob-v1.png';
 
 declare global {
   interface Window {
@@ -23,17 +25,39 @@ declare global {
 }
 
 type Audience = 'adult' | 'child';
+type FunnelVariant = 'v1' | 'standard';
 
 // Progress steps shown in quiz: Steps 2, 3, 4, 5, 6, 7 (Total 6 questions)
 const PROGRESS_STEPS = [2, 3, 4, 5, 6, 7];
 const TOTAL_PROGRESS = PROGRESS_STEPS.length;
 
 export default function App() {
+  // ─── Detect Initial Variant from URL ───────────────────────
+  const getInitialVariant = (): FunnelVariant => {
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get('v') === 'standard' || url.searchParams.get('v') === '2') {
+        return 'standard';
+      }
+      if (
+        url.pathname.includes('/v1') ||
+        url.pathname.includes('-v1') ||
+        url.searchParams.get('v') === '1' ||
+        url.searchParams.get('version') === 'v1'
+      ) {
+        return 'v1';
+      }
+    } catch {}
+    return 'v1'; // Default to V1 single-screen as requested!
+  };
+
   // ─── State ───────────────────────────────────────────────
+  const [variant, setVariant] = useState<FunnelVariant>(getInitialVariant);
   const [step, setStep] = useState<number>(0); // 0 = Hero, 1 = Audience, 2..7 = Questions, 8 = Interstitial, 9 = Loader, 10 = LeadForm
   const [audience, setAudience] = useState<Audience>('adult');
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [multiAspects, setMultiAspects] = useState<string[]>([]);
+  const [showV1Details, setShowV1Details] = useState<boolean>(false);
 
   // Contact Form State
   const [name, setName] = useState<string>('');
@@ -88,11 +112,12 @@ export default function App() {
     dl.push({
       event: 'quiz_step_reach',
       quiz_name: 'eng-adult-black-friday',
+      quiz_variant: variant,
       step_number: step,
       audience: audience,
       step_name:
         step === 0
-          ? 'hero_screen'
+          ? `hero_screen_${variant}`
           : step === 1
           ? 'audience_selection'
           : step === 8
@@ -103,7 +128,7 @@ export default function App() {
           ? 'lead_form_gate'
           : `question_${step}`,
     });
-  }, [step, audience]);
+  }, [step, audience, variant]);
 
   // 3. Loader Auto-Advance on Step 9
   useEffect(() => {
@@ -174,7 +199,7 @@ export default function App() {
 
     const qaParts: string[] = [
       `ip:${ipInfo.ip || 'unknown'}|country:${ipInfo.country || 'unknown'}`,
-      `[BLACK FRIDAY 2026]`,
+      `[BLACK FRIDAY 2026 - VARIANT: ${variant.toUpperCase()}]`,
       `Пропозиція: 48 уроків (1 670 грн/міс) + Цілий рік розмовних клубів у подарунок`,
       `Аудиторія: ${audience === 'adult' ? 'Дорослий (для себе)' : 'Дитина'}`,
       `Вік: ${answers.age || 'Не вказано'}`,
@@ -196,8 +221,8 @@ export default function App() {
       email: email.trim(),
       qa: qaParts.join(' ||| '),
       dialogueUrl: window.location.href,
-      dialogueName: 'Black Friday 2026 English Year Quiz',
-      dialogueId: 'eng_black_friday_2026',
+      dialogueName: `Black Friday 2026 Quiz (${variant.toUpperCase()})`,
+      dialogueId: `eng_black_friday_${variant}`,
       utm_source: urlParams.get('utm_source') || 'esputnik',
       utm_medium: urlParams.get('utm_medium') || 'promo_email',
       utm_campaign: urlParams.get('utm_campaign') || 'black_friday_year',
@@ -228,6 +253,7 @@ export default function App() {
         dl.push({
           event: 'form_success',
           quiz_name: 'eng-adult-black-friday',
+          quiz_variant: variant,
           audience: audience,
         });
 
@@ -299,13 +325,13 @@ export default function App() {
         className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b h-14 flex items-center px-4 justify-between shrink-0"
         style={{ borderColor: 'var(--border-subtle)' }}
       >
-        <div className="w-10 flex items-center">
+        <div className="w-12 flex items-center">
           {canGoBack && (
             <button
               id="back-btn"
               onClick={handleBack}
               aria-label="Назад"
-              className="p-2 -ml-2 transition-colors text-xl leading-none font-bold"
+              className="p-2 -ml-2 transition-colors text-xl leading-none font-bold cursor-pointer"
               style={{ color: 'var(--text-secondary)' }}
             >
               ←
@@ -324,23 +350,32 @@ export default function App() {
           <img src={logoBlack} alt="JustSchool" className="h-6 w-auto" />
         </div>
 
-        {/* Right side: step counter or BF tag */}
-        <div
-          className="text-xs font-bold min-w-[40px] text-right uppercase tracking-wider"
-          style={{ color: 'var(--text-muted)' }}
-        >
+        {/* Right side: step counter, BF tag or variant switcher */}
+        <div className="flex items-center gap-2 text-right">
           {progressIdx >= 0 ? (
-            `${progressIdx + 1}/${TOTAL_PROGRESS}`
-          ) : step === 0 ? (
             <span
-              className="text-[11px] font-extrabold px-2 py-0.5 rounded-full"
-              style={{ backgroundColor: 'var(--orange-25)', color: 'var(--brand)' }}
+              className="text-xs font-bold uppercase tracking-wider"
+              style={{ color: 'var(--text-muted)' }}
             >
-              BF 2026
+              {progressIdx + 1}/{TOTAL_PROGRESS}
             </span>
-          ) : (
-            ''
-          )}
+          ) : step === 0 ? (
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setVariant(variant === 'v1' ? 'standard' : 'v1')}
+                title="Перемкнути версію лендингу (V1 в один екран / Стандартна)"
+                className="text-[10px] font-black px-2 py-0.5 rounded-full border transition-all cursor-pointer"
+                style={{
+                  backgroundColor: variant === 'v1' ? '#1C160C' : 'var(--orange-25)',
+                  color: variant === 'v1' ? '#FBC314' : 'var(--brand)',
+                  borderColor: variant === 'v1' ? '#1C160C' : 'var(--orange-100)',
+                }}
+              >
+                {variant === 'v1' ? '⚡ V1: 1 ЕКРАН' : 'V2: ДЕТАЛЬНИЙ'}
+              </button>
+            </div>
+          ) : null}
         </div>
       </header>
 
@@ -360,12 +395,254 @@ export default function App() {
       {/* ─── Main Content Container (Mobile-first max-w-lg) ─── */}
       <main
         key={animKey}
-        className="step-enter flex-1 flex flex-col items-center px-4 py-6 w-full max-w-lg mx-auto"
+        className="step-enter flex-1 flex flex-col items-center px-4 py-4 sm:py-6 w-full max-w-lg mx-auto"
       >
-        {/* ════════════════════════════════════
-            STEP 0: HERO SCREEN
-        ════════════════════════════════════ */}
-        {step === 0 && (
+        {/* ══════════════════════════════════════════════════════
+            STEP 0 (HERO): VARIATION V1 (SINGLE SCREEN / 1 ЕКРАН)
+        ══════════════════════════════════════════════════════ */}
+        {step === 0 && variant === 'v1' && (
+          <div className="w-full flex flex-col items-center text-center">
+            {/* Top Compact BF Badge */}
+            <div className="mb-2 flex items-center justify-center gap-2">
+              <span className="bg-[#1C160C] text-[#FBC314] text-[11px] font-black px-3 py-0.5 rounded-full uppercase tracking-wider border border-neutral-700">
+                🖤 BLACK FRIDAY 2026
+              </span>
+              <span className="text-xs font-bold text-neutral-500">
+                Залишилось 14 місць
+              </span>
+            </div>
+
+            {/* Main Single-Screen Hero Card with Cropped Banner & Interactive Button */}
+            <div className="w-full bg-[#1C160C] rounded-3xl overflow-hidden shadow-2xl border border-neutral-800 flex flex-col relative transition-all">
+              {/* Cropped Banner Image (fake button cleanly cut off at table level) */}
+              <div className="relative w-full bg-[#1C160C] select-none">
+                <picture>
+                  <source media="(min-width: 640px)" srcSet={bannerDeskV1} />
+                  <img
+                    src={bannerMobV1}
+                    alt="Black Friday JustSchool"
+                    className="w-full h-auto object-cover block"
+                  />
+                </picture>
+              </div>
+
+              {/* Real Interactive Button replacing the cropped static image text */}
+              <div className="p-3 sm:p-4 bg-[#140A07] border-t border-neutral-800/80">
+                <button
+                  type="button"
+                  id="hero-v1-start-btn"
+                  onClick={handleStartFromHero}
+                  className="w-full py-4 px-6 rounded-2xl font-black text-base sm:text-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:brightness-105"
+                  style={{
+                    backgroundColor: '#FBC314', // Exact authentic yellow from banner design
+                    color: '#000000',
+                    boxShadow: '0 8px 24px rgba(251, 195, 20, 0.4)',
+                  }}
+                >
+                  <span>Розпочати зараз</span>
+                  <span className="text-xl leading-none">→</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Audience Segmented Control */}
+            <div className="mt-3 w-full">
+              <div
+                className="grid grid-cols-2 gap-1.5 p-1 rounded-2xl border"
+                style={{
+                  backgroundColor: 'var(--base-100)',
+                  borderColor: 'var(--border-subtle)',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setAudience('adult')}
+                  className="py-2.5 px-3 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  style={{
+                    backgroundColor: audience === 'adult' ? 'white' : 'transparent',
+                    color: audience === 'adult' ? 'var(--text-strong)' : 'var(--text-muted)',
+                    boxShadow: audience === 'adult' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                  }}
+                >
+                  <span className="text-sm">🧑</span>
+                  <span>Для дорослих (18+)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAudience('child')}
+                  className="py-2.5 px-3 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  style={{
+                    backgroundColor: audience === 'child' ? 'white' : 'transparent',
+                    color: audience === 'child' ? 'var(--text-strong)' : 'var(--text-muted)',
+                    boxShadow: audience === 'child' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                  }}
+                >
+                  <span className="text-sm">🧒</span>
+                  <span>Для дітей (4–17)</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 3 Core Value Pills (Fits comfortably above fold) */}
+            <div className="mt-2.5 grid grid-cols-3 gap-1.5 w-full text-center">
+              <div
+                className="p-2 rounded-xl border text-[11px] font-bold leading-tight"
+                style={{
+                  backgroundColor: 'var(--surface-card)',
+                  borderColor: 'var(--border-subtle)',
+                  color: 'var(--text-strong)',
+                }}
+              >
+                <div className="text-[#FF5B09] font-black">48 занять</div>
+                <div className="text-[10px] text-neutral-500">1 670 грн/міс</div>
+              </div>
+
+              <div
+                className="p-2 rounded-xl border text-[11px] font-bold leading-tight"
+                style={{
+                  backgroundColor: 'var(--orange-25)',
+                  borderColor: 'var(--orange-100)',
+                  color: 'var(--brand)',
+                }}
+              >
+                <div className="font-black">Рік клубів</div>
+                <div className="text-[10px] uppercase font-extrabold">0 грн Подарунок</div>
+              </div>
+
+              <div
+                className="p-2 rounded-xl border text-[11px] font-bold leading-tight"
+                style={{
+                  backgroundColor: 'var(--surface-card)',
+                  borderColor: 'var(--border-subtle)',
+                  color: 'var(--text-strong)',
+                }}
+              >
+                <div className="text-emerald-600 font-black">26 000+ грн</div>
+                <div className="text-[10px] text-neutral-500">Загальна вигода</div>
+              </div>
+            </div>
+
+            {/* Micro guarantee line */}
+            <p
+              className="mt-2 text-center text-[11px] font-semibold tracking-wide"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              ✓ Безкоштовний підбір • ~55 грн/день за щоденну практику
+            </p>
+
+            {/* Optional expandable details toggle for users who want to review the full breakdown */}
+            <div className="mt-3 w-full">
+              <button
+                type="button"
+                onClick={() => setShowV1Details(!showV1Details)}
+                className="text-xs font-bold text-neutral-500 hover:text-neutral-800 transition-colors flex items-center justify-center gap-1 mx-auto py-1"
+              >
+                <span>{showV1Details ? 'Приховати деталі розрахунку ▲' : 'Переглянути чек та відгуки ▼'}</span>
+              </button>
+
+              {showV1Details && (
+                <div className="mt-4 text-left space-y-4 step-enter">
+                  {/* Receipt Card */}
+                  <Card
+                    variant="raised"
+                    padding="md"
+                    style={{
+                      borderRadius: 'var(--radius-2xl)',
+                      border: '1px solid var(--border-subtle)',
+                    }}
+                  >
+                    <div className="flex items-center gap-2 mb-3 pb-2 border-b border-dashed border-[var(--border-subtle)]">
+                      <span className="text-lg">🧾</span>
+                      <span
+                        className="font-extrabold text-sm tracking-tight"
+                        style={{ color: 'var(--text-strong)' }}
+                      >
+                        Ваш розрахунковий чек Black Friday
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between items-start gap-2">
+                        <span style={{ color: 'var(--text-secondary)' }}>
+                          48 уроків (2 рази на тиждень):
+                        </span>
+                        <div className="text-right shrink-0">
+                          <span className="line-through text-neutral-400 mr-1.5">
+                            27 312 грн
+                          </span>
+                          <span className="font-bold" style={{ color: 'var(--text-strong)' }}>
+                            20 018 грн
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-start gap-2">
+                        <span style={{ color: 'var(--text-secondary)' }}>
+                          52 тижні розмовних клубів:
+                        </span>
+                        <span className="font-bold text-emerald-600 uppercase">
+                          0 грн (Подарунок)
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-start gap-2">
+                        <span style={{ color: 'var(--text-secondary)' }}>
+                          Платформа JustClass 24/7:
+                        </span>
+                        <span className="font-bold text-emerald-600">0 грн</span>
+                      </div>
+
+                      <div className="pt-2.5 mt-2 border-t border-dashed border-[var(--border-subtle)] flex justify-between items-center">
+                        <div>
+                          <div
+                            className="font-extrabold text-sm"
+                            style={{ color: 'var(--text-strong)' }}
+                          >
+                            РАЗОМ: 1 670 грн / міс
+                          </div>
+                          <div className="text-[10px] text-emerald-600 font-bold">
+                            Сумарна вигода 26 000+ грн
+                          </div>
+                        </div>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={handleStartFromHero}
+                        >
+                          Почати →
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Reviews Mini Block */}
+                  <div className="space-y-2">
+                    {REVIEWS.slice(0, 2).map((rev) => (
+                      <Card
+                        key={rev.name}
+                        variant="raised"
+                        padding="sm"
+                        style={{
+                          borderRadius: 'var(--radius-xl)',
+                          border: '1px solid var(--border-subtle)',
+                        }}
+                      >
+                        <div className="text-xs font-bold text-neutral-800">{rev.name} ({rev.role})</div>
+                        <p className="text-[11px] text-neutral-600 italic mt-0.5">"{rev.text}"</p>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════
+            STEP 0 (HERO): VARIATION V2 (STANDARD MULTI-CARD)
+        ══════════════════════════════════════════════════════ */}
+        {step === 0 && variant === 'standard' && (
           <div className="flex flex-col items-center text-center w-full relative">
             {/* Decorative brand shapes */}
             <div className="absolute -top-4 -right-6 pointer-events-none select-none opacity-20">
@@ -455,7 +732,7 @@ export default function App() {
               </div>
             </Card>
 
-            {/* Responsive Banner */}
+            {/* Banner */}
             <div className="w-full mb-6 rounded-2xl overflow-hidden border shadow-sm">
               <picture>
                 <source media="(min-width: 640px)" srcSet={bannerDesk} />
@@ -603,9 +880,7 @@ export default function App() {
                     >
                       РАЗОМ до сплати:
                     </div>
-                    <div
-                      className="text-[11px] font-semibold text-emerald-600"
-                    >
+                    <div className="text-[11px] font-semibold text-emerald-600">
                       Сумарна економія 26 000+ грн
                     </div>
                   </div>
