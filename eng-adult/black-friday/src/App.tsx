@@ -6,7 +6,12 @@ import {
   COMMON_QUESTIONS,
   REVIEWS,
 } from './data';
-import logoWhite from './assets/logo-horizontal-white.svg';
+import { Button } from './ds/components/core/Button';
+import { Badge } from './ds/components/core/Badge';
+import { Card } from './ds/components/core/Card';
+import { Tag } from './ds/components/core/Tag';
+import { BrandShape } from './ds/components/core/BrandShape';
+import logoBlack from './ds/assets/logo-horizontal-black.svg';
 import bannerDesk from './assets/banner-desk.png';
 import bannerMob from './assets/banner-mob.png';
 
@@ -18,6 +23,10 @@ declare global {
 }
 
 type Audience = 'adult' | 'child';
+
+// Progress steps shown in quiz: Steps 2, 3, 4, 5, 6, 7 (Total 6 questions)
+const PROGRESS_STEPS = [2, 3, 4, 5, 6, 7];
+const TOTAL_PROGRESS = PROGRESS_STEPS.length;
 
 export default function App() {
   // ─── State ───────────────────────────────────────────────
@@ -37,6 +46,7 @@ export default function App() {
   const [loaderProgress, setLoaderProgress] = useState<number>(0);
   const [geoCountry, setGeoCountry] = useState<string>('UA');
   const [ipInfo, setIpInfo] = useState<{ ip?: string; country?: string }>({});
+  const [animKey, setAnimKey] = useState<number>(0);
 
   // 1. GEO Detection & URL Sync on mount
   useEffect(() => {
@@ -105,39 +115,31 @@ export default function App() {
         if (prev >= 100) {
           clearInterval(interval);
           setTimeout(() => {
-            setStep(10);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            advance(10);
           }, 450);
           return 100;
         }
         return prev + 2;
       });
-    }, 45);
+    }, 40);
 
     return () => clearInterval(interval);
   }, [step]);
 
-  // ─── Handlers ────────────────────────────────────────────
-  const handleStartFromHero = (chosenAudience?: Audience) => {
-    if (chosenAudience) {
-      setAudience(chosenAudience);
-      setStep(2); // Skip audience question if selected from Hero
-    } else {
-      setStep(1);
-    }
+  // ─── Navigation Handlers ──────────────────────────────────
+  const advance = (nextStep?: number) => {
+    setAnimKey((k) => k + 1);
+    setStep((s) => (typeof nextStep === 'number' ? nextStep : s + 1));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSelectAudience = (type: Audience) => {
-    setAudience(type);
-    setStep(2);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleStartFromHero = () => {
+    advance(2); // directly advance to age question with selected audience
   };
 
   const handleSingleAnswer = (questionKey: string, optionLabel: string) => {
     setAnswers((prev) => ({ ...prev, [questionKey]: optionLabel }));
-    setStep((prev) => prev + 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    advance();
   };
 
   const toggleMultiAspect = (label: string) => {
@@ -149,12 +151,12 @@ export default function App() {
   const handleMultiSubmit = () => {
     if (multiAspects.length === 0) return;
     setAnswers((prev) => ({ ...prev, aspects: multiAspects.join(', ') }));
-    setStep(6);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    advance(6);
   };
 
   const handleBack = () => {
-    if (step === 2 && answers['audience_picked_on_hero']) {
+    setAnimKey((k) => k + 1);
+    if (step === 2) {
       setStep(0);
     } else if (step > 0) {
       setStep((prev) => prev - 1);
@@ -165,7 +167,7 @@ export default function App() {
   // ─── Lead Form Submission ────────────────────────────────
   const handleSubmitLead = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting) return;
+    if (isSubmitting) return; // double-submission guard
     if (!name.trim() || !email.trim() || !isPhoneValid) return;
 
     setIsSubmitting(true);
@@ -245,370 +247,653 @@ export default function App() {
 
   // Questions configuration based on audience
   const currentQuestions = audience === 'adult' ? ADULT_QUESTIONS : CHILD_QUESTIONS;
+  const progressIdx = PROGRESS_STEPS.indexOf(step);
+  const progressPercent =
+    progressIdx >= 0
+      ? Math.round(((progressIdx + 1) / TOTAL_PROGRESS) * 100)
+      : 0;
+
+  const canGoBack = step > 0 && step !== 9 && step !== 10;
 
   return (
-    <div className="min-h-screen bg-[#070707] text-white flex flex-col justify-between selection:bg-[#FF3D2E] selection:text-white relative overflow-hidden font-sans">
+    <div
+      className="min-h-[100dvh] flex flex-col"
+      style={{
+        backgroundColor: 'var(--surface-page-warm)',
+        fontFamily: 'var(--font-core)',
+        color: 'var(--text-body)',
+      }}
+    >
       {/* ─── Top Marquee Ticker ─── */}
-      <div className="bg-[#FF3D2E] py-2 px-3 overflow-hidden select-none border-b border-red-700/50">
-        <div className="animate-marquee whitespace-nowrap text-xs font-black tracking-widest uppercase text-black flex items-center gap-8">
-          <span>🖤 Black Friday 2026</span>
+      <div
+        className="py-1.5 px-3 overflow-hidden select-none border-b shrink-0"
+        style={{
+          backgroundColor: '#1C160C',
+          borderColor: 'rgba(255,255,255,0.1)',
+          color: '#FAF8F5',
+        }}
+      >
+        <div className="animate-marquee whitespace-nowrap text-[11px] font-black tracking-widest uppercase flex items-center gap-6">
+          <span className="text-[#FF5B09]">🖤 BLACK FRIDAY 2026</span>
           <span>•</span>
-          <span>Рік англійської — 1 670 грн/місяць</span>
+          <span>РІК АНГЛІЙСЬКОЇ — 1 670 ГРН/МІС</span>
           <span>•</span>
-          <span>Рік розмовних клубів у подарунок</span>
+          <span className="text-[#FFB800]">52 ТИЖНІ РОЗМОВНИХ КЛУБІВ У ПОДАРУНОК</span>
           <span>•</span>
-          <span>Вигода 26 000+ грн</span>
+          <span>ВИГОДА 26 000+ ГРН</span>
           <span>•</span>
-          <span>48 індивідуальних уроків</span>
+          <span>48 ІНДИВІДУАЛЬНИХ УРОКІВ</span>
           <span>•</span>
-          <span>🖤 Black Friday 2026</span>
+          <span className="text-[#FF5B09]">🖤 BLACK FRIDAY 2026</span>
           <span>•</span>
-          <span>Рік англійської — 1 670 грн/місяць</span>
+          <span>РІК АНГЛІЙСЬКОЇ — 1 670 ГРН/МІС</span>
           <span>•</span>
-          <span>Рік розмовних клубів у подарунок</span>
+          <span className="text-[#FFB800]">52 ТИЖНІ РОЗМОВНИХ КЛУБІВ У ПОДАРУНОК</span>
           <span>•</span>
-          <span>Вигода 26 000+ грн</span>
+          <span>ВИГОДА 26 000+ ГРН</span>
         </div>
       </div>
 
-      {/* ─── Header ─── */}
-      <header className="w-full max-w-4xl mx-auto px-4 py-4 sm:py-6 flex items-center justify-between border-b border-neutral-800/80">
-        <a href="#hero" onClick={() => setStep(0)} className="block">
-          <img
-            src={logoWhite}
-            alt="JustSchool"
-            className="h-7 sm:h-8 w-auto hover:opacity-90 transition-opacity"
-          />
-        </a>
-
-        <div className="flex items-center gap-3 sm:gap-6">
-          <a
-            href="tel:0800335481"
-            className="text-xs sm:text-sm font-bold text-neutral-300 hover:text-[#FF3D2E] transition-colors flex items-center gap-1.5"
-          >
-            <span className="text-[#FF3D2E]">📞</span> 080 033 54 81
-            <span className="hidden sm:inline text-xs font-normal text-neutral-500">
-              (безкоштовно)
-            </span>
-          </a>
-
-          {step > 0 && step < 9 && (
+      {/* ─── Sticky Header ─── */}
+      <header
+        className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b h-14 flex items-center px-4 justify-between shrink-0"
+        style={{ borderColor: 'var(--border-subtle)' }}
+      >
+        <div className="w-10 flex items-center">
+          {canGoBack && (
             <button
-              type="button"
+              id="back-btn"
               onClick={handleBack}
-              className="text-xs font-bold text-neutral-400 hover:text-white bg-neutral-900 border border-neutral-700 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+              aria-label="Назад"
+              className="p-2 -ml-2 transition-colors text-xl leading-none font-bold"
+              style={{ color: 'var(--text-secondary)' }}
             >
-              ← Назад
+              ←
             </button>
+          )}
+        </div>
+
+        {/* Logo in Header */}
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => {
+            setStep(0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        >
+          <img src={logoBlack} alt="JustSchool" className="h-6 w-auto" />
+        </div>
+
+        {/* Right side: step counter or BF tag */}
+        <div
+          className="text-xs font-bold min-w-[40px] text-right uppercase tracking-wider"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          {progressIdx >= 0 ? (
+            `${progressIdx + 1}/${TOTAL_PROGRESS}`
+          ) : step === 0 ? (
+            <span
+              className="text-[11px] font-extrabold px-2 py-0.5 rounded-full"
+              style={{ backgroundColor: 'var(--orange-25)', color: 'var(--brand)' }}
+            >
+              BF 2026
+            </span>
+          ) : (
+            ''
           )}
         </div>
       </header>
 
-      {/* ─── Progress Bar (for Quiz Steps 1–7) ─── */}
-      {step >= 1 && step <= 7 && (
-        <div className="w-full max-w-xl mx-auto px-4 pt-4">
-          <div className="flex items-center justify-between text-xs font-bold text-neutral-400 mb-2">
-            <span>Крок {step} з 7</span>
-            <span className="text-[#FF3D2E]">
-              {Math.round((step / 7) * 100)}% заповнено
-            </span>
-          </div>
-          <div className="w-full h-2 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800">
-            <div
-              className="h-full bg-gradient-to-r from-red-600 to-[#FF3D2E] rounded-full transition-all duration-300 shadow-sm shadow-red-500/50"
-              style={{ width: `${(step / 7) * 100}%` }}
-            />
-          </div>
+      {/* ─── Progress Bar (for questions) ─── */}
+      {progressIdx >= 0 && (
+        <div className="h-1 bg-[var(--base-200)] shrink-0">
+          <div
+            className="h-full transition-all duration-500 ease-out"
+            style={{
+              width: `${progressPercent}%`,
+              backgroundColor: 'var(--brand)',
+            }}
+          />
         </div>
       )}
 
-      {/* ─── Main Content ─── */}
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 sm:py-8 flex flex-col justify-center">
-        {/* ══════════════════════════════════════════════════
-            STEP 0: HERO & VALUE OFFER (From Email)
-        ══════════════════════════════════════════════════ */}
+      {/* ─── Main Content Container (Mobile-first max-w-lg) ─── */}
+      <main
+        key={animKey}
+        className="step-enter flex-1 flex flex-col items-center px-4 py-6 w-full max-w-lg mx-auto"
+      >
+        {/* ════════════════════════════════════
+            STEP 0: HERO SCREEN
+        ════════════════════════════════════ */}
         {step === 0 && (
-          <div className="space-y-8 animate-fade-in">
-            {/* Visual Banner from Email */}
-            <div className="rounded-2xl overflow-hidden border border-neutral-800 shadow-2xl relative">
+          <div className="flex flex-col items-center text-center w-full relative">
+            {/* Decorative brand shapes */}
+            <div className="absolute -top-4 -right-6 pointer-events-none select-none opacity-20">
+              <BrandShape shape="burst" size={80} color="var(--element-orange)" />
+            </div>
+
+            {/* Badge */}
+            <div className="mb-4">
+              <Badge tone="brand" size="md">
+                🖤 ГОЛОВНА ПРОПОЗИЦІЯ РОКУ
+              </Badge>
+            </div>
+
+            {/* Main Title */}
+            <h1
+              className="text-3xl sm:text-4xl font-extrabold leading-tight tracking-tight mb-2"
+              style={{ color: 'var(--text-strong)', letterSpacing: '-0.02em' }}
+            >
+              Цілий рік англійської
+            </h1>
+            <p
+              className="text-sm sm:text-base font-medium leading-relaxed mb-5 max-w-sm"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              48 індивідуальних уроків + 52 тижні розмовних клубів у подарунок
+            </p>
+
+            {/* Price Callout Card */}
+            <Card
+              variant="raised"
+              padding="md"
+              style={{
+                width: '100%',
+                marginBottom: '1.25rem',
+                borderRadius: 'var(--radius-2xl)',
+                border: '2px solid var(--orange-100)',
+                backgroundColor: 'var(--surface-card)',
+              }}
+            >
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span
+                  className="text-xs font-bold uppercase tracking-wider"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  Спецціна Black Friday
+                </span>
+                <span className="bg-[#1C160C] text-white text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  Знижка -35%
+                </span>
+              </div>
+
+              <div className="flex items-baseline justify-between gap-3">
+                <div className="text-left">
+                  <div
+                    className="text-xs font-semibold line-through"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    2 276 грн / міс
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span
+                      className="text-3xl sm:text-4xl font-black"
+                      style={{ color: 'var(--brand)' }}
+                    >
+                      1 670 грн
+                    </span>
+                    <span
+                      className="text-xs sm:text-sm font-bold"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      / місяць
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  className="text-right px-3 py-1.5 rounded-xl border text-xs font-black"
+                  style={{
+                    backgroundColor: 'var(--orange-25)',
+                    borderColor: 'var(--orange-100)',
+                    color: 'var(--brand)',
+                  }}
+                >
+                  <div>Вигода</div>
+                  <div>26 000+ грн</div>
+                </div>
+              </div>
+            </Card>
+
+            {/* Responsive Banner */}
+            <div className="w-full mb-6 rounded-2xl overflow-hidden border shadow-sm">
               <picture>
-                <source media="(max-width: 640px)" srcSet={bannerMob} />
+                <source media="(min-width: 640px)" srcSet={bannerDesk} />
                 <img
-                  src={bannerDesk}
-                  alt="Black Friday в JustSchool: рік англійської"
+                  src={bannerMob}
+                  alt="Black Friday JustSchool"
                   className="w-full h-auto object-cover block"
                 />
               </picture>
-              <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md border border-yellow-500/40 text-yellow-400 text-xs font-black uppercase tracking-wider shadow-lg">
-                  ⚡ Знижка діє обмежений час
-                </span>
+            </div>
+
+            {/* Audience Picker */}
+            <div className="w-full text-left mb-6">
+              <div
+                className="text-xs font-bold uppercase tracking-wider mb-2.5 px-1"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Оберіть, для кого навчання:
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setAudience('adult')}
+                  className="p-3.5 rounded-2xl border-2 transition-all text-left active:scale-[0.98] shadow-xs cursor-pointer"
+                  style={{
+                    backgroundColor:
+                      audience === 'adult' ? 'var(--orange-25)' : 'var(--surface-card)',
+                    borderColor:
+                      audience === 'adult' ? 'var(--brand)' : 'var(--border-subtle)',
+                  }}
+                >
+                  <div className="text-2xl mb-1.5">🧑</div>
+                  <div
+                    className="font-extrabold text-sm leading-tight"
+                    style={{ color: 'var(--text-strong)' }}
+                  >
+                    Для дорослих
+                  </div>
+                  <div
+                    className="text-xs font-medium mt-0.5"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    18+ років
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAudience('child')}
+                  className="p-3.5 rounded-2xl border-2 transition-all text-left active:scale-[0.98] shadow-xs cursor-pointer"
+                  style={{
+                    backgroundColor:
+                      audience === 'child' ? 'var(--orange-25)' : 'var(--surface-card)',
+                    borderColor:
+                      audience === 'child' ? 'var(--brand)' : 'var(--border-subtle)',
+                  }}
+                >
+                  <div className="text-2xl mb-1.5">🧒</div>
+                  <div
+                    className="font-extrabold text-sm leading-tight"
+                    style={{ color: 'var(--text-strong)' }}
+                  >
+                    Для дитини
+                  </div>
+                  <div
+                    className="text-xs font-medium mt-0.5"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    4–17 років
+                  </div>
+                </button>
               </div>
             </div>
 
-            {/* Hero Offer & Price Box */}
-            <div className="text-center space-y-4 max-w-2xl mx-auto">
-              <div className="inline-block px-4 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-black tracking-wider text-yellow-400 uppercase">
-                🖤 ГОЛОВНА ПРОПОЗИЦІЯ РОКУ
-              </div>
-
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
-                Цілий рік англійської
-              </h1>
-
-              <div className="flex flex-col items-center justify-center">
-                <span className="text-base sm:text-lg text-neutral-500 font-semibold line-through">
-                  2 276 грн
-                </span>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl sm:text-7xl font-black text-[#FF3D2E] tracking-tight drop-shadow-md">
-                    1 670 грн
-                  </span>
-                  <span className="text-lg sm:text-2xl font-bold text-neutral-300">
-                    / місяць
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-sm sm:text-base text-neutral-300 max-w-xl mx-auto leading-relaxed">
-                Для дитини чи для себе — 48 уроків з викладачем і{' '}
-                <strong className="text-white underline decoration-[#FF3D2E] decoration-2 underline-offset-4">
-                  цілий рік розмовних клубів у подарунок
-                </strong>
-                . Найвигідніший спосіб заговорити англійською без страху.
-              </p>
-            </div>
-
-            {/* Receipt Card / Чек Black Friday (Exact from Email) */}
-            <div className="max-w-xl mx-auto bg-white text-neutral-900 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden border border-neutral-200">
-              <div className="text-center pb-4 border-b border-dashed border-neutral-300">
-                <span className="text-xs font-extrabold tracking-widest uppercase text-neutral-500">
-                  🧾 Ваш розрахунковий чек Black Friday
+            {/* Receipt Card ("🧾 Ваш розрахунковий чек Black Friday") */}
+            <Card
+              variant="raised"
+              padding="md"
+              style={{
+                width: '100%',
+                marginBottom: '1.5rem',
+                textAlign: 'left',
+                borderRadius: 'var(--radius-2xl)',
+                border: '1px solid var(--border-subtle)',
+              }}
+            >
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-dashed border-[var(--border-subtle)]">
+                <span className="text-lg">🧾</span>
+                <span
+                  className="font-extrabold text-sm tracking-tight"
+                  style={{ color: 'var(--text-strong)' }}
+                >
+                  Ваш розрахунковий чек Black Friday
                 </span>
               </div>
 
-              <div className="py-4 space-y-3.5 text-sm sm:text-base">
-                <div className="flex justify-between items-center py-1 border-b border-dashed border-neutral-200">
-                  <span className="font-bold flex items-center gap-2">
-                    📚 48 уроків з викладачем
+              <div className="space-y-2.5 text-xs">
+                <div className="flex justify-between items-start gap-2">
+                  <span style={{ color: 'var(--text-secondary)' }}>
+                    48 індивідуальних уроків (2 рази на тиждень):
                   </span>
-                  <div className="text-right">
-                    <span className="text-xs text-neutral-400 line-through mr-1.5">
+                  <div className="text-right shrink-0">
+                    <span className="line-through text-neutral-400 mr-1.5">
                       27 312 грн
                     </span>
-                    <strong className="text-neutral-900 font-black">
+                    <span className="font-bold" style={{ color: 'var(--text-strong)' }}>
                       20 018 грн
-                    </strong>
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center py-1 border-b border-dashed border-neutral-200">
-                  <span className="font-bold flex items-center gap-2">
-                    🗣 Рік розмовних клубів (52 тижні)
+                <div className="flex justify-between items-start gap-2">
+                  <span style={{ color: 'var(--text-secondary)' }}>
+                    52 тижні розмовних клубів (щотижня):
                   </span>
-                  <div className="text-right">
-                    <span className="text-xs text-neutral-400 line-through mr-1.5">
+                  <div className="text-right shrink-0">
+                    <span className="line-through text-neutral-400 mr-1.5">
                       19 200 грн
                     </span>
-                    <strong className="text-[#FF3D2E] font-black uppercase text-xs sm:text-sm bg-red-100 px-2 py-0.5 rounded-md">
-                      ПОДАРУНОК 🎁
-                    </strong>
+                    <span className="font-bold text-emerald-600 uppercase">
+                      0 грн (Подарунок)
+                    </span>
                   </div>
                 </div>
 
-                <div className="pt-2 flex justify-between items-baseline">
-                  <span className="font-black text-sm uppercase tracking-wide text-neutral-800">
-                    ВАША ЗАГАЛЬНА ВИГОДА:
+                <div className="flex justify-between items-start gap-2">
+                  <span style={{ color: 'var(--text-secondary)' }}>
+                    Інтерактивна платформа JustClass 24/7:
                   </span>
-                  <span className="text-2xl sm:text-3xl font-black text-[#FF3D2E]">
-                    26 000+ грн
+                  <span className="font-bold text-emerald-600">0 грн</span>
+                </div>
+
+                <div className="flex justify-between items-start gap-2">
+                  <span style={{ color: 'var(--text-secondary)' }}>
+                    Персональний куратор та сертифікат:
                   </span>
+                  <span className="font-bold text-emerald-600">0 грн</span>
+                </div>
+
+                <div className="pt-3 mt-2 border-t border-dashed border-[var(--border-subtle)] flex justify-between items-center">
+                  <div>
+                    <div
+                      className="font-extrabold text-sm"
+                      style={{ color: 'var(--text-strong)' }}
+                    >
+                      РАЗОМ до сплати:
+                    </div>
+                    <div
+                      className="text-[11px] font-semibold text-emerald-600"
+                    >
+                      Сумарна економія 26 000+ грн
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div
+                      className="text-lg font-black"
+                      style={{ color: 'var(--brand)' }}
+                    >
+                      1 670 грн / міс
+                    </div>
+                    <div
+                      className="text-[10px] font-medium"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      ~55 грн / день за щоденну англійську
+                    </div>
+                  </div>
                 </div>
               </div>
+            </Card>
 
-              <div className="pt-4 border-t border-neutral-200 text-center space-y-1 bg-neutral-50 -mx-6 -mb-6 p-4 rounded-b-3xl">
-                <p className="text-xs text-neutral-600 font-semibold">
-                  20 018 грн за повний річний курс = <strong>1 670 грн на місяць</strong>
-                </p>
-                <p className="text-xs text-neutral-500">
-                  ☕ Це близько <strong>55 грн на день</strong> — менше, ніж чашка кави
-                </p>
-              </div>
-            </div>
-
-            {/* Audience Pickers (Для дитини чи для дорослих) */}
-            <div className="max-w-xl mx-auto space-y-3">
-              <h3 className="text-center text-sm font-extrabold uppercase tracking-wider text-neutral-400 mb-1">
-                Оберіть, хто буде навчатися:
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <button
-                  type="button"
-                  onClick={() => handleStartFromHero('adult')}
-                  className="p-5 rounded-2xl bg-[#121212] border-2 border-neutral-800 hover:border-[#FF3D2E] hover:bg-[#181818] transition-all text-left flex flex-col justify-between group shadow-lg"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-3xl">🧑‍💼</span>
-                    <div>
-                      <h4 className="font-black text-base text-white group-hover:text-[#FF3D2E] transition-colors">
-                        Для дорослих
-                      </h4>
-                      <span className="text-xs text-neutral-400 font-medium">
-                        (від 18 років)
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-xs text-neutral-400 leading-relaxed">
-                    Для роботи, кар'єри, подорожей та щотижнева розмовна практика без страху.
-                  </p>
-                  <span className="mt-3 inline-flex items-center text-xs font-bold text-[#FF3D2E]">
-                    Почати підбір →
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleStartFromHero('child')}
-                  className="p-5 rounded-2xl bg-[#121212] border-2 border-neutral-800 hover:border-[#FF3D2E] hover:bg-[#181818] transition-all text-left flex flex-col justify-between group shadow-lg"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-3xl">🧒</span>
-                    <div>
-                      <h4 className="font-black text-base text-white group-hover:text-[#FF3D2E] transition-colors">
-                        Для дитини
-                      </h4>
-                      <span className="text-xs text-neutral-400 font-medium">
-                        (4–17 років)
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-xs text-neutral-400 leading-relaxed">
-                    Рік спокійного прогресу з викладачем, підтягування оцінок і клуби з однолітками.
-                  </p>
-                  <span className="mt-3 inline-flex items-center text-xs font-bold text-[#FF3D2E]">
-                    Почати підбір →
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            {/* Why Clubs Value Callout Box */}
-            <div className="max-w-xl mx-auto p-5 rounded-2xl bg-[#121212] border-l-4 border-yellow-400 border border-neutral-800 text-left space-y-1.5">
-              <h4 className="text-sm font-black text-yellow-400 flex items-center gap-2">
-                🎁 Чому клуби — це головний бонус Black Friday?
-              </h4>
-              <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed">
-                На індивідуальних уроках ви розбираєте граматику та правила, а в розмовних
-                клубах — починаєте говорити! Цілий рік живої групової практики зніме мовний
-                бар'єр назавжди.
-              </p>
-            </div>
-
-            {/* Bottom Primary CTA Button */}
-            <div className="max-w-xl mx-auto text-center pt-2">
-              <button
-                type="button"
-                onClick={() => handleStartFromHero()}
-                className="w-full py-5 px-6 rounded-2xl bg-[#FF3D2E] hover:bg-[#E03022] text-white font-black text-lg sm:text-xl uppercase tracking-wider transition-all shadow-xl shadow-red-600/30 transform hover:-translate-y-0.5 active:translate-y-0 bf-glow-btn flex items-center justify-center gap-3 cursor-pointer"
+            {/* Speaking Clubs Callout Box */}
+            <div
+              className="w-full rounded-2xl p-4 flex items-start gap-3 mb-6 text-left border"
+              style={{
+                backgroundColor: 'var(--orange-25)',
+                borderColor: 'var(--orange-100)',
+              }}
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 text-white"
+                style={{ backgroundColor: 'var(--brand)' }}
               >
-                <span>Зафіксувати ціну 1 670 грн/міс</span>
-                <span className="text-2xl">→</span>
-              </button>
-              <p className="text-xs text-neutral-500 mt-2">
-                Залишилося лише 24 промо-пакети на поточний потік
+                🗣️
+              </div>
+              <div className="flex-1">
+                <div
+                  className="text-xs font-black uppercase tracking-wider mb-1"
+                  style={{ color: 'var(--brand)' }}
+                >
+                  Чому розмовні клуби — це прорив у навчанні?
+                </div>
+                <p
+                  className="text-xs font-semibold leading-relaxed"
+                  style={{ color: 'var(--orange-700)' }}
+                >
+                  Кожен тиждень ви отримуєте додаткову практику живого спілкування в
+                  міні-групах до 8 осіб. 300+ розмовних тем на вибір — ідеальний спосіб
+                  назавжди подолати мовний бар’єр.
+                </p>
+              </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-3 w-full mb-6">
+              {[
+                { v: '17 000+', l: 'студентів' },
+                { v: '3.8M+', l: 'занять проведено' },
+                { v: '1 700+', l: 'викладачів' },
+                { v: '95%', l: 'рекомендують друзям' },
+              ].map((b) => (
+                <Card
+                  key={b.l}
+                  variant="raised"
+                  padding="sm"
+                  style={{
+                    textAlign: 'center',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-xl)',
+                  }}
+                >
+                  <div
+                    className="text-xl sm:text-2xl font-black"
+                    style={{ color: 'var(--brand)' }}
+                  >
+                    {b.v}
+                  </div>
+                  <div
+                    className="text-xs font-semibold mt-0.5"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    {b.l}
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            {/* Primary Action Button */}
+            <div className="w-full space-y-2.5">
+              <Button
+                variant="primary"
+                size="lg"
+                fullWidth
+                onClick={handleStartFromHero}
+                style={{
+                  height: 56,
+                  fontSize: 'var(--fs-body-lg)',
+                  borderRadius: 'var(--radius-pill)',
+                  boxShadow: 'var(--shadow-brand)',
+                }}
+              >
+                Зафіксувати знижку та почати →
+              </Button>
+              <p
+                className="text-center text-xs font-semibold uppercase tracking-widest"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Безкоштовно • Залишилось 14 місць за спецціною
               </p>
             </div>
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════
-            STEP 1: AUDIENCE SELECTOR (Fallback if not picked on Hero)
-        ══════════════════════════════════════════════════ */}
+        {/* ════════════════════════════════════
+            STEP 1: AUDIENCE SELECTOR (Fallback)
+        ════════════════════════════════════ */}
         {step === 1 && (
-          <div className="max-w-xl mx-auto w-full space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <span className="text-xs font-black uppercase tracking-wider text-[#FF3D2E]">
-                Крок 1 з 7
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black">
-                Хто буде вивчати англійську?
-              </h2>
-              <p className="text-sm text-neutral-400">
-                Це потрібно для адаптації програми та підбору відповідного викладача
-              </p>
-            </div>
+          <div className="w-full">
+            <h2
+              className="text-2xl font-extrabold mb-2 leading-tight text-center"
+              style={{ color: 'var(--text-strong)' }}
+            >
+              Для кого обираєте навчання?
+            </h2>
+            <p
+              className="text-sm text-center mb-6 font-medium leading-relaxed"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              Спецпропозиція Black Friday діє як для дорослих, так і для дитячих програм
+            </p>
 
-            <div className="space-y-3 pt-2">
+            <div className="grid gap-3">
               <button
                 type="button"
-                onClick={() => handleSelectAudience('adult')}
-                className="w-full p-5 rounded-2xl bg-[#121212] border-2 border-neutral-800 hover:border-[#FF3D2E] transition-all flex items-center gap-4 text-left group"
+                onClick={() => {
+                  setAudience('adult');
+                  advance(2);
+                }}
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group shadow-xs active:scale-[0.98] cursor-pointer"
+                style={{
+                  backgroundColor: 'var(--surface-card)',
+                  borderColor: 'var(--border-subtle)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--brand)';
+                  e.currentTarget.style.backgroundColor = 'var(--orange-25)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                  e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                }}
               >
-                <span className="text-3xl sm:text-4xl">🧑‍💼</span>
+                <span
+                  className="text-2xl w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border"
+                  style={{
+                    backgroundColor: 'var(--base-100)',
+                    borderColor: 'var(--border-subtle)',
+                  }}
+                >
+                  🧑
+                </span>
                 <div className="flex-1">
-                  <h4 className="font-black text-lg text-white group-hover:text-[#FF3D2E] transition-colors">
-                    Для себе (Дорослі)
-                  </h4>
-                  <p className="text-xs sm:text-sm text-neutral-400">
-                    Англійська для роботи, кар'єри, подорожей або розмовна практика
-                  </p>
+                  <div
+                    className="font-bold text-base leading-tight"
+                    style={{ color: 'var(--text-strong)' }}
+                  >
+                    Для себе (Дорослі 18+)
+                  </div>
+                  <div
+                    className="text-xs font-medium mt-1"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    Кар'єра, переїзд, подорожі та вільне спілкування
+                  </div>
                 </div>
-                <span className="text-neutral-500 group-hover:text-white transition-colors text-xl font-bold">
-                  →
+                <span
+                  className="text-lg shrink-0 font-bold"
+                  style={{ color: 'var(--brand)' }}
+                >
+                  ›
                 </span>
               </button>
 
               <button
                 type="button"
-                onClick={() => handleSelectAudience('child')}
-                className="w-full p-5 rounded-2xl bg-[#121212] border-2 border-neutral-800 hover:border-[#FF3D2E] transition-all flex items-center gap-4 text-left group"
+                onClick={() => {
+                  setAudience('child');
+                  advance(2);
+                }}
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group shadow-xs active:scale-[0.98] cursor-pointer"
+                style={{
+                  backgroundColor: 'var(--surface-card)',
+                  borderColor: 'var(--border-subtle)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--brand)';
+                  e.currentTarget.style.backgroundColor = 'var(--orange-25)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                  e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                }}
               >
-                <span className="text-3xl sm:text-4xl">🧒</span>
+                <span
+                  className="text-2xl w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border"
+                  style={{
+                    backgroundColor: 'var(--base-100)',
+                    borderColor: 'var(--border-subtle)',
+                  }}
+                >
+                  🧒
+                </span>
                 <div className="flex-1">
-                  <h4 className="font-black text-lg text-white group-hover:text-[#FF3D2E] transition-colors">
-                    Для моєї дитини
-                  </h4>
-                  <p className="text-xs sm:text-sm text-neutral-400">
-                    Для дошкільнят, школярів чи підлітків (4–17 років)
-                  </p>
+                  <div
+                    className="font-bold text-base leading-tight"
+                    style={{ color: 'var(--text-strong)' }}
+                  >
+                    Для дитини (4–17 років)
+                  </div>
+                  <div
+                    className="text-xs font-medium mt-1"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    Шкільні оцінки, подолання страху та вільна мова в ігровій формі
+                  </div>
                 </div>
-                <span className="text-neutral-500 group-hover:text-white transition-colors text-xl font-bold">
-                  →
+                <span
+                  className="text-lg shrink-0 font-bold"
+                  style={{ color: 'var(--brand)' }}
+                >
+                  ›
                 </span>
               </button>
             </div>
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════
-            STEP 2: AGE
-        ══════════════════════════════════════════════════ */}
+        {/* ════════════════════════════════════
+            STEP 2: AGE QUESTION
+        ════════════════════════════════════ */}
         {step === 2 && (
-          <div className="max-w-xl mx-auto w-full space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <span className="text-xs font-black uppercase tracking-wider text-[#FF3D2E]">
-                Крок 2 з 7
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black">
-                {currentQuestions.age.question}
-              </h2>
-              <p className="text-sm text-neutral-400">
-                {currentQuestions.age.subtitle}
-              </p>
-            </div>
+          <div className="w-full">
+            <h2
+              className="text-2xl font-extrabold mb-2 leading-tight text-center"
+              style={{ color: 'var(--text-strong)' }}
+            >
+              {currentQuestions.age.question}
+            </h2>
+            <p
+              className="text-sm text-center mb-6 font-medium leading-relaxed"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              {currentQuestions.age.subtitle}
+            </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <div className="grid gap-3">
               {currentQuestions.age.options.map((opt) => (
                 <button
                   key={opt.id}
-                  type="button"
                   onClick={() => handleSingleAnswer('age', opt.label)}
-                  className="p-4 sm:p-5 rounded-2xl bg-[#121212] border-2 border-neutral-800 hover:border-[#FF3D2E] hover:bg-[#181818] transition-all flex items-center gap-3.5 text-left group cursor-pointer"
+                  className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group shadow-xs active:scale-[0.98] cursor-pointer"
+                  style={{
+                    backgroundColor: 'var(--surface-card)',
+                    borderColor: 'var(--border-subtle)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--brand)';
+                    e.currentTarget.style.backgroundColor = 'var(--orange-25)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                    e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                  }}
                 >
-                  <span className="text-2xl sm:text-3xl">{opt.emoji}</span>
-                  <span className="font-black text-sm sm:text-base text-white group-hover:text-[#FF3D2E] transition-colors">
+                  <span
+                    className="text-2xl w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border"
+                    style={{
+                      backgroundColor: 'var(--base-100)',
+                      borderColor: 'var(--border-subtle)',
+                    }}
+                  >
+                    {opt.emoji}
+                  </span>
+                  <div className="flex-1 font-bold text-base" style={{ color: 'var(--text-strong)' }}>
                     {opt.label}
+                  </div>
+                  <span className="text-lg shrink-0 font-bold" style={{ color: 'var(--brand)' }}>
+                    ›
                   </span>
                 </button>
               ))}
@@ -616,227 +901,419 @@ export default function App() {
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════
-            STEP 3: LEVEL / SITUATION
-        ══════════════════════════════════════════════════ */}
+        {/* ════════════════════════════════════
+            STEP 3: LEVEL OR SITUATION
+        ════════════════════════════════════ */}
         {step === 3 && (
-          <div className="max-w-xl mx-auto w-full space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <span className="text-xs font-black uppercase tracking-wider text-[#FF3D2E]">
-                Крок 3 з 7
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black">
-                {audience === 'adult'
-                  ? ADULT_QUESTIONS.level.question
-                  : CHILD_QUESTIONS.situation.question}
-              </h2>
-              <p className="text-sm text-neutral-400">
-                {audience === 'adult'
-                  ? ADULT_QUESTIONS.level.subtitle
-                  : CHILD_QUESTIONS.situation.subtitle}
-              </p>
-            </div>
-
-            <div className="space-y-3 pt-2">
-              {(audience === 'adult'
-                ? ADULT_QUESTIONS.level.options
-                : CHILD_QUESTIONS.situation.options
-              ).map((opt) => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() =>
-                    handleSingleAnswer(
-                      audience === 'adult' ? 'level' : 'situation',
-                      opt.label
-                    )
-                  }
-                  className="w-full p-4 sm:p-5 rounded-2xl bg-[#121212] border-2 border-neutral-800 hover:border-[#FF3D2E] hover:bg-[#181818] transition-all flex items-center gap-3.5 text-left group cursor-pointer"
+          <div className="w-full">
+            {audience === 'adult' ? (
+              <>
+                <h2
+                  className="text-2xl font-extrabold mb-2 leading-tight text-center"
+                  style={{ color: 'var(--text-strong)' }}
                 >
-                  <span className="text-2xl sm:text-3xl">{opt.emoji}</span>
-                  <div className="flex-1">
-                    <div className="font-black text-sm sm:text-base text-white group-hover:text-[#FF3D2E] transition-colors">
-                      {opt.label}
-                    </div>
-                    {opt.subtitle && (
-                      <div className="text-xs text-neutral-400 mt-0.5">
-                        {opt.subtitle}
+                  {ADULT_QUESTIONS.level.question}
+                </h2>
+                <p
+                  className="text-sm text-center mb-6 font-medium leading-relaxed"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  {ADULT_QUESTIONS.level.subtitle}
+                </p>
+
+                <div className="grid gap-3">
+                  {ADULT_QUESTIONS.level.options.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => handleSingleAnswer('level', opt.label)}
+                      className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group shadow-xs active:scale-[0.98] cursor-pointer"
+                      style={{
+                        backgroundColor: 'var(--surface-card)',
+                        borderColor: 'var(--border-subtle)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--brand)';
+                        e.currentTarget.style.backgroundColor = 'var(--orange-25)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                        e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                      }}
+                    >
+                      <span
+                        className="text-2xl w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border"
+                        style={{
+                          backgroundColor: 'var(--base-100)',
+                          borderColor: 'var(--border-subtle)',
+                        }}
+                      >
+                        {opt.emoji}
+                      </span>
+                      <div className="flex-1">
+                        <div
+                          className="font-bold text-base leading-tight"
+                          style={{ color: 'var(--text-strong)' }}
+                        >
+                          {opt.label}
+                        </div>
+                        {opt.subtitle && (
+                          <div
+                            className="text-xs font-medium mt-0.5"
+                            style={{ color: 'var(--text-muted)' }}
+                          >
+                            {opt.subtitle}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <span className="text-neutral-600 group-hover:text-white transition-colors">
-                    →
-                  </span>
-                </button>
-              ))}
-            </div>
+                      <span className="text-lg shrink-0 font-bold" style={{ color: 'var(--brand)' }}>
+                        ›
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <h2
+                  className="text-2xl font-extrabold mb-2 leading-tight text-center"
+                  style={{ color: 'var(--text-strong)' }}
+                >
+                  {CHILD_QUESTIONS.situation.question}
+                </h2>
+                <p
+                  className="text-sm text-center mb-6 font-medium leading-relaxed"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  {CHILD_QUESTIONS.situation.subtitle}
+                </p>
+
+                <div className="grid gap-3">
+                  {CHILD_QUESTIONS.situation.options.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => handleSingleAnswer('situation', opt.label)}
+                      className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group shadow-xs active:scale-[0.98] cursor-pointer"
+                      style={{
+                        backgroundColor: 'var(--surface-card)',
+                        borderColor: 'var(--border-subtle)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--brand)';
+                        e.currentTarget.style.backgroundColor = 'var(--orange-25)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                        e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                      }}
+                    >
+                      <span
+                        className="text-2xl w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border"
+                        style={{
+                          backgroundColor: 'var(--base-100)',
+                          borderColor: 'var(--border-subtle)',
+                        }}
+                      >
+                        {opt.emoji}
+                      </span>
+                      <div
+                        className="flex-1 font-bold text-sm leading-snug"
+                        style={{ color: 'var(--text-strong)' }}
+                      >
+                        {opt.label}
+                      </div>
+                      <span className="text-lg shrink-0 font-bold" style={{ color: 'var(--brand)' }}>
+                        ›
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════
-            STEP 4: GOAL / PRIORITY
-        ══════════════════════════════════════════════════ */}
+        {/* ════════════════════════════════════
+            STEP 4: GOAL OR PRIORITY
+        ════════════════════════════════════ */}
         {step === 4 && (
-          <div className="max-w-xl mx-auto w-full space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <span className="text-xs font-black uppercase tracking-wider text-[#FF3D2E]">
-                Крок 4 з 7
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black">
-                {audience === 'adult'
-                  ? ADULT_QUESTIONS.goal.question
-                  : CHILD_QUESTIONS.priority.question}
-              </h2>
-              <p className="text-sm text-neutral-400">
-                {audience === 'adult'
-                  ? ADULT_QUESTIONS.goal.subtitle
-                  : CHILD_QUESTIONS.priority.subtitle}
-              </p>
-            </div>
-
-            <div className="space-y-3 pt-2">
-              {(audience === 'adult'
-                ? ADULT_QUESTIONS.goal.options
-                : CHILD_QUESTIONS.priority.options
-              ).map((opt) => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() =>
-                    handleSingleAnswer(
-                      audience === 'adult' ? 'goal' : 'priority',
-                      opt.label
-                    )
-                  }
-                  className="w-full p-4 sm:p-5 rounded-2xl bg-[#121212] border-2 border-neutral-800 hover:border-[#FF3D2E] hover:bg-[#181818] transition-all flex items-center gap-3.5 text-left group cursor-pointer"
+          <div className="w-full">
+            {audience === 'adult' ? (
+              <>
+                <h2
+                  className="text-2xl font-extrabold mb-2 leading-tight text-center"
+                  style={{ color: 'var(--text-strong)' }}
                 >
-                  <span className="text-2xl sm:text-3xl">{opt.emoji}</span>
-                  <div className="flex-1">
-                    <div className="font-black text-sm sm:text-base text-white group-hover:text-[#FF3D2E] transition-colors">
-                      {opt.label}
-                    </div>
-                    {opt.subtitle && (
-                      <div className="text-xs text-neutral-400 mt-0.5">
-                        {opt.subtitle}
+                  {ADULT_QUESTIONS.goal.question}
+                </h2>
+                <p
+                  className="text-sm text-center mb-6 font-medium leading-relaxed"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  {ADULT_QUESTIONS.goal.subtitle}
+                </p>
+
+                <div className="grid gap-3">
+                  {ADULT_QUESTIONS.goal.options.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => handleSingleAnswer('goal', opt.label)}
+                      className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group shadow-xs active:scale-[0.98] cursor-pointer"
+                      style={{
+                        backgroundColor: 'var(--surface-card)',
+                        borderColor: 'var(--border-subtle)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--brand)';
+                        e.currentTarget.style.backgroundColor = 'var(--orange-25)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                        e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                      }}
+                    >
+                      <span
+                        className="text-2xl w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border"
+                        style={{
+                          backgroundColor: 'var(--base-100)',
+                          borderColor: 'var(--border-subtle)',
+                        }}
+                      >
+                        {opt.emoji}
+                      </span>
+                      <div className="flex-1">
+                        <div
+                          className="font-bold text-base leading-tight"
+                          style={{ color: 'var(--text-strong)' }}
+                        >
+                          {opt.label}
+                        </div>
+                        {opt.subtitle && (
+                          <div
+                            className="text-xs font-medium mt-0.5"
+                            style={{ color: 'var(--text-muted)' }}
+                          >
+                            {opt.subtitle}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <span className="text-neutral-600 group-hover:text-white transition-colors">
-                    →
-                  </span>
-                </button>
-              ))}
-            </div>
+                      <span className="text-lg shrink-0 font-bold" style={{ color: 'var(--brand)' }}>
+                        ›
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <h2
+                  className="text-2xl font-extrabold mb-2 leading-tight text-center"
+                  style={{ color: 'var(--text-strong)' }}
+                >
+                  {CHILD_QUESTIONS.priority.question}
+                </h2>
+                <p
+                  className="text-sm text-center mb-6 font-medium leading-relaxed"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  {CHILD_QUESTIONS.priority.subtitle}
+                </p>
+
+                <div className="grid gap-3">
+                  {CHILD_QUESTIONS.priority.options.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => handleSingleAnswer('priority', opt.label)}
+                      className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group shadow-xs active:scale-[0.98] cursor-pointer"
+                      style={{
+                        backgroundColor: 'var(--surface-card)',
+                        borderColor: 'var(--border-subtle)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--brand)';
+                        e.currentTarget.style.backgroundColor = 'var(--orange-25)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                        e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                      }}
+                    >
+                      <span
+                        className="text-2xl w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border"
+                        style={{
+                          backgroundColor: 'var(--base-100)',
+                          borderColor: 'var(--border-subtle)',
+                        }}
+                      >
+                        {opt.emoji}
+                      </span>
+                      <div
+                        className="flex-1 font-bold text-sm leading-snug"
+                        style={{ color: 'var(--text-strong)' }}
+                      >
+                        {opt.label}
+                      </div>
+                      <span className="text-lg shrink-0 font-bold" style={{ color: 'var(--brand)' }}>
+                        ›
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════
-            STEP 5: ASPECTS (MULTI-SELECT)
-        ══════════════════════════════════════════════════ */}
+        {/* ════════════════════════════════════
+            STEP 5: MULTI-SELECT ASPECTS
+        ════════════════════════════════════ */}
         {step === 5 && (
-          <div className="max-w-xl mx-auto w-full space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <span className="text-xs font-black uppercase tracking-wider text-[#FF3D2E]">
-                Крок 5 з 7 • Можна обрати декілька
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black">
-                {audience === 'adult'
-                  ? ADULT_QUESTIONS.aspects.question
-                  : CHILD_QUESTIONS.aspects.question}
-              </h2>
-              <p className="text-sm text-neutral-400">
-                Позначте всі навички, на яких слід зробити особливий акцент
-              </p>
-            </div>
+          <div className="w-full">
+            <h2
+              className="text-2xl font-extrabold mb-2 leading-tight text-center"
+              style={{ color: 'var(--text-strong)' }}
+            >
+              {audience === 'adult'
+                ? ADULT_QUESTIONS.aspects.question
+                : CHILD_QUESTIONS.aspects.question}
+            </h2>
+            <p
+              className="text-sm text-center mb-6 font-medium leading-relaxed"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              Оберіть один або кілька варіантів для акценту в програмі
+            </p>
 
-            <div className="space-y-2.5 pt-2">
+            <div className="grid gap-2.5 mb-6">
               {(audience === 'adult'
                 ? ADULT_QUESTIONS.aspects.options
                 : CHILD_QUESTIONS.aspects.options
               ).map((opt) => {
-                const isSelected = multiAspects.includes(opt.label);
+                const sel = multiAspects.includes(opt.label);
                 return (
                   <button
                     key={opt.id}
-                    type="button"
                     onClick={() => toggleMultiAspect(opt.label)}
-                    className={`w-full p-4 rounded-2xl border-2 transition-all flex items-center justify-between text-left cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#1E1212] border-[#FF3D2E] text-white shadow-lg shadow-red-500/20'
-                        : 'bg-[#121212] border-neutral-800 text-neutral-300 hover:border-neutral-700'
-                    }`}
+                    className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left active:scale-[0.98] shadow-xs cursor-pointer"
+                    style={{
+                      backgroundColor: sel ? 'var(--orange-25)' : 'var(--surface-card)',
+                      borderColor: sel ? 'var(--brand)' : 'var(--border-subtle)',
+                    }}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{opt.emoji}</span>
-                      <span className="font-black text-sm sm:text-base">
-                        {opt.label}
-                      </span>
-                    </div>
-                    <div
-                      className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center text-xs font-bold ${
-                        isSelected
-                          ? 'border-[#FF3D2E] bg-[#FF3D2E] text-white'
-                          : 'border-neutral-600 bg-transparent'
-                      }`}
+                    <span
+                      className="text-xl w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border"
+                      style={{
+                        backgroundColor: 'var(--base-100)',
+                        borderColor: 'var(--border-subtle)',
+                      }}
                     >
-                      {isSelected ? '✓' : ''}
+                      {opt.emoji}
+                    </span>
+                    <span
+                      className="flex-1 font-bold text-sm leading-snug"
+                      style={{ color: 'var(--text-strong)' }}
+                    >
+                      {opt.label}
+                    </span>
+                    <div
+                      className="w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-all"
+                      style={{
+                        borderColor: sel ? 'var(--brand)' : 'var(--border-strong)',
+                        backgroundColor: sel ? 'var(--brand)' : 'transparent',
+                      }}
+                    >
+                      {sel && (
+                        <span className="text-white text-xs font-black leading-none">
+                          ✓
+                        </span>
+                      )}
                     </div>
                   </button>
                 );
               })}
             </div>
 
-            <div className="pt-3">
-              <button
-                type="button"
-                disabled={multiAspects.length === 0}
-                onClick={handleMultiSubmit}
-                className="w-full py-4.5 rounded-2xl bg-[#FF3D2E] hover:bg-[#E03022] text-white font-black text-base uppercase tracking-wider transition-all shadow-lg shadow-red-600/30 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              >
-                Продовжити ({multiAspects.length} обрано) →
-              </button>
-            </div>
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              disabled={multiAspects.length === 0}
+              onClick={handleMultiSubmit}
+              style={{
+                height: 56,
+                fontSize: 'var(--fs-body-lg)',
+                borderRadius: 'var(--radius-pill)',
+                boxShadow: multiAspects.length > 0 ? 'var(--shadow-brand)' : 'none',
+              }}
+            >
+              Продовжити →
+            </Button>
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════
+        {/* ════════════════════════════════════
             STEP 6: INTENSITY
-        ══════════════════════════════════════════════════ */}
+        ════════════════════════════════════ */}
         {step === 6 && (
-          <div className="max-w-xl mx-auto w-full space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <span className="text-xs font-black uppercase tracking-wider text-[#FF3D2E]">
-                Крок 6 з 7
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black">
-                {COMMON_QUESTIONS.intensity.question}
-              </h2>
-              <p className="text-sm text-neutral-400">
-                {COMMON_QUESTIONS.intensity.subtitle}
-              </p>
-            </div>
+          <div className="w-full">
+            <h2
+              className="text-2xl font-extrabold mb-2 leading-tight text-center"
+              style={{ color: 'var(--text-strong)' }}
+            >
+              {COMMON_QUESTIONS.intensity.question}
+            </h2>
+            <p
+              className="text-sm text-center mb-6 font-medium leading-relaxed"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              {COMMON_QUESTIONS.intensity.subtitle}
+            </p>
 
-            <div className="space-y-3 pt-2">
+            <div className="grid gap-3">
               {COMMON_QUESTIONS.intensity.options.map((opt) => (
                 <button
                   key={opt.id}
-                  type="button"
                   onClick={() => handleSingleAnswer('intensity', opt.label)}
-                  className="w-full p-4 sm:p-5 rounded-2xl bg-[#121212] border-2 border-neutral-800 hover:border-[#FF3D2E] hover:bg-[#181818] transition-all flex items-center gap-3.5 text-left group cursor-pointer"
+                  className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group shadow-xs active:scale-[0.98] cursor-pointer"
+                  style={{
+                    backgroundColor: 'var(--surface-card)',
+                    borderColor: 'var(--border-subtle)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--brand)';
+                    e.currentTarget.style.backgroundColor = 'var(--orange-25)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                    e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                  }}
                 >
-                  <span className="text-2xl sm:text-3xl">{opt.emoji}</span>
+                  <span
+                    className="text-2xl w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border"
+                    style={{
+                      backgroundColor: 'var(--base-100)',
+                      borderColor: 'var(--border-subtle)',
+                    }}
+                  >
+                    {opt.emoji}
+                  </span>
                   <div className="flex-1">
-                    <div className="font-black text-sm sm:text-base text-white group-hover:text-[#FF3D2E] transition-colors">
+                    <div
+                      className="font-bold text-base leading-tight"
+                      style={{ color: 'var(--text-strong)' }}
+                    >
                       {opt.label}
                     </div>
                     {opt.subtitle && (
-                      <div className="text-xs text-neutral-400 mt-0.5">
+                      <div
+                        className="text-xs font-medium mt-0.5"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
                         {opt.subtitle}
                       </div>
                     )}
                   </div>
-                  <span className="text-neutral-600 group-hover:text-white transition-colors">
-                    →
+                  <span className="text-lg shrink-0 font-bold" style={{ color: 'var(--brand)' }}>
+                    ›
                   </span>
                 </button>
               ))}
@@ -844,34 +1321,63 @@ export default function App() {
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════
+        {/* ════════════════════════════════════
             STEP 7: SCHEDULE
-        ══════════════════════════════════════════════════ */}
+        ════════════════════════════════════ */}
         {step === 7 && (
-          <div className="max-w-xl mx-auto w-full space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <span className="text-xs font-black uppercase tracking-wider text-[#FF3D2E]">
-                Крок 7 з 7
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black">
-                {COMMON_QUESTIONS.schedule.question}
-              </h2>
-              <p className="text-sm text-neutral-400">
-                {COMMON_QUESTIONS.schedule.subtitle}
-              </p>
-            </div>
+          <div className="w-full">
+            <h2
+              className="text-2xl font-extrabold mb-2 leading-tight text-center"
+              style={{ color: 'var(--text-strong)' }}
+            >
+              {COMMON_QUESTIONS.schedule.question}
+            </h2>
+            <p
+              className="text-sm text-center mb-6 font-medium leading-relaxed"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              {COMMON_QUESTIONS.schedule.subtitle}
+            </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <div className="grid gap-3">
               {COMMON_QUESTIONS.schedule.options.map((opt) => (
                 <button
                   key={opt.id}
-                  type="button"
-                  onClick={() => handleSingleAnswer('schedule', opt.label)}
-                  className="p-4 sm:p-5 rounded-2xl bg-[#121212] border-2 border-neutral-800 hover:border-[#FF3D2E] hover:bg-[#181818] transition-all flex items-center gap-3 text-left group cursor-pointer"
+                  onClick={() => {
+                    setAnswers((prev) => ({ ...prev, schedule: opt.label }));
+                    advance(8);
+                  }}
+                  className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group shadow-xs active:scale-[0.98] cursor-pointer"
+                  style={{
+                    backgroundColor: 'var(--surface-card)',
+                    borderColor: 'var(--border-subtle)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--brand)';
+                    e.currentTarget.style.backgroundColor = 'var(--orange-25)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                    e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                  }}
                 >
-                  <span className="text-2xl sm:text-3xl">{opt.emoji}</span>
-                  <span className="font-black text-sm text-white group-hover:text-[#FF3D2E] transition-colors">
+                  <span
+                    className="text-2xl w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border"
+                    style={{
+                      backgroundColor: 'var(--base-100)',
+                      borderColor: 'var(--border-subtle)',
+                    }}
+                  >
+                    {opt.emoji}
+                  </span>
+                  <div
+                    className="flex-1 font-bold text-base leading-tight"
+                    style={{ color: 'var(--text-strong)' }}
+                  >
                     {opt.label}
+                  </div>
+                  <span className="text-lg shrink-0 font-bold" style={{ color: 'var(--brand)' }}>
+                    ›
                   </span>
                 </button>
               ))}
@@ -879,282 +1385,334 @@ export default function App() {
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════
-            STEP 8: VALUE INTERSTITIAL & REVIEWS
-        ══════════════════════════════════════════════════ */}
+        {/* ════════════════════════════════════
+            STEP 8: INTERSTITIAL (VALUE & REVIEWS)
+        ════════════════════════════════════ */}
         {step === 8 && (
-          <div className="max-w-2xl mx-auto w-full space-y-6 animate-fade-in text-center">
-            <div className="space-y-2">
-              <span className="inline-block px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 text-xs font-black uppercase tracking-wider">
-                🎁 Головний бонус вашого пакета
-              </span>
-              <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
-                Цілий рік розмовних клубів (52 тижні) — 0 грн замість 19 200 грн
-              </h2>
-              <p className="text-sm sm:text-base text-neutral-300 max-w-lg mx-auto">
-                На індивідуальних уроках ви розбираєте граматику з викладачем, а в клубах —
-                спілкуєтеся наживо. Це саме те, що перетворює знання на вільне впевнене мовлення!
-              </p>
+          <div className="w-full">
+            {/* Dark Hero Card */}
+            <div
+              className="rounded-3xl p-6 text-center text-white mb-6 relative overflow-hidden shadow-xl"
+              style={{
+                backgroundColor: 'var(--surface-inverse)',
+                border: '1px solid var(--base-800)',
+              }}
+            >
+              <div className="absolute -right-8 -bottom-8 pointer-events-none opacity-20 filter invert">
+                <BrandShape shape="rings" size={160} />
+              </div>
+              <div className="absolute -left-6 -top-6 pointer-events-none opacity-25">
+                <BrandShape shape="burst" size={120} color="var(--element-yellow)" />
+              </div>
+
+              <div className="relative z-10">
+                <div className="text-4xl mb-3">🖤</div>
+                <h2 className="text-xl font-extrabold mb-2 leading-tight">
+                  Вашу знижку Black Friday зафіксовано!
+                </h2>
+                <p className="text-sm font-normal text-neutral-300 leading-relaxed mb-4 max-w-sm mx-auto">
+                  Пакет з 48 індивідуальних уроків (1 670 грн/міс) та цілий рік щотижневих
+                  розмовних клубів у подарунок зарезервовано.
+                </p>
+
+                <div className="inline-flex items-center gap-2 bg-[#FF5B09]/20 border border-[#FF5B09]/50 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                  <span>🔥 Економія понад 26 000 грн</span>
+                </div>
+              </div>
             </div>
 
-            {/* Social Proof Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-2">
-              <div className="p-3.5 rounded-2xl bg-[#121212] border border-neutral-800">
-                <div className="text-xl sm:text-2xl font-black text-[#FF3D2E]">17 000+</div>
-                <div className="text-[11px] font-semibold text-neutral-400">активних учнів</div>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-[#121212] border border-neutral-800">
-                <div className="text-xl sm:text-2xl font-black text-[#FF3D2E]">3.8 млн+</div>
-                <div className="text-[11px] font-semibold text-neutral-400">проведених уроків</div>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-[#121212] border border-neutral-800">
-                <div className="text-xl sm:text-2xl font-black text-[#FF3D2E]">1 700+</div>
-                <div className="text-[11px] font-semibold text-neutral-400">викладачів</div>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-[#121212] border border-neutral-800">
-                <div className="text-xl sm:text-2xl font-black text-[#FF3D2E]">4.9 / 5</div>
-                <div className="text-[11px] font-semibold text-neutral-400">середня оцінка</div>
-              </div>
+            {/* Testimonials */}
+            <div className="text-center mb-4">
+              <h3
+                className="text-lg font-extrabold"
+                style={{ color: 'var(--text-strong)' }}
+              >
+                Відгуки студентів JustSchool
+              </h3>
             </div>
 
-            {/* Reviews Carousel/Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
-              {REVIEWS.map((rev, i) => (
-                <div
-                  key={i}
-                  className="p-4 rounded-2xl bg-[#121212] border border-neutral-800 flex flex-col justify-between"
+            <div className="space-y-3 mb-6">
+              {REVIEWS.map((rev) => (
+                <Card
+                  key={rev.name}
+                  variant="raised"
+                  padding="sm"
+                  style={{
+                    borderRadius: 'var(--radius-xl)',
+                    border: '1px solid var(--border-subtle)',
+                  }}
                 >
-                  <p className="text-xs text-neutral-300 leading-relaxed italic mb-3">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center font-extrabold text-sm shrink-0 border"
+                      style={{
+                        backgroundColor: 'var(--orange-25)',
+                        color: 'var(--orange-700)',
+                        borderColor: 'var(--orange-100)',
+                      }}
+                    >
+                      {rev.name[0]}
+                    </div>
+                    <div>
+                      <div
+                        className="font-extrabold text-sm"
+                        style={{ color: 'var(--text-strong)' }}
+                      >
+                        {rev.name}
+                      </div>
+                      <div
+                        className="text-xs font-medium"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
+                        {rev.role}
+                      </div>
+                    </div>
+                  </div>
+                  <p
+                    className="text-xs font-medium leading-relaxed italic"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
                     "{rev.text}"
                   </p>
-                  <div>
-                    <div className="text-xs font-black text-white">{rev.name}</div>
-                    <div className="text-[10px] text-neutral-500">{rev.role}</div>
-                  </div>
-                </div>
+                </Card>
               ))}
             </div>
 
-            <div className="pt-4">
-              <button
-                type="button"
-                onClick={() => setStep(9)}
-                className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-[#FF3D2E] hover:bg-[#E03022] text-white font-black text-base sm:text-lg uppercase tracking-wider transition-all shadow-xl shadow-red-600/30 bf-glow-btn cursor-pointer inline-flex items-center justify-center gap-3"
-              >
-                <span>Отримати мій розрахунок та план →</span>
-              </button>
-            </div>
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              onClick={() => advance(9)}
+              style={{
+                height: 56,
+                fontSize: 'var(--fs-body-lg)',
+                borderRadius: 'var(--radius-pill)',
+                boxShadow: 'var(--shadow-brand)',
+              }}
+            >
+              Перейти до розрахунку плану →
+            </Button>
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════
-            STEP 9: DYNAMIC LOADER CALCULATION
-        ══════════════════════════════════════════════════ */}
+        {/* ════════════════════════════════════
+            STEP 9: LOADER (CALCULATION)
+        ════════════════════════════════════ */}
         {step === 9 && (
-          <div className="max-w-md mx-auto w-full text-center space-y-6 animate-fade-in py-8">
-            <div className="w-16 h-16 mx-auto rounded-full bg-red-950/40 border-2 border-[#FF3D2E] flex items-center justify-center text-2xl animate-spin">
-              ⚙️
+          <div className="w-full flex flex-col items-center text-center py-6">
+            {/* Spinner with JustSchool styling */}
+            <div
+              className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 border"
+              style={{
+                backgroundColor: 'var(--orange-25)',
+                borderColor: 'var(--orange-100)',
+              }}
+            >
+              <div
+                className="w-10 h-10 border-4 rounded-full animate-spin"
+                style={{
+                  borderColor: 'var(--orange-100)',
+                  borderTopColor: 'var(--brand)',
+                }}
+              />
             </div>
 
-            <div className="space-y-2">
-              <h3 className="text-2xl font-black text-white">
-                Формуємо ваш Black Friday пакет...
-              </h3>
-              <p className="text-xs text-neutral-400">
-                Фіксуємо знижку 26 000+ грн та закріплюємо викладача
-              </p>
+            <h2
+              className="text-xl font-extrabold mb-8 leading-tight"
+              style={{ color: 'var(--text-strong)' }}
+            >
+              Формуємо ваш персональний план Black Friday...
+            </h2>
+
+            {/* Progress bar */}
+            <div className="w-full bg-[var(--base-200)] rounded-full h-2.5 mb-3 overflow-hidden">
+              <div
+                className="h-full transition-all duration-300"
+                style={{
+                  width: `${loaderProgress}%`,
+                  backgroundColor: 'var(--brand)',
+                }}
+              />
+            </div>
+            <div
+              className="font-black text-2xl font-mono mb-10"
+              style={{ color: 'var(--brand)' }}
+            >
+              {Math.round(loaderProgress)}%
             </div>
 
-            {/* Animated percentage progress bar */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs font-bold text-neutral-400">
-                <span>Прогрес генерації</span>
-                <span className="text-[#FF3D2E]">{loaderProgress}%</span>
-              </div>
-              <div className="w-full h-3 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800">
-                <div
-                  className="h-full bg-gradient-to-r from-red-600 to-[#FF3D2E] rounded-full transition-all duration-150"
-                  style={{ width: `${loaderProgress}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Checklist items */}
-            <div className="p-4 rounded-2xl bg-[#121212] border border-neutral-800 text-left text-xs space-y-2.5">
-              <div
-                className={`flex items-center gap-2 transition-opacity ${
-                  loaderProgress > 20 ? 'text-white' : 'text-neutral-600'
-                }`}
-              >
-                <span>{loaderProgress > 20 ? '✓' : '○'}</span>
-                <span>Фіксація ціни 1 670 грн/місяць замість 2 276 грн</span>
-              </div>
-              <div
-                className={`flex items-center gap-2 transition-opacity ${
-                  loaderProgress > 50 ? 'text-white' : 'text-neutral-600'
-                }`}
-              >
-                <span>{loaderProgress > 50 ? '✓' : '○'}</span>
-                <span>Нарахування 52 тижнів розмовних клубів (0 грн)</span>
-              </div>
-              <div
-                className={`flex items-center gap-2 transition-opacity ${
-                  loaderProgress > 80 ? 'text-white' : 'text-neutral-600'
-                }`}
-              >
-                <span>{loaderProgress > 80 ? '✓' : '○'}</span>
-                <span>Підбір розкладу під ваш обраний час</span>
-              </div>
+            {/* Checklist */}
+            <div className="w-full space-y-3 text-left">
+              {[
+                'Фіксація спецціни Black Friday 1 670 грн/місяць...',
+                'Нарахування безкоштовного року розмовних клубів (0 грн)...',
+                'Складання персонального графіку уроків...',
+                'Підбір сертифікованого викладача за критеріями...',
+              ].map((p, i) => {
+                const threshold = (i / 4) * 100;
+                const active = loaderProgress > threshold;
+                return (
+                  <div
+                    key={p}
+                    className="flex items-center gap-3 text-sm font-semibold transition-all duration-500"
+                    style={{
+                      color: active ? 'var(--text-strong)' : 'var(--base-400)',
+                    }}
+                  >
+                    <div
+                      className="w-2.5 h-2.5 rounded-full shrink-0 transition-all duration-500"
+                      style={{
+                        backgroundColor: active ? 'var(--brand)' : 'var(--base-300)',
+                      }}
+                    />
+                    {p}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════
-            STEP 10: LEAD FORM GATE (With Onboarding Redirect)
-        ══════════════════════════════════════════════════ */}
+        {/* ════════════════════════════════════
+            STEP 10: LEAD FORM GATE
+        ════════════════════════════════════ */}
         {step === 10 && (
-          <div className="max-w-xl mx-auto w-full bg-[#101010] border border-neutral-800 rounded-3xl p-6 sm:p-9 shadow-2xl animate-fade-in space-y-6">
-            <div className="text-center space-y-2">
-              <span className="inline-block px-3 py-1 rounded-full bg-red-950/40 border border-[#FF3D2E]/40 text-[#FF3D2E] text-xs font-black uppercase tracking-wider">
-                🎉 Пропозицію зафіксовано
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
-                Заберіть рік англійської за 1 670 грн/міс
+          <div className="w-full">
+            <div className="text-center mb-6">
+              <div className="mb-2">
+                <Badge tone="brand" size="md">
+                  🎉 СПЕЦПРОПОЗИЦІЯ ЗБЕРЕЖЕНА
+                </Badge>
+              </div>
+              <h2
+                className="text-2xl font-extrabold mb-2 leading-tight"
+                style={{ color: 'var(--text-strong)' }}
+              >
+                Отримайте рік англійської за спецціною
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-400 max-w-md mx-auto leading-relaxed">
-                Введіть контактні дані для активації акційного пакету «48 уроків + Рік
-                розмовних клубів у подарунок». Менеджер зв'яжеться для узгодження першого уроку.
+              <p
+                className="text-sm font-medium leading-relaxed"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                Залиште контакти, щоб закріпити знижку 1 670 грн/місяць та забрати цілий рік
+                розмовних клубів у подарунок
               </p>
             </div>
 
-            {/* Summary mini card */}
-            <div className="p-4 rounded-2xl bg-[#161616] border border-neutral-800 flex items-center justify-between text-xs sm:text-sm">
-              <div className="space-y-0.5">
-                <span className="text-neutral-400 block text-xs">Обрано для:</span>
-                <span className="font-bold text-white">
-                  {audience === 'adult' ? 'Дорослий (18+)' : 'Дитина'} • {answers.intensity || '2 рази/тижд'}
-                </span>
+            {/* Gift banner */}
+            <div
+              className="rounded-2xl p-4 flex items-center gap-3 mb-6 border"
+              style={{
+                backgroundColor: 'var(--orange-25)',
+                borderColor: 'var(--orange-100)',
+              }}
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 text-white"
+                style={{ backgroundColor: 'var(--brand)' }}
+              >
+                🎁
               </div>
-              <div className="text-right">
-                <span className="text-neutral-400 block text-xs">Ціна Black Friday:</span>
-                <span className="font-black text-[#FF3D2E] text-base">
-                  1 670 грн / міс
-                </span>
-              </div>
+              <p
+                className="text-xs font-bold leading-tight"
+                style={{ color: 'var(--orange-700)' }}
+              >
+                Безкоштовний пробний урок з методистом у подарунок! Отримайте
+                індивідуальний розбір та протестуйте платформу.
+              </p>
             </div>
 
-            {/* Lead Form */}
             <form onSubmit={handleSubmitLead} className="space-y-4">
               {/* Name */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-300 mb-1.5">
-                  Ваше ім'я <span className="text-[#FF3D2E]">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Олена або Олександр"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  disabled={isSubmitting}
-                  className="w-full px-4 py-3.5 rounded-2xl border-2 border-neutral-800 bg-[#161616] text-white focus:border-[#FF3D2E] focus:ring-4 focus:ring-[#FF3D2E]/20 outline-none font-semibold text-base transition-all disabled:opacity-50"
-                />
-              </div>
+              <input
+                id="lead-name"
+                type="text"
+                placeholder="Ваше ім'я"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={isSubmitting}
+                required
+                autoComplete="name"
+                className="w-full p-4 rounded-2xl border-2 outline-none transition-all font-semibold bg-white disabled:opacity-50"
+                style={{
+                  borderColor: 'var(--border-default)',
+                  color: 'var(--text-strong)',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--brand)';
+                  e.currentTarget.style.boxShadow = 'var(--focus-ring)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-default)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              />
 
-              {/* Phone Input with Multi-Country Validation */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-300 mb-1.5">
-                  Номер телефону <span className="text-[#FF3D2E]">*</span>
-                </label>
-                <PhoneInput
-                  value={rawPhone}
-                  onChange={(p, valid) => {
-                    setRawPhone(p);
-                    setIsPhoneValid(valid);
-                  }}
-                  disabled={isSubmitting}
-                  initialCountry={geoCountry}
-                  theme="dark"
-                />
-              </div>
+              {/* Phone (multi-country) */}
+              <PhoneInput
+                onChange={(raw, valid) => {
+                  setRawPhone(raw);
+                  setIsPhoneValid(valid);
+                }}
+                initialCountry={geoCountry}
+                disabled={isSubmitting}
+              />
 
               {/* Email */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-300 mb-1.5">
-                  Електронна пошта (Email) <span className="text-[#FF3D2E]">*</span>
-                </label>
-                <input
-                  type="email"
-                  required
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isSubmitting}
-                  className="w-full px-4 py-3.5 rounded-2xl border-2 border-neutral-800 bg-[#161616] text-white focus:border-[#FF3D2E] focus:ring-4 focus:ring-[#FF3D2E]/20 outline-none font-semibold text-base transition-all disabled:opacity-50"
-                />
-              </div>
+              <input
+                id="lead-email"
+                type="email"
+                placeholder="Ваш e-mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isSubmitting}
+                required
+                autoComplete="email"
+                className="w-full p-4 rounded-2xl border-2 outline-none transition-all font-semibold bg-white disabled:opacity-50"
+                style={{
+                  borderColor: 'var(--border-default)',
+                  color: 'var(--text-strong)',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--brand)';
+                  e.currentTarget.style.boxShadow = 'var(--focus-ring)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-default)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              />
 
-              {/* Submit CTA Button */}
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={isSubmitting || !name.trim() || !email.trim() || !isPhoneValid}
-                  className="w-full py-4.5 px-6 rounded-2xl bg-[#FF3D2E] hover:bg-[#E03022] text-white font-black text-base sm:text-lg uppercase tracking-wider transition-all shadow-xl shadow-red-600/30 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer bf-glow-btn flex items-center justify-center gap-2"
-                >
-                  <span>
-                    {isSubmitting ? 'Реєструємо пропозицію...' : 'Забрати рік англійської →'}
-                  </span>
-                </button>
-              </div>
+              {/* Submit */}
+              <Button
+                id="lead-submit"
+                variant="primary"
+                size="lg"
+                fullWidth
+                type="submit"
+                disabled={
+                  isSubmitting || !isPhoneValid || !name.trim() || !email.trim()
+                }
+                style={{
+                  height: 56,
+                  fontSize: 'var(--fs-body-lg)',
+                  borderRadius: 'var(--radius-pill)',
+                  boxShadow: 'var(--shadow-brand)',
+                }}
+              >
+                {isSubmitting ? 'Надсилаємо заявку...' : 'Забрати рік англійської →'}
+              </Button>
 
-              <div className="text-center text-[11px] text-neutral-500 pt-1">
-                🔒 Ваші дані захищено. Після надсилання ви перейдете в інтерактивний кабінет студента JustSchool.
-              </div>
+              <p
+                className="text-center text-[10px] font-semibold uppercase tracking-widest"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Твої дані у безпеці • Без спаму • Офіційна оферта
+              </p>
             </form>
           </div>
         )}
       </main>
-
-      {/* ─── Footer ─── */}
-      <footer className="w-full border-t border-neutral-900 bg-[#050505] py-6 px-4 text-center text-xs text-neutral-500">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-left">
-            <div className="text-neutral-400 font-bold mb-1">
-              JustSchool © {new Date().getFullYear()} • Black Friday Special Offer
-            </div>
-            <div className="text-[11px]">
-              Онлайн-школа англійської мови для дітей та дорослих
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 text-xs font-semibold">
-            <a
-              href="https://justschool.me/uk/privacy-policy"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-neutral-300 transition-colors"
-            >
-              Конфіденційність
-            </a>
-            <span>•</span>
-            <a
-              href="https://justschool.me/uk/terms-of-use"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-neutral-300 transition-colors"
-            >
-              Умови акції
-            </a>
-            <span>•</span>
-            <a
-              href="tel:0800335481"
-              className="text-[#FF3D2E] hover:underline"
-            >
-              080 033 54 81
-            </a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
