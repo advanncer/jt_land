@@ -34,24 +34,12 @@ const PROGRESS_STEPS = [2, 3, 4, 5, 6, 7];
 const TOTAL_PROGRESS = PROGRESS_STEPS.length;
 
 export default function App() {
-  // ─── Detect Initial Variant from URL ───────────────────────
-  const getInitialVariant = (): FunnelVariant => {
-    try {
-      const url = new URL(window.location.href);
-      if (url.searchParams.get('v') === 'standard' || url.searchParams.get('v') === '2') {
-        return 'standard';
-      }
-      if (
-        url.pathname.includes('/v1') ||
-        url.pathname.includes('-v1') ||
-        url.searchParams.get('v') === '1' ||
-        url.searchParams.get('version') === 'v1'
-      ) {
-        return 'v1';
-      }
-    } catch {}
-    return 'v1'; // Default to V1 single-screen as requested!
-  };
+  // ─── Detect Variant Strictly by Route (No GET-params) ──────
+  const isV1 =
+    typeof window !== 'undefined' &&
+    (window.location.pathname.includes('v1') ||
+      window.location.pathname.endsWith('/v1'));
+  const variant: FunnelVariant = isV1 ? 'v1' : 'standard';
 
   const getInitialAudience = (): Audience => {
     try {
@@ -63,7 +51,6 @@ export default function App() {
   };
 
   // ─── State ───────────────────────────────────────────────
-  const [variant, setVariant] = useState<FunnelVariant>(getInitialVariant);
   const [step, setStep] = useState<number>(0); // 0 = Hero, 1 = Audience, 2..7 = Questions, 8 = Interstitial, 9 = Loader, 10 = LeadForm
   const [audience, setAudience] = useState<Audience>(getInitialAudience);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -385,21 +372,15 @@ export default function App() {
               {progressIdx + 1}/{TOTAL_PROGRESS}
             </span>
           ) : step === 0 ? (
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setVariant(variant === 'v1' ? 'standard' : 'v1')}
-                title="Перемкнути версію лендингу (V1 в один екран / Стандартна)"
-                className="text-[10px] font-black px-2 py-0.5 rounded-full border transition-all cursor-pointer"
-                style={{
-                  backgroundColor: variant === 'v1' ? '#1C160C' : 'var(--orange-25)',
-                  color: variant === 'v1' ? '#FBC314' : 'var(--brand)',
-                  borderColor: variant === 'v1' ? '#1C160C' : 'var(--orange-100)',
-                }}
-              >
-                {variant === 'v1' ? '⚡ V1: 1 ЕКРАН' : 'V2: ДЕТАЛЬНИЙ'}
-              </button>
-            </div>
+            <span
+              className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full"
+              style={{
+                backgroundColor: 'var(--orange-25)',
+                color: 'var(--brand)',
+              }}
+            >
+              BF 2026
+            </span>
           ) : null}
         </div>
       </header>
@@ -444,10 +425,10 @@ export default function App() {
                 <picture>
                   <source
                     media="(min-width: 640px)"
-                    srcSet={audience === 'child' ? bannerChildDesk : bannerDeskV1}
+                    srcSet={bannerChildDesk}
                   />
                   <img
-                    src={audience === 'child' ? bannerChildMob : bannerMobV1}
+                    src={bannerChildMob}
                     alt="Black Friday JustSchool"
                     className="w-full h-auto object-cover block"
                   />
