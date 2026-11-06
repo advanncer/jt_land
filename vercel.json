@@ -352,6 +352,26 @@
   ],
   "redirects": [
     {
+      "source": "/onboarding",
+      "destination": "https://student.justschool.me/onboarding",
+      "permanent": false
+    },
+    {
+      "source": "/uk/onboarding",
+      "destination": "https://student.justschool.me/onboarding",
+      "permanent": false
+    },
+    {
+      "source": "/onboarding/:path*",
+      "destination": "https://student.justschool.me/onboarding",
+      "permanent": false
+    },
+    {
+      "source": "/uk/onboarding/:path*",
+      "destination": "https://student.justschool.me/onboarding",
+      "permanent": false
+    },
+    {
       "source": "/blogger",
       "destination": "/blogger/halloween",
       "permanent": false

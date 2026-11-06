@@ -167,8 +167,12 @@ export default function App() {
       // Conversions (Purchase) are sent server-side via n8n Conversions API (CAPI) on /api/submit.
       // Sending it in browser without matching event_id caused 2x Purchase duplication in Meta Ads.
 
+      const defaultOnboardingUrl = email.trim()
+        ? `https://id.justschool.me/login?email=${encodeURIComponent(email.trim())}`
+        : 'https://student.justschool.me/onboarding';
+
       const fallbackTimer = setTimeout(() => {
-        window.location.href = 'https://justschool.me/uk/onboarding';
+        window.location.href = defaultOnboardingUrl;
       }, 7000);
 
       const res = await fetch('/api/submit', {
@@ -186,13 +190,21 @@ export default function App() {
           quiz_name: 'eng-adult-quiz-plan-v2',
         });
         const result = await res.json();
-        window.location.href =
-          result?.redirectUri || 'https://justschool.me/uk/onboarding';
+        const targetRedirect =
+          result?.redirectUri &&
+          String(result.redirectUri).trim() !== '' &&
+          !String(result.redirectUri).includes('justschool.me/uk/onboarding')
+            ? String(result.redirectUri).trim()
+            : defaultOnboardingUrl;
+
+        window.location.href = targetRedirect;
       } else {
-        window.location.href = 'https://justschool.me/uk/onboarding';
+        window.location.href = defaultOnboardingUrl;
       }
     } catch {
-      window.location.href = 'https://justschool.me/uk/onboarding';
+      window.location.href = email.trim()
+        ? `https://id.justschool.me/login?email=${encodeURIComponent(email.trim())}`
+        : 'https://student.justschool.me/onboarding';
     }
   };
 

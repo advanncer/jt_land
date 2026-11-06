@@ -626,10 +626,35 @@ export default async function handler(request, response) {
     console.log("Submission execution summary:", summary);
 
     // Forward the n8n response (with redirectUri) back to the client if available
+    let finalRedirectUri = "";
+    if (n8nResult && n8nResult.value && n8nResult.value.data && n8nResult.value.data.redirectUri) {
+      finalRedirectUri = String(n8nResult.value.data.redirectUri).trim();
+    }
+
+    // Guard against empty redirectUri or obsolete /uk/onboarding route (which renders a 404 on main site)
+    if (
+      !finalRedirectUri ||
+      finalRedirectUri === "" ||
+      finalRedirectUri.includes("justschool.me/uk/onboarding") ||
+      finalRedirectUri === "/onboarding" ||
+      finalRedirectUri === "/uk/onboarding"
+    ) {
+      finalRedirectUri = email
+        ? `https://id.justschool.me/login?email=${encodeURIComponent(email)}`
+        : "https://student.justschool.me/onboarding";
+    }
+
     if (n8nResult && n8nResult.value.data) {
-      return response.status(200).json(n8nResult.value.data);
+      return response.status(200).json({
+        ...n8nResult.value.data,
+        redirectUri: finalRedirectUri,
+      });
     } else {
-      return response.status(200).json({ success: true, summary });
+      return response.status(200).json({
+        success: true,
+        redirectUri: finalRedirectUri,
+        summary,
+      });
     }
   } catch (e) {
     console.error("Handler Error:", e);

@@ -234,10 +234,14 @@ export default function App() {
       Lead_type: activeLeadType,
     };
 
+    const defaultOnboardingUrl = email.trim()
+      ? `https://id.justschool.me/login?email=${encodeURIComponent(email.trim())}`
+      : 'https://student.justschool.me/onboarding';
+
     try {
       // 7-second fallback redirect in case network hangs
       const fallbackTimer = setTimeout(() => {
-        window.location.href = 'https://justschool.me/uk/onboarding';
+        window.location.href = defaultOnboardingUrl;
       }, 7000);
 
       const res = await fetch('/api/submit', {
@@ -258,14 +262,20 @@ export default function App() {
         });
 
         const result = await res.json();
-        window.location.href =
-          result?.redirectUri || 'https://justschool.me/uk/onboarding';
+        const targetRedirect =
+          result?.redirectUri &&
+          String(result.redirectUri).trim() !== '' &&
+          !String(result.redirectUri).includes('justschool.me/uk/onboarding')
+            ? String(result.redirectUri).trim()
+            : defaultOnboardingUrl;
+
+        window.location.href = targetRedirect;
       } else {
-        window.location.href = 'https://justschool.me/uk/onboarding';
+        window.location.href = defaultOnboardingUrl;
       }
     } catch (err) {
       console.error('Submission error:', err);
-      window.location.href = 'https://justschool.me/uk/onboarding';
+      window.location.href = defaultOnboardingUrl;
     } finally {
       setIsSubmitting(false);
     }
