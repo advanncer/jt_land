@@ -30,6 +30,36 @@ import {
   RotateCcw,
 } from 'lucide-react';
 
+// ─── Analytics Helpers ─────────────────────────────────────
+function trackEvent(eventName: string, params: Record<string, any> = {}) {
+  try {
+    const dl = ((window as any).dataLayer = (window as any).dataLayer || []);
+    dl.push({
+      event: eventName,
+      ...params,
+    });
+    if (typeof (window as any).gtag === 'function') {
+      (window as any).gtag('event', eventName, params);
+    }
+  } catch (err) {
+    console.warn('Analytics event error:', err);
+  }
+}
+
+function trackMeta(eventName: string, params: Record<string, any> = {}, isCustom = false) {
+  try {
+    if (typeof (window as any).fbq === 'function') {
+      if (isCustom) {
+        (window as any).fbq('trackCustom', eventName, params);
+      } else {
+        (window as any).fbq('track', eventName, params);
+      }
+    }
+  } catch (err) {
+    console.warn('Meta Pixel error:', err);
+  }
+}
+
 export default function App() {
   // ─── State ───────────────────────────────────────────────
   // step: 0 = Hero, 1 = Size, 2..13 = Questions 1..12, 14 = Lead Form, 15 = Result
@@ -120,33 +150,116 @@ export default function App() {
     };
   }, [answers, multiplier]);
 
-  // ─── GTM Step Tracking ───────────────────────────────────
+  // ─── Analytics & Funnel Tracking ──────────────────────────
+  const stepStartTime = useRef<number>(Date.now());
+  const prevStepRef = useRef<number>(step);
+
   useEffect(() => {
     try {
-      const dl = ((window as any).dataLayer = (window as any).dataLayer || []);
+      const now = Date.now();
+      const timeSpentSec = Math.max(1, Math.round((now - stepStartTime.current) / 1000));
+      const prevStep = prevStepRef.current;
+      stepStartTime.current = now;
+      prevStepRef.current = step;
+
+      // 1. Time spent on the previous step
+      if (prevStep !== step) {
+        trackEvent('quiz_step_time', {
+          quiz_name: 'b2b_hr_calc',
+          step_index: prevStep,
+          time_on_step_sec: timeSpentSec,
+        });
+      }
+
       let stepName = 'hero';
       if (step === 1) stepName = 'company_size';
       else if (step >= 2 && step <= 13) stepName = `question_${step - 1}_${QUESTIONS[step - 2]?.shortName}`;
       else if (step === 14) stepName = 'lead_form';
       else if (step === 15) stepName = `result_${calcResults.zoneType}`;
 
-      dl.push({
-        event: 'quiz_step_reach',
+      // 2. Generic Step Reach
+      trackEvent('quiz_step_reach', {
         quiz_name: 'b2b_hr_calc',
         step_number: step,
         step_title: stepName,
       });
-    } catch {}
+
+      // 3. Step Specific Events (GA4 & Meta Pixel)
+      if (step === 0) {
+        trackEvent('custom-page-view', {
+          quiz_name: 'b2b_hr_calc',
+          page_path: window.location.pathname,
+          page_title: 'HR-калькулятор рутини | JustSchool B2B',
+        });
+      } else if (step === 1) {
+        trackEvent('quiz_start', { quiz_name: 'b2b_hr_calc' });
+        trackMeta('QuizStart', { quiz_name: 'b2b_hr_calc' }, true);
+        trackMeta('ViewContent', { content_name: 'b2b_hr_calculator', content_category: 'B2B' });
+      } else if (step >= 2 && step <= 13) {
+        const progressPct = Math.round(((step - 1) / 12) * 100);
+        trackEvent('quiz_progress', {
+          quiz_name: 'b2b_hr_calc',
+          quiz_progress_pct: progressPct,
+          step_index: step,
+        });
+        if (step === 5 || step === 9 || step === 13) {
+          trackMeta('QuizMilestone', {
+            quiz_name: 'b2b_hr_calc',
+            step: step,
+            progress_pct: progressPct,
+          }, true);
+        }
+      } else if (step === 14) {
+        trackEvent('form_start', {
+          quiz_name: 'b2b_hr_calc',
+          form_name: 'b2b_lead_form',
+        });
+        trackEvent('quiz_progress', {
+          quiz_name: 'b2b_hr_calc',
+          quiz_progress_pct: 100,
+          step_index: 14,
+        });
+        trackMeta('InitiateCheckout', {
+          content_name: 'b2b_hr_calculator_form',
+          value: calcResults.monthMoney,
+          currency: 'USD',
+        });
+        trackMeta('LeadFormView', { quiz_name: 'b2b_hr_calc' }, true);
+      } else if (step === 15) {
+        trackEvent('view_item', {
+          item_name: `b2b_calc_result_${calcResults.zoneType}`,
+          value: calcResults.monthMoney,
+          currency: 'USD',
+        });
+      }
+    } catch (err) {
+      console.warn('Step tracking error:', err);
+    }
   }, [step, calcResults.zoneType]);
 
-  // ─── Step Navigation ─────────────────────────────────────
+  // ─── Step Navigation & Actions ───────────────────────────
   const goTo = (targetStep: number) => {
     setStep(targetStep);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleStartQuiz = () => {
+    trackEvent('quiz_start', { quiz_name: 'b2b_hr_calc' });
+    trackMeta('QuizStart', { quiz_name: 'b2b_hr_calc' }, true);
+    trackMeta('ViewContent', { content_name: 'b2b_hr_calculator', content_category: 'B2B' });
+    goTo(1);
+  };
+
   const handleSelectSize = (idx: number) => {
     setSizeIdx(idx);
+    const sizeOption = COMPANY_SIZES[idx];
+    trackEvent('quiz_progress', {
+      quiz_name: 'b2b_hr_calc',
+      quiz_progress_pct: 8,
+      step_index: 1,
+      size: sizeOption?.label,
+    });
+    trackMeta('QuizStep', { step: 1, step_name: 'company_size', size: sizeOption?.label }, true);
     setTimeout(() => goTo(2), 150);
   };
 
@@ -155,6 +268,18 @@ export default function App() {
     const newAnswers = [...answers];
     newAnswers[qIndex] = optIdx;
     setAnswers(newAnswers);
+
+    const answeredCount = newAnswers.filter((a) => a !== null).length;
+    const progressPct = Math.round((answeredCount / 12) * 100);
+    const currentQ = QUESTIONS[qIndex];
+
+    trackEvent('quiz_progress', {
+      quiz_name: 'b2b_hr_calc',
+      quiz_progress_pct: progressPct,
+      step_index: step,
+      question_id: currentQ?.id,
+      question_name: currentQ?.shortName,
+    });
 
     // Trigger floating counter bounce
     setLossBump(true);
@@ -168,6 +293,19 @@ export default function App() {
         goTo(step + 1);
       }
     }, 220);
+  };
+
+  const handleFieldFocus = (fieldName: string) => {
+    trackEvent('form_field_focus', {
+      quiz_name: 'b2b_hr_calc',
+      field_name: fieldName,
+    });
+  };
+
+  const handleOpenDemoModal = () => {
+    trackEvent('cta_click', { quiz_name: 'b2b_hr_calc', cta_action: 'demo_modal_open' });
+    trackMeta('DemoModalOpen', { quiz_name: 'b2b_hr_calc' }, true);
+    setIsDemoModalOpen(true);
   };
 
   const handleRestart = () => {
@@ -238,14 +376,35 @@ export default function App() {
     };
 
     try {
-      // Fire client-side Meta Lead for B2B analytics
-      if (typeof (window as any).fbq === 'function') {
-        (window as any).fbq('track', 'Lead', {
-          content_name: 'b2b_hr_calculator',
-          value: calcResults.monthMoney,
-          currency: 'USD',
-        });
-      }
+      // 1. Meta Pixel Lead
+      trackMeta('Lead', {
+        content_name: 'b2b_hr_calculator',
+        value: calcResults.monthMoney,
+        currency: 'USD',
+      });
+
+      // 2. Google Ads Conversion & GA4 Conversions
+      trackEvent('new_quiz_form_submit', {
+        quiz_name: 'b2b_hr_calc',
+        value: calcResults.monthMoney,
+        currency: 'USD',
+      });
+      trackEvent('generate_lead_google', {
+        quiz_name: 'b2b_hr_calc',
+        lead_type: 'b2b-corporate',
+        value: calcResults.monthMoney,
+        currency: 'USD',
+      });
+      trackEvent('generate_lead', {
+        quiz_name: 'b2b_hr_calc',
+        lead_type: 'b2b-corporate',
+        value: calcResults.monthMoney,
+        currency: 'USD',
+      });
+      trackEvent('goodpromo_lead', {
+        quiz_name: 'b2b_hr_calc',
+        lead_type: 'b2b-corporate',
+      });
 
       const res = await fetch('/api/submit', {
         method: 'POST',
@@ -254,9 +413,7 @@ export default function App() {
       });
 
       if (res.ok) {
-        const dl = ((window as any).dataLayer = (window as any).dataLayer || []);
-        dl.push({
-          event: 'form_success',
+        trackEvent('form_success', {
           quiz_name: 'b2b_hr_calc',
           lead_type: 'b2b-corporate',
           week_hours: calcResults.weekHours,
@@ -279,6 +436,16 @@ export default function App() {
     setDemoSubmitting(true);
 
     try {
+      trackMeta('Schedule', {
+        content_name: 'b2b_hr_calc_demo',
+        value: calcResults.monthMoney,
+        currency: 'USD',
+      });
+      trackMeta('Contact', {
+        content_name: 'b2b_hr_calc_demo',
+      });
+      trackMeta('DemoBooked', { quiz_name: 'b2b_hr_calc' }, true);
+
       const urlParams = new URLSearchParams(window.location.search);
       await fetch('/api/submit', {
         method: 'POST',
@@ -301,11 +468,13 @@ export default function App() {
         }),
       });
 
-      const dl = ((window as any).dataLayer = (window as any).dataLayer || []);
-      dl.push({
-        event: 'cta_click',
+      trackEvent('cta_click', {
         quiz_name: 'b2b_hr_calc',
         cta_action: 'demo_booked',
+        zone: calcResults.zoneType,
+      });
+      trackEvent('demo_booking_success', {
+        quiz_name: 'b2b_hr_calc',
         zone: calcResults.zoneType,
       });
 
@@ -403,7 +572,7 @@ export default function App() {
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto pt-2">
                 <button
                   type="button"
-                  onClick={() => goTo(1)}
+                  onClick={handleStartQuiz}
                   className="px-8 py-4 bg-gradient-to-r from-[#FF7411] to-[#FF5B09] hover:from-[#F56600] hover:to-[#E24A00] text-white font-black text-base sm:text-lg rounded-2xl shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-3"
                 >
                   <span>Розрахувати втрати</span>
@@ -629,6 +798,7 @@ export default function App() {
                   placeholder="Олена або Олександр"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  onFocus={() => handleFieldFocus('name')}
                   disabled={isSubmitting}
                   className="w-full p-4 rounded-2xl border-2 border-slate-200 focus:border-[#FF5B09] outline-none font-semibold text-slate-900 bg-white transition-all disabled:opacity-50 text-base"
                 />
@@ -645,6 +815,7 @@ export default function App() {
                   placeholder="hr@yourcompany.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onFocus={() => handleFieldFocus('email')}
                   disabled={isSubmitting}
                   className="w-full p-4 rounded-2xl border-2 border-slate-200 focus:border-[#FF5B09] outline-none font-semibold text-slate-900 bg-white transition-all disabled:opacity-50 text-base"
                 />
@@ -660,6 +831,7 @@ export default function App() {
                     setRawPhone(raw);
                     setIsPhoneValid(valid);
                   }}
+                  onFocus={() => handleFieldFocus('phone')}
                   initialCountry={geoCountry}
                   disabled={isSubmitting}
                 />
@@ -675,6 +847,7 @@ export default function App() {
                   placeholder="Наприклад: IT Solutions Group"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
+                  onFocus={() => handleFieldFocus('company')}
                   disabled={isSubmitting}
                   className="w-full p-4 rounded-2xl border-2 border-slate-200 focus:border-[#FF5B09] outline-none font-semibold text-slate-900 bg-white transition-all disabled:opacity-50 text-base"
                 />
@@ -741,7 +914,7 @@ export default function App() {
               <div className="flex flex-wrap items-center gap-4">
                 <button
                   type="button"
-                  onClick={() => setIsDemoModalOpen(true)}
+                  onClick={handleOpenDemoModal}
                   className="px-8 py-4 bg-gradient-to-r from-[#FF7411] to-[#FF5B09] hover:from-[#F56600] hover:to-[#E24A00] text-white font-black text-base sm:text-lg rounded-2xl shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-3"
                 >
                   <span>{currentZone.ctaText}</span>
@@ -927,7 +1100,7 @@ export default function App() {
               <div className="mt-8 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
                 <button
                   type="button"
-                  onClick={() => setIsDemoModalOpen(true)}
+                  onClick={handleOpenDemoModal}
                   className="px-7 py-4 bg-gradient-to-r from-[#FF7411] to-[#FF5B09] hover:from-[#F56600] hover:to-[#E24A00] text-white font-black text-base rounded-2xl shadow-lg shadow-orange-500/25 transition-all flex items-center gap-2.5"
                 >
                   <Sparkles size={18} />

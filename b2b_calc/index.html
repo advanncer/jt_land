@@ -16,6 +16,32 @@
     </script>
     <!-- End Google Tag Manager -->
 
+    <!-- Initial custom-page-view for GTM GA4 Tag trigger -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "custom-page-view",
+        page_path: window.location.pathname,
+        page_location: window.location.href,
+        page_title: "HR-калькулятор рутини | JustSchool B2B",
+        quiz_name: "b2b_hr_calc"
+      });
+    </script>
+
+    <!-- Global Site Tag (gtag.js) - Google Analytics 4 (Direct Failsafe) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0Q0MZLQFWY"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', 'G-0Q0MZLQFWY', {
+        send_page_view: true,
+        page_title: 'HR-калькулятор рутини: скільки годин і бюджету спалює ваш бізнес | JustSchool B2B',
+        page_path: window.location.pathname
+      });
+    </script>
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <title>HR-калькулятор рутини: скільки годин і бюджету спалює ваш бізнес | JustSchool B2B</title>

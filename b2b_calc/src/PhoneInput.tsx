@@ -108,12 +108,14 @@ interface PhoneInputProps {
   onChange: (raw: string, valid: boolean) => void;
   initialCountry?: string;
   disabled?: boolean;
+  onFocus?: () => void;
 }
 
 export default function PhoneInput({
   onChange,
   initialCountry = 'UA',
   disabled = false,
+  onFocus,
 }: PhoneInputProps) {
   const [country, setCountry] = useState<Country>(() => {
     return COUNTRIES.find(c => c.code === initialCountry.toUpperCase()) || COUNTRIES[0];
@@ -175,6 +177,7 @@ export default function PhoneInput({
       setDisplay(prefix);
       onChange('+' + country.dial, false);
     }
+    if (onFocus) onFocus();
   };
 
   const handleBlur = () => {
