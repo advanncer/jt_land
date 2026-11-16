@@ -206,6 +206,59 @@ export default async function handler(request, response) {
     );
   }
 
+  // --- Enrich payload with URL query params and Splitter attribution for n8n/Creatio ---
+  if (dialogueUrl) {
+    try {
+      const parsedUrl = new URL(dialogueUrl);
+      const sp = parsedUrl.searchParams;
+      if (!data.utm_source && sp.get("utm_source")) data.utm_source = sp.get("utm_source");
+      if (!data.utm_medium && sp.get("utm_medium")) data.utm_medium = sp.get("utm_medium");
+      if (!data.utm_campaign && sp.get("utm_campaign")) data.utm_campaign = sp.get("utm_campaign");
+      if (!data.utm_content && sp.get("utm_content")) data.utm_content = sp.get("utm_content");
+      if (!data.utm_term && sp.get("utm_term")) data.utm_term = sp.get("utm_term");
+      if (!data.utm_subject && sp.get("utm_subject")) data.utm_subject = sp.get("utm_subject");
+
+      if (!data.campaign_id && sp.get("campaign_id")) data.campaign_id = sp.get("campaign_id");
+      if (!data.adset_id && sp.get("adset_id")) data.adset_id = sp.get("adset_id");
+      if (!data.ad_id && sp.get("ad_id")) data.ad_id = sp.get("ad_id");
+      if (!data.fbclid && sp.get("fbclid")) data.fbclid = sp.get("fbclid");
+
+      const uLeadType = sp.get("leadType") || sp.get("lead_type");
+      if (!data.lead_type && uLeadType) data.lead_type = uLeadType;
+      if (!data.leadType && uLeadType) data.leadType = uLeadType;
+    } catch (e) {
+      console.warn("Could not parse dialogueUrl params:", e.message);
+    }
+  }
+
+  if (splitId) data.split_id = splitId;
+  if (splitVariant) data.split_variant = splitVariant;
+
+  if (!data.lead_type && !data.leadType) {
+    if (dialogueUrl.includes("/eng-child/")) {
+      data.lead_type = "english-for-children";
+      data.leadType = "english-for-children";
+    } else if (dialogueUrl.includes("/prog/")) {
+      data.lead_type = "programming-for-children";
+      data.leadType = "programming-for-children";
+    } else if (dialogueUrl.includes("/math/")) {
+      data.lead_type = "math-for-children";
+      data.leadType = "math-for-children";
+    } else {
+      data.lead_type = "english-for-adults";
+      data.leadType = "english-for-adults";
+    }
+  }
+
+  if (!data.dialogueId || data.dialogueId === "unknown") {
+    try {
+      const pSegments = new URL(dialogueUrl).pathname.split("/").filter(Boolean);
+      if (pSegments.length > 0) {
+        data.dialogueId = pSegments.join("-");
+      }
+    } catch (e) {}
+  }
+
   // --- Send to n8n (Creatio CRM) ---
   const isB2B = Boolean(
     data.dialogueId === "b2b_ukrsib" ||

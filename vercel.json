@@ -42,6 +42,10 @@
       "destination": "/api/s_router?slug=:slug"
     },
     {
+      "source": "/s/:slug/",
+      "destination": "/api/s_router?slug=:slug"
+    },
+    {
       "source": "/eng-adult/main",
       "destination": "/eng-adult/main/index.html"
     },

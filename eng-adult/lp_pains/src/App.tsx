@@ -72,14 +72,30 @@ const App: React.FC = () => {
       }
     });
 
+    const urlParams = new URLSearchParams(window.location.search);
+
     const payload = {
       name: formData.name,
       phone: formData.phone,
       email: formData.email,
       qa: qaParts.join("|||"),
-      dialogueName: "JustSchool Quiz",
-      dialogueId: "unknown",
+      dialogueName: "English Adult Pains Quiz",
+      dialogueId: "eng_adult_lp_pains",
       dialogueUrl: window.location.href,
+      utm_source: urlParams.get("utm_source") || "facebook",
+      utm_medium: urlParams.get("utm_medium") || "cpc",
+      utm_campaign: urlParams.get("utm_campaign") || "",
+      utm_term: urlParams.get("utm_term") || "",
+      utm_content: urlParams.get("utm_content") || "",
+      utm_subject: "English",
+      subject: "English",
+      lead_type: urlParams.get("leadType") || urlParams.get("lead_type") || "english-for-adults",
+      leadType: urlParams.get("leadType") || urlParams.get("lead_type") || "english-for-adults",
+      campaign_id: urlParams.get("campaign_id") || "",
+      adset_id: urlParams.get("adset_id") || "",
+      ad_id: urlParams.get("ad_id") || "",
+      split_id: urlParams.get("split_id") || "",
+      split_variant: urlParams.get("split_variant") || "",
     };
 
     try {

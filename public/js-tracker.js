@@ -148,22 +148,29 @@
 
     window.fetch = function (resource, init) {
       var url = typeof resource === "string" ? resource : (resource && resource.url) || "";
-      if (typeof url === "string" && (url.indexOf("/api/submit") > -1 || url.indexOf("n8n.justschool.me") > -1 || url.indexOf("/webhook/") > -1)) {
-        try {
-          if (init && init.body && typeof init.body === "string") {
-            var parsed = null;
-            try { parsed = JSON.parse(init.body); } catch (e) {}
-            if (parsed) {
-              if (splitId && splitVariant && !parsed.split_id) {
-                parsed.split_id = splitId;
-                parsed.split_variant = splitVariant;
-                init.body = JSON.stringify(parsed);
+      if (typeof url === "string") {
+        var isApiSubmit = url.indexOf("/api/submit") > -1;
+        var isExternalWebhook = url.indexOf("n8n.justschool.me") > -1 || url.indexOf("/webhook/") > -1;
+        if (isApiSubmit || isExternalWebhook) {
+          try {
+            if (init && init.body && typeof init.body === "string") {
+              var parsed = null;
+              try { parsed = JSON.parse(init.body); } catch (e) {}
+              if (parsed) {
+                if (splitId && splitVariant && !parsed.split_id) {
+                  parsed.split_id = splitId;
+                  parsed.split_variant = splitVariant;
+                  init.body = JSON.stringify(parsed);
+                }
+                // Only trigger external beacon tracker for external webhooks; /api/submit handles tracking natively
+                if (isExternalWebhook) {
+                  trackConversion(parsed);
+                }
               }
-              trackConversion(parsed);
             }
+          } catch (e) {
+            console.error("[JustSchool Tracker] Fetch intercept error:", e);
           }
-        } catch (e) {
-          console.error("[JustSchool Tracker] Fetch intercept error:", e);
         }
       }
       return origFetch.apply(this, [resource, init]);
