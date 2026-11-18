@@ -20,8 +20,8 @@ export type QuestionKey = 'age' | 'level' | 'goal' | 'aspects' | 'intensity' | '
 // While they are null, every price line is hidden instead of rendering a placeholder.
 export const OFFER = {
   discountPercent: 13,
-  price: null as number | null,
-  oldPrice: null as number | null,
+  price: 1980 as number | null,
+  oldPrice: 2276 as number | null,
   deadlineLabel: '23:59 13.11',
   timeZone: 'Europe/Kyiv',
 };
