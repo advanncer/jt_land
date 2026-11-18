@@ -352,6 +352,38 @@
     {
       "source": "/eng-adult/black-friday-v1",
       "destination": "/eng-adult/black-friday/index.html"
+    },
+    {
+      "source": "/friday-13",
+      "destination": "/eng-adult/friday-13/index.html"
+    },
+    {
+      "source": "/friday-13/:path*",
+      "destination": "/eng-adult/friday-13/index.html"
+    },
+    {
+      "source": "/friday-13-v1",
+      "destination": "/eng-adult/friday-13/index.html"
+    },
+    {
+      "source": "/friday-13-v1/:path*",
+      "destination": "/eng-adult/friday-13/index.html"
+    },
+    {
+      "source": "/eng-adult/friday-13",
+      "destination": "/eng-adult/friday-13/index.html"
+    },
+    {
+      "source": "/eng-adult/friday-13/:path*",
+      "destination": "/eng-adult/friday-13/index.html"
+    },
+    {
+      "source": "/eng-adult/friday-13-v1",
+      "destination": "/eng-adult/friday-13/index.html"
+    },
+    {
+      "source": "/eng-adult/friday-13-v1/:path*",
+      "destination": "/eng-adult/friday-13/index.html"
     }
   ],
   "redirects": [

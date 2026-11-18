@@ -95,6 +95,10 @@ export default defineConfig({
           __dirname,
           "eng-adult/black-friday/index.html",
         ),
+        engAdultFriday13: resolve(
+          __dirname,
+          "eng-adult/friday-13/index.html",
+        ),
       },
     },
   },
