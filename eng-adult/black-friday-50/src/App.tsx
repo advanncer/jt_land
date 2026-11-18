@@ -24,8 +24,8 @@ declare global {
 type Audience = 'adult' | 'child';
 type Variant = 'v1' | 'v2';
 
-const QUIZ_NAME = 'eng-adult-friday-13';
-const DIALOGUE_ID = 'friday_13_2026';
+const QUIZ_NAME = 'eng-adult-black-friday-50';
+const DIALOGUE_ID = 'black_friday_50_2026';
 
 // Step map: 0 hero · 1–6 questions · 7 discount screen · 8 loader · 9 plan + form
 const FIRST_Q = 1;
@@ -39,7 +39,7 @@ const LEAD_TYPE: Record<Audience, string> = {
   child: 'english-for-children',
 };
 
-// Variant strictly by route: /friday-13-v1 → V1, everything else → V2
+// Variant strictly by route: /black-friday-50-v1 → V1, everything else → V2
 const detectVariant = (): Variant =>
   /-v1\/?$/.test(window.location.pathname) ? 'v1' : 'v2';
 
@@ -86,10 +86,10 @@ function Countdown({ compact = false }: { compact?: boolean }) {
       <div className="flex items-center gap-1.5" role="timer" aria-live="off">
         {units.map(([v, label], i) => (
           <React.Fragment key={label}>
-            {i > 0 && <span className="text-[var(--f13-cta)] font-black self-start mt-1.5">:</span>}
+            {i > 0 && <span className="text-[var(--bf-cta)] font-black self-start mt-1.5">:</span>}
             <span className="flex flex-col items-center">
               <span
-                className={`f13-display tabular-nums rounded-xl bg-white/[0.06] border border-white/10 text-white text-center ${
+                className={`bf-display tabular-nums rounded-xl bg-white/[0.06] border border-white/10 text-white text-center ${
                   compact ? 'text-lg px-2 py-1 min-w-[2.6rem]' : 'text-2xl px-2.5 py-1.5 min-w-[3.2rem]'
                 }`}
               >
@@ -106,8 +106,8 @@ function Countdown({ compact = false }: { compact?: boolean }) {
 
 function PromoBadge() {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-[var(--f13-cta)]/40 bg-[var(--f13-cta)]/10 px-3.5 py-1 text-[11px] font-black uppercase tracking-widest text-[var(--f13-cta)]">
-      <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand)] f13-pulse" />
+    <span className="inline-flex items-center gap-2 rounded-full border border-[var(--bf-cta)]/40 bg-[var(--bf-cta)]/10 px-3.5 py-1 text-[11px] font-black uppercase tracking-widest text-[var(--bf-cta)]">
+      <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand)] bf-pulse" />
       Black Friday · До {OFFER.deadlineLabel}
     </span>
   );
@@ -117,14 +117,14 @@ function BigBF({ size = 'lg' }: { size?: 'md' | 'lg' }) {
   return (
     <div className="relative select-none flex items-center justify-center mb-4" aria-hidden="true">
       <span
-        className={`f13-outline flex flex-col items-center leading-[0.95] ${
+        className={`bf-outline flex flex-col items-center leading-[0.95] ${
           size === 'lg' ? 'text-[3.9rem] sm:text-[5.5rem]' : 'text-[3.4rem] sm:text-[4.5rem]'
         }`}
       >
         <span>BLACK</span>
         <span>FRIDAY</span>
       </span>
-      <span className="absolute -right-2 -bottom-7 -rotate-6 rounded-xl bg-[var(--brand)] px-2.5 py-1 f13-display text-xl text-white shadow-lg whitespace-nowrap">
+      <span className="absolute -right-2 -bottom-7 -rotate-6 rounded-xl bg-[var(--brand)] px-2.5 py-1 bf-display text-xl text-white shadow-lg whitespace-nowrap">
         <span className="text-sm align-middle">{OFFER.discountPrefix}</span> {OFFER.discountValue}
       </span>
     </div>
@@ -135,7 +135,7 @@ function PriceBlock() {
   if (!OFFER.price || !OFFER.oldPrice) return null;
   return (
     <div className="flex items-baseline justify-center gap-3">
-      <span className="f13-display text-3xl text-white">
+      <span className="bf-display text-3xl text-white">
         <span className="text-base font-bold">від</span> {formatUah(OFFER.price)} <span className="text-base font-bold">грн/міс</span>
       </span>
       <span className="text-base font-semibold text-white/40 line-through">
@@ -164,7 +164,7 @@ function CtaButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className="f13-cta w-full rounded-full py-4 px-6 text-base sm:text-lg font-extrabold flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+      className="bf-cta w-full rounded-full py-4 px-6 text-base sm:text-lg font-extrabold flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {children}
     </button>
@@ -190,7 +190,7 @@ function AudienceToggle({
             aria-selected={active}
             onClick={() => onChange(a)}
             className={`rounded-full py-2.5 text-sm font-bold transition-colors cursor-pointer ${
-              active ? 'bg-white text-[var(--f13-bg)]' : 'text-white/70 hover:text-white'
+              active ? 'bg-white text-[var(--bf-bg)]' : 'text-white/70 hover:text-white'
             }`}
           >
             {a === 'adult' ? '🧑 Дорослі' : '🧒 Дитина'}
@@ -236,7 +236,7 @@ function OptionButton({
       type="button"
       onClick={onClick}
       aria-pressed={multi ? selected : undefined}
-      className={`f13-option w-full flex items-center gap-4 p-4 rounded-2xl border-2 text-left cursor-pointer active:scale-[0.98] ${
+      className={`bf-option w-full flex items-center gap-4 p-4 rounded-2xl border-2 text-left cursor-pointer active:scale-[0.98] ${
         selected ? 'is-selected' : ''
       }`}
     >
@@ -252,7 +252,7 @@ function OptionButton({
       {multi ? (
         <span
           className={`w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 text-xs font-black ${
-            selected ? 'bg-[var(--f13-cta)] border-[var(--f13-cta)] text-black' : 'border-white/30'
+            selected ? 'bg-[var(--bf-cta)] border-[var(--bf-cta)] text-black' : 'border-white/30'
           }`}
         >
           {selected ? '✓' : ''}
@@ -416,7 +416,7 @@ export default function App() {
       quiz_variant: variant,
       utm_source: params.get('utm_source'),
       utm_medium: params.get('utm_medium'),
-      utm_campaign: params.get('utm_campaign') || 'friday_13_2026',
+      utm_campaign: params.get('utm_campaign') || 'black_friday_50_2026',
       utm_content: params.get('utm_content'),
       utm_term: params.get('utm_term'),
       utm_subject: 'English',
@@ -471,9 +471,9 @@ export default function App() {
   const loaderStage = Math.min(LOADER_STAGES.length - 1, Math.floor(loaderProgress / (100 / LOADER_STAGES.length)));
 
   return (
-    <div className="min-h-[100dvh] flex flex-col f13-page">
+    <div className="min-h-[100dvh] flex flex-col bf-page">
       {/* Header */}
-      <header className="sticky top-0 z-50 h-14 flex items-center justify-between px-4 border-b border-white/10 bg-[var(--f13-bg)]/90 backdrop-blur-md shrink-0">
+      <header className="sticky top-0 z-50 h-14 flex items-center justify-between px-4 border-b border-white/10 bg-[var(--bf-bg)]/90 backdrop-blur-md shrink-0">
         <div className="w-20">
           {canGoBack && (
             <button
@@ -494,7 +494,7 @@ export default function App() {
               {step - FIRST_Q + 1}/{questions.length}
             </span>
           ) : (
-            <span className="f13-display text-xs text-[var(--f13-cta)] whitespace-nowrap">{DISCOUNT_LABEL}</span>
+            <span className="bf-display text-xs text-[var(--bf-cta)] whitespace-nowrap">{DISCOUNT_LABEL}</span>
           )}
         </div>
       </header>
@@ -516,7 +516,7 @@ export default function App() {
             <Countdown compact />
             <BigBF size="md" />
             <div>
-              <h1 className="f13-display text-2xl sm:text-3xl text-white leading-tight">
+              <h1 className="bf-display text-2xl sm:text-3xl text-white leading-tight">
                 {DISCOUNT_LABEL} на навчання англійської
               </h1>
               <p className="mt-2 text-sm font-medium text-white/60">
@@ -543,8 +543,8 @@ export default function App() {
               <PromoBadge />
               <BigBF size="lg" />
               <div>
-                <h1 className="f13-display text-3xl sm:text-4xl text-white leading-tight">
-                  <span className="text-[var(--f13-cta)] whitespace-nowrap">{DISCOUNT_LABEL}</span> на навчання англійської
+                <h1 className="bf-display text-3xl sm:text-4xl text-white leading-tight">
+                  <span className="text-[var(--bf-cta)] whitespace-nowrap">{DISCOUNT_LABEL}</span> на навчання англійської
                 </h1>
                 <p className="mt-3 text-base font-medium text-white/65">
                   Пройдіть короткий тест, отримайте персональний план і зафіксуйте знижку до{' '}
@@ -562,21 +562,21 @@ export default function App() {
               </div>
             </section>
 
-            <section className="f13-panel rounded-3xl p-5">
-              <h2 className="f13-display text-lg text-white mb-4">Що ви отримуєте</h2>
+            <section className="bf-panel rounded-3xl p-5">
+              <h2 className="bf-display text-lg text-white mb-4">Що ви отримуєте</h2>
               <Bullets items={HERO_BULLETS[audience]} />
             </section>
 
             <section>
-              <h2 className="f13-display text-lg text-white mb-4 text-center">Як забрати знижку</h2>
+              <h2 className="bf-display text-lg text-white mb-4 text-center">Як забрати знижку</h2>
               <ol className="grid gap-3">
                 {[
                   ['Пройдіть тест', '6 коротких питань про рівень, мету та графік'],
                   ['Отримайте план', 'Персональна програма під ваші відповіді'],
                   ['Залиште контакти', `Знижка ${DISCOUNT_LABEL} закріпиться за вами`],
                 ].map(([t, d], i) => (
-                  <li key={t} className="f13-panel rounded-2xl p-4 flex items-center gap-4">
-                    <span className="f13-display text-2xl text-[var(--brand)] w-8 shrink-0">{i + 1}</span>
+                  <li key={t} className="bf-panel rounded-2xl p-4 flex items-center gap-4">
+                    <span className="bf-display text-2xl text-[var(--brand)] w-8 shrink-0">{i + 1}</span>
                     <span>
                       <span className="block font-bold text-white">{t}</span>
                       <span className="block text-sm text-white/60">{d}</span>
@@ -587,13 +587,13 @@ export default function App() {
             </section>
 
             <section>
-              <h2 className="f13-display text-lg text-white mb-4 text-center">Питання</h2>
+              <h2 className="bf-display text-lg text-white mb-4 text-center">Питання</h2>
               <div className="grid gap-2">
                 {FAQ.map((f) => (
-                  <details key={f.q} className="f13-panel rounded-2xl p-4 group">
+                  <details key={f.q} className="bf-panel rounded-2xl p-4 group">
                     <summary className="cursor-pointer list-none flex justify-between items-center font-bold text-white">
                       {f.q}
-                      <span className="text-[var(--f13-cta)] transition-transform group-open:rotate-45 text-xl leading-none">+</span>
+                      <span className="text-[var(--bf-cta)] transition-transform group-open:rotate-45 text-xl leading-none">+</span>
                     </summary>
                     <p className="mt-2 text-sm text-white/65 leading-relaxed">{f.a}</p>
                   </details>
@@ -613,7 +613,7 @@ export default function App() {
         {/* ═══ STEPS 1–6 · Questions ═══ */}
         {currentQ && (
           <section>
-            <h2 className="f13-display text-xl sm:text-2xl text-white text-center leading-tight mb-2">
+            <h2 className="bf-display text-xl sm:text-2xl text-white text-center leading-tight mb-2">
               {currentQ.question}
             </h2>
             <p className="text-sm text-center font-medium text-white/60 mb-6">{currentQ.subtitle}</p>
@@ -646,11 +646,11 @@ export default function App() {
         {step === STEP_DISCOUNT && (
           <section className="flex-1 flex flex-col items-center text-center gap-5 pt-4">
             <span className="text-5xl" aria-hidden>🎁</span>
-            <h2 className="f13-display text-2xl sm:text-3xl text-white leading-tight">
+            <h2 className="bf-display text-2xl sm:text-3xl text-white leading-tight">
               Ваша знижка вже чекає
             </h2>
-            <div className="f13-panel rounded-3xl px-6 py-5 w-full">
-              <div className="f13-display text-6xl text-[var(--f13-cta)] whitespace-nowrap">
+            <div className="bf-panel rounded-3xl px-6 py-5 w-full">
+              <div className="bf-display text-6xl text-[var(--bf-cta)] whitespace-nowrap">
                 <span className="text-2xl align-middle">{OFFER.discountPrefix}</span> {OFFER.discountValue}
               </div>
               <p className="mt-2 text-sm font-semibold text-white/70">на навчання · до {OFFER.deadlineLabel}</p>
@@ -671,7 +671,7 @@ export default function App() {
         {/* ═══ STEP 8 · Loader ═══ */}
         {step === STEP_LOADER && (
           <section className="flex-1 flex flex-col items-center text-center pt-8">
-            <div className="f13-display text-6xl text-[var(--f13-cta)] tabular-nums mb-6">{loaderProgress}%</div>
+            <div className="bf-display text-6xl text-[var(--bf-cta)] tabular-nums mb-6">{loaderProgress}%</div>
             <div className="w-full h-2.5 rounded-full bg-white/10 overflow-hidden mb-8">
               <div className="h-full bg-[var(--brand)] transition-all duration-200" style={{ width: `${loaderProgress}%` }} />
             </div>
@@ -688,7 +688,7 @@ export default function App() {
                   >
                     <span
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${
-                        done ? 'bg-[var(--brand)] text-white' : active ? 'border-2 border-[var(--f13-cta)] border-t-transparent animate-spin' : 'border-2 border-white/20'
+                        done ? 'bg-[var(--brand)] text-white' : active ? 'border-2 border-[var(--bf-cta)] border-t-transparent animate-spin' : 'border-2 border-white/20'
                       }`}
                     >
                       {done ? '✓' : ''}
@@ -708,12 +708,12 @@ export default function App() {
               <span className="inline-block rounded-full bg-[var(--brand)] px-3 py-1 text-[11px] font-black uppercase tracking-widest text-white mb-3">
                 План готовий · знижку активовано
               </span>
-              <h2 className="f13-display text-2xl text-white leading-tight">
+              <h2 className="bf-display text-2xl text-white leading-tight">
                 {audience === 'adult' ? 'Ваш персональний план' : 'План для вашої дитини'}
               </h2>
             </div>
 
-            <div className="f13-panel rounded-3xl p-5">
+            <div className="bf-panel rounded-3xl p-5">
               <dl className="grid gap-3 text-sm">
                 {(
                   [
@@ -733,9 +733,9 @@ export default function App() {
                     </div>
                   ))}
               </dl>
-              <div className="mt-4 flex items-center justify-between rounded-2xl bg-[var(--f13-cta)]/10 border border-[var(--f13-cta)]/30 px-4 py-3">
-                <span className="text-sm font-bold text-[var(--f13-cta)]">Знижка Black Friday</span>
-                <span className="f13-display text-xl text-[var(--f13-cta)] whitespace-nowrap">{DISCOUNT_LABEL}</span>
+              <div className="mt-4 flex items-center justify-between rounded-2xl bg-[var(--bf-cta)]/10 border border-[var(--bf-cta)]/30 px-4 py-3">
+                <span className="text-sm font-bold text-[var(--bf-cta)]">Знижка Black Friday</span>
+                <span className="bf-display text-xl text-[var(--bf-cta)] whitespace-nowrap">{DISCOUNT_LABEL}</span>
               </div>
               {PRICE_LINE && <p className="mt-3 text-center text-sm font-bold text-white">{PRICE_LINE}</p>}
             </div>
@@ -754,7 +754,7 @@ export default function App() {
                   disabled={isSubmitting}
                   required
                   autoComplete="name"
-                  className="f13-input w-full p-4 rounded-2xl border-2 outline-none font-semibold bg-white disabled:opacity-50"
+                  className="bf-input w-full p-4 rounded-2xl border-2 outline-none font-semibold bg-white disabled:opacity-50"
                 />
                 <input
                   id="lead-email"
@@ -765,7 +765,7 @@ export default function App() {
                   disabled={isSubmitting}
                   required
                   autoComplete="email"
-                  className="f13-input w-full p-4 rounded-2xl border-2 outline-none font-semibold bg-white disabled:opacity-50"
+                  className="bf-input w-full p-4 rounded-2xl border-2 outline-none font-semibold bg-white disabled:opacity-50"
                 />
                 <PhoneInput
                   onChange={(raw, valid) => {

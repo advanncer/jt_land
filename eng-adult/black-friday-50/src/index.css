@@ -3,91 +3,91 @@
 
 /* ─── Black Friday promo theme (dark), layered on top of ds tokens ─── */
 :root {
-  --f13-bg: #1C160C;
-  --f13-surface: #2A2114;
-  --f13-surface-hover: #33291A;
-  --f13-cta: #FBC314;
-  --f13-cta-hover: #E5B010;
+  --bf-bg: #1C160C;
+  --bf-surface: #2A2114;
+  --bf-surface-hover: #33291A;
+  --bf-cta: #FBC314;
+  --bf-cta-hover: #E5B010;
   --font-promo: "Unbounded", var(--font-core);
 }
 
 body {
   font-family: var(--font-core);
-  background-color: var(--f13-bg);
+  background-color: var(--bf-bg);
   color: #fff;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-.f13-page {
+.bf-page {
   background:
     radial-gradient(60rem 30rem at 50% -10rem, rgba(245, 102, 0, 0.18), transparent 70%),
-    var(--f13-bg);
+    var(--bf-bg);
 }
 
-.f13-display {
+.bf-display {
   font-family: var(--font-promo);
   font-weight: 800;
   letter-spacing: -0.01em;
 }
 
 /* Big "BLACK FRIDAY" wordmark */
-.f13-outline {
+.bf-outline {
   font-family: var(--font-promo);
   font-weight: 900;
   line-height: 0.9;
-  color: var(--f13-cta);
+  color: var(--bf-cta);
   text-shadow: 0 4px 0 #8a5a00, 0 0 40px rgba(251, 195, 20, 0.3);
 }
 
-.f13-cta {
-  background-color: var(--f13-cta);
+.bf-cta {
+  background-color: var(--bf-cta);
   color: #000;
   box-shadow: 0 8px 24px rgba(251, 195, 20, 0.35);
 }
-.f13-cta:not(:disabled):hover {
-  background-color: var(--f13-cta-hover);
+.bf-cta:not(:disabled):hover {
+  background-color: var(--bf-cta-hover);
 }
-.f13-cta:focus-visible {
+.bf-cta:focus-visible {
   outline: 3px solid #fff;
   outline-offset: 3px;
 }
 
-.f13-panel {
-  background-color: var(--f13-surface);
+.bf-panel {
+  background-color: var(--bf-surface);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.f13-option {
-  background-color: var(--f13-surface);
+.bf-option {
+  background-color: var(--bf-surface);
   border-color: rgba(255, 255, 255, 0.08);
   transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
 }
-.f13-option:hover,
-.f13-option.is-selected {
+.bf-option:hover,
+.bf-option.is-selected {
   border-color: var(--brand);
-  background-color: var(--f13-surface-hover);
+  background-color: var(--bf-surface-hover);
 }
-.f13-option:focus-visible {
-  outline: 2px solid var(--f13-cta);
+.bf-option:focus-visible {
+  outline: 2px solid var(--bf-cta);
   outline-offset: 2px;
 }
 
-.f13-input {
+.bf-input {
   border-color: var(--border-default);
   color: var(--text-strong);
 }
-.f13-input:focus {
+.bf-input:focus {
   border-color: var(--brand);
   box-shadow: var(--focus-ring);
 }
 
-@keyframes f13Pulse {
+@keyframes bfPulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
 }
-.f13-pulse {
-  animation: f13Pulse 1.4s ease-in-out infinite;
+.bf-pulse {
+  animation: bfPulse 1.4s ease-in-out infinite;
 }
 
 /* Step transition */
@@ -113,5 +113,5 @@ input::placeholder {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .step-enter, .f13-pulse, .animate-spin { animation: none; }
+  .step-enter, .bf-pulse, .animate-spin { animation: none; }
 }

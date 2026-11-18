@@ -354,36 +354,20 @@
       "destination": "/eng-adult/black-friday/index.html"
     },
     {
-      "source": "/friday-13",
-      "destination": "/eng-adult/friday-13/index.html"
+      "source": "/black-friday-50",
+      "destination": "/eng-adult/black-friday-50/index.html"
     },
     {
-      "source": "/friday-13/:path*",
-      "destination": "/eng-adult/friday-13/index.html"
+      "source": "/black-friday-50/:path*",
+      "destination": "/eng-adult/black-friday-50/index.html"
     },
     {
-      "source": "/friday-13-v1",
-      "destination": "/eng-adult/friday-13/index.html"
+      "source": "/black-friday-50-v1",
+      "destination": "/eng-adult/black-friday-50/index.html"
     },
     {
-      "source": "/friday-13-v1/:path*",
-      "destination": "/eng-adult/friday-13/index.html"
-    },
-    {
-      "source": "/eng-adult/friday-13",
-      "destination": "/eng-adult/friday-13/index.html"
-    },
-    {
-      "source": "/eng-adult/friday-13/:path*",
-      "destination": "/eng-adult/friday-13/index.html"
-    },
-    {
-      "source": "/eng-adult/friday-13-v1",
-      "destination": "/eng-adult/friday-13/index.html"
-    },
-    {
-      "source": "/eng-adult/friday-13-v1/:path*",
-      "destination": "/eng-adult/friday-13/index.html"
+      "source": "/black-friday-50-v1/:path*",
+      "destination": "/eng-adult/black-friday-50/index.html"
     }
   ],
   "redirects": [
@@ -436,6 +420,46 @@
       "source": "/freeproduct",
       "destination": "/free-products/astro-english",
       "permanent": true
+    },
+    {
+      "source": "/friday-13",
+      "destination": "/black-friday-50",
+      "permanent": false
+    },
+    {
+      "source": "/friday-13/:path*",
+      "destination": "/black-friday-50",
+      "permanent": false
+    },
+    {
+      "source": "/friday-13-v1",
+      "destination": "/black-friday-50-v1",
+      "permanent": false
+    },
+    {
+      "source": "/friday-13-v1/:path*",
+      "destination": "/black-friday-50-v1",
+      "permanent": false
+    },
+    {
+      "source": "/eng-adult/friday-13",
+      "destination": "/black-friday-50",
+      "permanent": false
+    },
+    {
+      "source": "/eng-adult/friday-13/:path*",
+      "destination": "/black-friday-50",
+      "permanent": false
+    },
+    {
+      "source": "/eng-adult/friday-13-v1",
+      "destination": "/black-friday-50-v1",
+      "permanent": false
+    },
+    {
+      "source": "/eng-adult/friday-13-v1/:path*",
+      "destination": "/black-friday-50-v1",
+      "permanent": false
     }
   ],
   "crons": [
