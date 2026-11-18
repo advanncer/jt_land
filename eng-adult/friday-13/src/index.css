@@ -1,7 +1,7 @@
 @import "./ds/styles.css";
 @import "tailwindcss";
 
-/* ─── Пʼятниця 13 promo theme (dark), layered on top of ds tokens ─── */
+/* ─── Black Friday promo theme (dark), layered on top of ds tokens ─── */
 :root {
   --f13-bg: #1C160C;
   --f13-surface: #2A2114;
@@ -31,14 +31,13 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Big outlined "13" */
+/* Big "BLACK FRIDAY" wordmark */
 .f13-outline {
   font-family: var(--font-promo);
   font-weight: 900;
   line-height: 0.9;
-  color: transparent;
-  -webkit-text-stroke: 3px var(--f13-cta);
-  text-shadow: 0 0 40px rgba(251, 195, 20, 0.25);
+  color: var(--f13-cta);
+  text-shadow: 0 4px 0 #8a5a00, 0 0 40px rgba(251, 195, 20, 0.3);
 }
 
 .f13-cta {

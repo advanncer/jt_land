@@ -108,16 +108,23 @@ function PromoBadge() {
   return (
     <span className="inline-flex items-center gap-2 rounded-full border border-[var(--f13-cta)]/40 bg-[var(--f13-cta)]/10 px-3.5 py-1 text-[11px] font-black uppercase tracking-widest text-[var(--f13-cta)]">
       <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand)] f13-pulse" />
-      Пʼятниця 13 · До {OFFER.deadlineLabel}
+      Black Friday · До {OFFER.deadlineLabel}
     </span>
   );
 }
 
-function Big13({ size = 'lg' }: { size?: 'md' | 'lg' }) {
+function BigBF({ size = 'lg' }: { size?: 'md' | 'lg' }) {
   return (
-    <div className="relative select-none flex items-center justify-center" aria-hidden="true">
-      <span className={`f13-outline ${size === 'lg' ? 'text-[9.5rem] sm:text-[11rem]' : 'text-[7rem]'}`}>13</span>
-      <span className="absolute -right-6 top-4 rotate-12 rounded-xl bg-[var(--brand)] px-2.5 py-1 f13-display text-xl text-white shadow-lg whitespace-nowrap">
+    <div className="relative select-none flex items-center justify-center mb-4" aria-hidden="true">
+      <span
+        className={`f13-outline flex flex-col items-center leading-[0.95] ${
+          size === 'lg' ? 'text-[3.9rem] sm:text-[5.5rem]' : 'text-[3.4rem] sm:text-[4.5rem]'
+        }`}
+      >
+        <span>BLACK</span>
+        <span>FRIDAY</span>
+      </span>
+      <span className="absolute -right-2 -bottom-7 -rotate-6 rounded-xl bg-[var(--brand)] px-2.5 py-1 f13-display text-xl text-white shadow-lg whitespace-nowrap">
         <span className="text-sm align-middle">{OFFER.discountPrefix}</span> {OFFER.discountValue}
       </span>
     </div>
@@ -386,7 +393,7 @@ export default function App() {
 
     const qa = [
       `ip:${ipInfo.ip || 'unknown'}|country:${ipInfo.country || 'unknown'}`,
-      `[ПʼЯТНИЦЯ 13 · 2026 · ${variant.toUpperCase()}]`,
+      `[BLACK FRIDAY · 2026 · ${variant.toUpperCase()}]`,
       `Пропозиція: знижка ${DISCOUNT_LABEL} на навчання${PRICE_LINE ? ` (${PRICE_LINE})` : ''}, діє до 23:59 ${OFFER.deadlineLabel}`,
       `Аудиторія: ${audience === 'adult' ? 'Дорослий' : 'Дитина'}`,
       `Вік: ${answers.age || 'Не вказано'}`,
@@ -403,7 +410,7 @@ export default function App() {
       email: cleanEmail,
       qa,
       dialogueUrl: window.location.href,
-      dialogueName: `Пʼятниця 13 · 2026 Quiz (${variant.toUpperCase()})`,
+      dialogueName: `Black Friday · 2026 Quiz (${variant.toUpperCase()})`,
       dialogueId: DIALOGUE_ID,
       quiz_name: QUIZ_NAME,
       quiz_variant: variant,
@@ -507,7 +514,7 @@ export default function App() {
           <section className="flex-1 flex flex-col items-center text-center gap-4">
             <PromoBadge />
             <Countdown compact />
-            <Big13 size="md" />
+            <BigBF size="md" />
             <div>
               <h1 className="f13-display text-2xl sm:text-3xl text-white leading-tight">
                 {DISCOUNT_LABEL} на навчання англійської
@@ -534,11 +541,10 @@ export default function App() {
           <div className="flex flex-col gap-10">
             <section className="flex flex-col items-center text-center gap-5">
               <PromoBadge />
-              <Big13 size="lg" />
+              <BigBF size="lg" />
               <div>
                 <h1 className="f13-display text-3xl sm:text-4xl text-white leading-tight">
-                  Пʼятниця 13 —<br />
-                  <span className="text-[var(--f13-cta)] whitespace-nowrap">{DISCOUNT_LABEL}</span> на навчання
+                  <span className="text-[var(--f13-cta)] whitespace-nowrap">{DISCOUNT_LABEL}</span> на навчання англійської
                 </h1>
                 <p className="mt-3 text-base font-medium text-white/65">
                   Пройдіть короткий тест, отримайте персональний план і зафіксуйте знижку до{' '}
@@ -728,7 +734,7 @@ export default function App() {
                   ))}
               </dl>
               <div className="mt-4 flex items-center justify-between rounded-2xl bg-[var(--f13-cta)]/10 border border-[var(--f13-cta)]/30 px-4 py-3">
-                <span className="text-sm font-bold text-[var(--f13-cta)]">Знижка Пʼятниці 13</span>
+                <span className="text-sm font-bold text-[var(--f13-cta)]">Знижка Black Friday</span>
                 <span className="f13-display text-xl text-[var(--f13-cta)] whitespace-nowrap">{DISCOUNT_LABEL}</span>
               </div>
               {PRICE_LINE && <p className="mt-3 text-center text-sm font-bold text-white">{PRICE_LINE}</p>}
