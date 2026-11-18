@@ -19,19 +19,23 @@ export type QuestionKey = 'age' | 'level' | 'goal' | 'aspects' | 'intensity' | '
 // price / oldPrice: set to a number (UAH per month) to show the price block.
 // While they are null, every price line is hidden instead of rendering a placeholder.
 export const OFFER = {
-  discountPercent: 13,
-  price: 1980 as number | null,
+  discountPrefix: 'до',
+  discountValue: '−50%',
+  // "від" price = oldPrice − 50% (max discount). Set to null to hide price lines.
+  price: 1138 as number | null,
   oldPrice: 2276 as number | null,
-  deadlineLabel: '23:59 13.11',
-  timeZone: 'Europe/Kyiv',
+  deadlineLabel: '30.11',
+  deadlineISO: '2026-11-30T23:59:59+02:00', // 23:59:59 Europe/Kyiv
 };
+
+export const DISCOUNT_LABEL = `${OFFER.discountPrefix} ${OFFER.discountValue}`;
 
 export const formatUah = (n: number) =>
   n.toLocaleString('uk-UA').replace(/\s/g, ' ');
 
 export const PRICE_LINE: string | null =
   OFFER.price && OFFER.oldPrice
-    ? `${formatUah(OFFER.price)} грн/міс замість ${formatUah(OFFER.oldPrice)}`
+    ? `від ${formatUah(OFFER.price)} грн/міс замість ${formatUah(OFFER.oldPrice)}`
     : null;
 
 const ADULT: Question[] = [
@@ -183,7 +187,7 @@ export const LOADER_STAGES = [
 export const FAQ = [
   {
     q: 'До коли діє знижка?',
-    a: `Акція «Пʼятниця 13» діє до ${OFFER.deadlineLabel}. Знижка фіксується за вами, щойно ви залишите заявку.`,
+    a: `Акція «Пʼятниця 13» діє до 23:59 ${OFFER.deadlineLabel}. Залиште заявку — менеджер підбере програму й зафіксує вашу знижку.`,
   },
   {
     q: 'Що буде після заявки?',

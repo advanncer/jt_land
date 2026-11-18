@@ -6,6 +6,7 @@ import {
   FAQ,
   HERO_BULLETS,
   LOADER_STAGES,
+  DISCOUNT_LABEL,
   OFFER,
   PRICE_LINE,
   QUESTIONS,
@@ -52,48 +53,49 @@ const initialAudience = (): Audience => {
   return 'adult';
 };
 
-// Seconds left until midnight in Kyiv time (offer ends 23:59)
-const secondsToMidnight = (): number => {
-  const parts = new Intl.DateTimeFormat('en-GB', {
-    timeZone: OFFER.timeZone,
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hourCycle: 'h23',
-  }).formatToParts(new Date());
-  const get = (t: string) => Number(parts.find((p) => p.type === t)?.value || 0);
-  return Math.max(0, 86400 - (get('hour') * 3600 + get('minute') * 60 + get('second')));
-};
+// Seconds left until the offer deadline (23:59:59 Kyiv on OFFER.deadlineISO)
+const DEADLINE_MS = new Date(OFFER.deadlineISO).getTime();
+const secondsLeft = (): number => Math.max(0, Math.floor((DEADLINE_MS - Date.now()) / 1000));
 
 function useCountdown() {
-  const [left, setLeft] = useState(secondsToMidnight);
+  const [left, setLeft] = useState(secondsLeft);
   useEffect(() => {
-    const id = setInterval(() => setLeft(secondsToMidnight()), 1000);
+    const id = setInterval(() => setLeft(secondsLeft()), 1000);
     return () => clearInterval(id);
   }, []);
   const pad = (n: number) => String(n).padStart(2, '0');
-  return [Math.floor(left / 3600), Math.floor((left % 3600) / 60), left % 60].map(pad);
+  const days = Math.floor(left / 86400);
+  const units = [
+    [Math.floor((left % 86400) / 3600), 'год'],
+    [Math.floor((left % 3600) / 60), 'хв'],
+    [left % 60, 'сек'],
+  ] as [number, string][];
+  if (days > 0) units.unshift([days, 'дн']);
+  return units.map(([v, l]) => [pad(v), l] as const);
 }
 
 // ─── Small presentational pieces ────────────────────────────────────────────
 
 function Countdown({ compact = false }: { compact?: boolean }) {
-  const [h, m, s] = useCountdown();
+  const units = useCountdown();
   return (
     <div className="flex flex-col items-center">
       <span className="text-[11px] font-bold uppercase tracking-widest text-white/60 mb-1.5">
         До кінця акції
       </span>
       <div className="flex items-center gap-1.5" role="timer" aria-live="off">
-        {[h, m, s].map((v, i) => (
-          <React.Fragment key={i}>
-            {i > 0 && <span className="text-[var(--f13-cta)] font-black">:</span>}
-            <span
-              className={`f13-display tabular-nums rounded-xl bg-white/[0.06] border border-white/10 text-white text-center ${
-                compact ? 'text-lg px-2 py-1 min-w-[2.6rem]' : 'text-2xl px-2.5 py-1.5 min-w-[3.2rem]'
-              }`}
-            >
-              {v}
+        {units.map(([v, label], i) => (
+          <React.Fragment key={label}>
+            {i > 0 && <span className="text-[var(--f13-cta)] font-black self-start mt-1.5">:</span>}
+            <span className="flex flex-col items-center">
+              <span
+                className={`f13-display tabular-nums rounded-xl bg-white/[0.06] border border-white/10 text-white text-center ${
+                  compact ? 'text-lg px-2 py-1 min-w-[2.6rem]' : 'text-2xl px-2.5 py-1.5 min-w-[3.2rem]'
+                }`}
+              >
+                {v}
+              </span>
+              <span className="mt-1 text-[10px] font-semibold text-white/45">{label}</span>
             </span>
           </React.Fragment>
         ))}
@@ -106,7 +108,7 @@ function PromoBadge() {
   return (
     <span className="inline-flex items-center gap-2 rounded-full border border-[var(--f13-cta)]/40 bg-[var(--f13-cta)]/10 px-3.5 py-1 text-[11px] font-black uppercase tracking-widest text-[var(--f13-cta)]">
       <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand)] f13-pulse" />
-      Пʼятниця 13 · Лише сьогодні
+      Пʼятниця 13 · До {OFFER.deadlineLabel}
     </span>
   );
 }
@@ -115,8 +117,8 @@ function Big13({ size = 'lg' }: { size?: 'md' | 'lg' }) {
   return (
     <div className="relative select-none flex items-center justify-center" aria-hidden="true">
       <span className={`f13-outline ${size === 'lg' ? 'text-[9.5rem] sm:text-[11rem]' : 'text-[7rem]'}`}>13</span>
-      <span className="absolute -right-2 top-4 rotate-12 rounded-xl bg-[var(--brand)] px-2.5 py-1 f13-display text-xl text-white shadow-lg">
-        −{OFFER.discountPercent}%
+      <span className="absolute -right-6 top-4 rotate-12 rounded-xl bg-[var(--brand)] px-2.5 py-1 f13-display text-xl text-white shadow-lg whitespace-nowrap">
+        <span className="text-sm align-middle">{OFFER.discountPrefix}</span> {OFFER.discountValue}
       </span>
     </div>
   );
@@ -127,7 +129,7 @@ function PriceBlock() {
   return (
     <div className="flex items-baseline justify-center gap-3">
       <span className="f13-display text-3xl text-white">
-        {formatUah(OFFER.price)} <span className="text-base font-bold">грн/міс</span>
+        <span className="text-base font-bold">від</span> {formatUah(OFFER.price)} <span className="text-base font-bold">грн/міс</span>
       </span>
       <span className="text-base font-semibold text-white/40 line-through">
         {formatUah(OFFER.oldPrice)}
@@ -385,7 +387,7 @@ export default function App() {
     const qa = [
       `ip:${ipInfo.ip || 'unknown'}|country:${ipInfo.country || 'unknown'}`,
       `[ПʼЯТНИЦЯ 13 · 2026 · ${variant.toUpperCase()}]`,
-      `Пропозиція: знижка −${OFFER.discountPercent}% на навчання${PRICE_LINE ? ` (${PRICE_LINE})` : ''}, діє до ${OFFER.deadlineLabel}`,
+      `Пропозиція: знижка ${DISCOUNT_LABEL} на навчання${PRICE_LINE ? ` (${PRICE_LINE})` : ''}, діє до 23:59 ${OFFER.deadlineLabel}`,
       `Аудиторія: ${audience === 'adult' ? 'Дорослий' : 'Дитина'}`,
       `Вік: ${answers.age || 'Не вказано'}`,
       `Рівень: ${answers.level || 'Не вказано'}`,
@@ -465,7 +467,7 @@ export default function App() {
     <div className="min-h-[100dvh] flex flex-col f13-page">
       {/* Header */}
       <header className="sticky top-0 z-50 h-14 flex items-center justify-between px-4 border-b border-white/10 bg-[var(--f13-bg)]/90 backdrop-blur-md shrink-0">
-        <div className="w-14">
+        <div className="w-20">
           {canGoBack && (
             <button
               id="back-btn"
@@ -479,13 +481,13 @@ export default function App() {
           )}
         </div>
         <img src={logoWhite} alt="JustSchool" className="h-6 w-auto" />
-        <div className="w-14 text-right">
+        <div className="w-20 text-right">
           {currentQ ? (
             <span className="text-xs font-bold text-white/50">
               {step - FIRST_Q + 1}/{questions.length}
             </span>
           ) : (
-            <span className="f13-display text-xs text-[var(--f13-cta)]">−{OFFER.discountPercent}%</span>
+            <span className="f13-display text-xs text-[var(--f13-cta)] whitespace-nowrap">{DISCOUNT_LABEL}</span>
           )}
         </div>
       </header>
@@ -508,10 +510,10 @@ export default function App() {
             <Big13 size="md" />
             <div>
               <h1 className="f13-display text-2xl sm:text-3xl text-white leading-tight">
-                −{OFFER.discountPercent}% на навчання англійської
+                {DISCOUNT_LABEL} на навчання англійської
               </h1>
               <p className="mt-2 text-sm font-medium text-white/60">
-                Діє до {OFFER.deadlineLabel}
+                Діє до 23:59 {OFFER.deadlineLabel}
               </p>
             </div>
             <PriceBlock />
@@ -536,7 +538,7 @@ export default function App() {
               <div>
                 <h1 className="f13-display text-3xl sm:text-4xl text-white leading-tight">
                   Пʼятниця 13 —<br />
-                  <span className="text-[var(--f13-cta)]">−{OFFER.discountPercent}%</span> на навчання
+                  <span className="text-[var(--f13-cta)] whitespace-nowrap">{DISCOUNT_LABEL}</span> на навчання
                 </h1>
                 <p className="mt-3 text-base font-medium text-white/65">
                   Пройдіть короткий тест, отримайте персональний план і зафіксуйте знижку до{' '}
@@ -565,7 +567,7 @@ export default function App() {
                 {[
                   ['Пройдіть тест', '6 коротких питань про рівень, мету та графік'],
                   ['Отримайте план', 'Персональна програма під ваші відповіді'],
-                  ['Залиште контакти', `Знижка −${OFFER.discountPercent}% закріпиться за вами`],
+                  ['Залиште контакти', `Знижка ${DISCOUNT_LABEL} закріпиться за вами`],
                 ].map(([t, d], i) => (
                   <li key={t} className="f13-panel rounded-2xl p-4 flex items-center gap-4">
                     <span className="f13-display text-2xl text-[var(--brand)] w-8 shrink-0">{i + 1}</span>
@@ -596,7 +598,7 @@ export default function App() {
             <section className="flex flex-col items-center gap-4 text-center pb-4">
               <Countdown compact />
               <CtaButton id="hero-v2-bottom-btn" onClick={() => goTo(FIRST_Q)}>
-                Забрати −{OFFER.discountPercent}% <span aria-hidden>→</span>
+                Забрати знижку <span aria-hidden>→</span>
               </CtaButton>
             </section>
           </div>
@@ -642,7 +644,9 @@ export default function App() {
               Ваша знижка вже чекає
             </h2>
             <div className="f13-panel rounded-3xl px-6 py-5 w-full">
-              <div className="f13-display text-6xl text-[var(--f13-cta)]">−{OFFER.discountPercent}%</div>
+              <div className="f13-display text-6xl text-[var(--f13-cta)] whitespace-nowrap">
+                <span className="text-2xl align-middle">{OFFER.discountPrefix}</span> {OFFER.discountValue}
+              </div>
               <p className="mt-2 text-sm font-semibold text-white/70">на навчання · до {OFFER.deadlineLabel}</p>
               {PRICE_LINE && <p className="mt-3 text-base font-bold text-white">{PRICE_LINE}</p>}
             </div>
@@ -725,7 +729,7 @@ export default function App() {
               </dl>
               <div className="mt-4 flex items-center justify-between rounded-2xl bg-[var(--f13-cta)]/10 border border-[var(--f13-cta)]/30 px-4 py-3">
                 <span className="text-sm font-bold text-[var(--f13-cta)]">Знижка Пʼятниці 13</span>
-                <span className="f13-display text-xl text-[var(--f13-cta)]">−{OFFER.discountPercent}%</span>
+                <span className="f13-display text-xl text-[var(--f13-cta)] whitespace-nowrap">{DISCOUNT_LABEL}</span>
               </div>
               {PRICE_LINE && <p className="mt-3 text-center text-sm font-bold text-white">{PRICE_LINE}</p>}
             </div>
@@ -770,7 +774,7 @@ export default function App() {
                   type="submit"
                   disabled={isSubmitting || !isPhoneValid || !name.trim() || !email.trim()}
                 >
-                  {isSubmitting ? 'Надсилаємо заявку...' : `Закріпити −${OFFER.discountPercent}% →`}
+                  {isSubmitting ? 'Надсилаємо заявку...' : 'Закріпити знижку →'}
                 </CtaButton>
                 <p className="text-center text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
                   Ваші дані в безпеці · Без спаму
