@@ -21,8 +21,8 @@ export type QuestionKey = 'age' | 'level' | 'goal' | 'aspects' | 'intensity' | '
 export const OFFER = {
   discountPrefix: 'до',
   discountValue: '−50%',
-  // "від" price = oldPrice − 50% (max discount). Set to null to hide price lines.
-  price: 1138 as number | null,
+  // "від" price shown on the page. Set to null to hide price lines.
+  price: 1670 as number | null,
   oldPrice: 2276 as number | null,
   deadlineLabel: '30.11',
   deadlineISO: '2026-11-30T23:59:59+02:00', // 23:59:59 Europe/Kyiv
