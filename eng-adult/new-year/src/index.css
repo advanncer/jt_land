@@ -1,0 +1,236 @@
+@import "./ds/styles.css";
+/* Scan only this landing for classes (keeps the CSS bundle small) */
+@import "tailwindcss" source(none);
+@source "./";
+
+/* ─── New Year promo theme (dark pine), layered on top of ds tokens ─── */
+:root {
+  --ny-bg: #0B2A1E;
+  --ny-card: #123826;
+  --ny-border: #24533B;
+  --ny-text: #FFF8EC;
+  --ny-muted: #B9D0C2;
+  --ny-red: #C8202C;
+  --ny-gold: #F2C14E;
+  --ny-gold-hover: #E3AE33;
+  --ny-green: #3FB37A;
+  --font-promo: "Unbounded", var(--font-core);
+}
+
+html {
+  background-color: var(--ny-bg);
+}
+
+body {
+  font-family: var(--font-core);
+  background-color: var(--ny-bg);
+  color: var(--ny-text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ny-page {
+  background:
+    radial-gradient(70rem 32rem at 50% -12rem, rgba(242, 193, 78, 0.10), transparent 70%),
+    var(--ny-bg);
+}
+
+.ny-display {
+  font-family: var(--font-promo);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.ny-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 9999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ny-text);
+  background: var(--ny-red);
+  box-shadow: 0 6px 18px rgba(200, 32, 44, 0.35);
+}
+
+.ny-card {
+  background-color: var(--ny-card);
+  border: 1px solid var(--ny-border);
+}
+
+.ny-cta {
+  background-color: var(--ny-gold);
+  color: #141414;
+  box-shadow: 0 8px 24px rgba(242, 193, 78, 0.3);
+  transition: background-color 0.15s, transform 0.1s;
+}
+.ny-cta:not(:disabled):hover {
+  background-color: var(--ny-gold-hover);
+}
+.ny-cta:focus-visible,
+.ny-option:focus-visible,
+.ny-gift:focus-visible {
+  outline: 3px solid var(--ny-text);
+  outline-offset: 3px;
+}
+
+.ny-option {
+  background-color: var(--ny-card);
+  border-color: var(--ny-border);
+  transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+}
+.ny-option:hover,
+.ny-option.is-selected {
+  border-color: var(--ny-gold);
+  background-color: #17442F;
+}
+
+/* Gift tiles (V1) */
+.ny-gift {
+  background:
+    linear-gradient(90deg, transparent calc(50% - 6px), rgba(242, 193, 78, 0.85) calc(50% - 6px), rgba(242, 193, 78, 0.85) calc(50% + 6px), transparent calc(50% + 6px)),
+    var(--ny-red);
+  border: 2px solid rgba(255, 248, 236, 0.15);
+  transition: transform 0.2s;
+}
+.ny-gift:not(.is-open):hover {
+  transform: translateY(-2px);
+}
+.ny-gift.is-open {
+  background: var(--ny-card);
+  border-color: var(--ny-gold);
+  animation: nyPop 0.35s var(--ease-out) both;
+}
+
+@keyframes nyPop {
+  0% { transform: scale(0.9); }
+  60% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+@keyframes nyWiggle {
+  0%, 85%, 100% { transform: rotate(0); }
+  90% { transform: rotate(-8deg); }
+  95% { transform: rotate(8deg); }
+}
+.ny-wiggle {
+  display: inline-block;
+  animation: nyWiggle 3s ease-in-out infinite;
+}
+
+/* Lead form card */
+.ny-form {
+  background: var(--ny-text);
+}
+.ny-input {
+  border-color: var(--border-default);
+  color: var(--text-strong);
+}
+.ny-input:focus {
+  border-color: var(--ny-red);
+  box-shadow: 0 0 0 3px rgba(200, 32, 44, 0.2);
+}
+
+
+/* ─── Garland under the header ─── */
+.ny-garland {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -9px;
+  height: 14px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 6px;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 14px at 50% -6px, transparent 9px, rgba(185, 208, 194, 0.35) 10px, transparent 11px) 0 0 / 28px 14px repeat-x;
+}
+.ny-garland span {
+  width: 6px;
+  height: 8px;
+  margin-top: 4px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  box-shadow: 0 0 6px currentColor;
+  will-change: opacity;
+  animation: nyTwinkle 2.1s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes nyTwinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ─── Light CSS snow in hero (transform-only animation → compositor, no repaints) ─── */
+.ny-snow {
+  isolation: isolate;
+  overflow: hidden;
+}
+.ny-snow::before,
+.ny-snow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -480px;
+  height: calc(100% + 480px);
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(2px 2px at 20px 30px, rgba(255, 248, 236, 0.9), transparent 60%),
+    radial-gradient(1.5px 1.5px at 90px 120px, rgba(255, 248, 236, 0.7), transparent 60%),
+    radial-gradient(2px 2px at 160px 60px, rgba(255, 248, 236, 0.8), transparent 60%),
+    radial-gradient(1px 1px at 230px 170px, rgba(255, 248, 236, 0.7), transparent 60%),
+    radial-gradient(1.5px 1.5px at 60px 200px, rgba(255, 248, 236, 0.6), transparent 60%);
+  background-size: 260px 240px;
+  opacity: 0.55;
+  will-change: transform;
+  animation: nySnow 16s linear infinite;
+}
+.ny-snow::after {
+  background-size: 180px 160px;
+  opacity: 0.35;
+  animation-duration: 24s;
+}
+@keyframes nySnow {
+  from { transform: translate3d(0, 0, 0); }
+  /* 480px = 2 × 240px and 3 × 160px tiles → seamless loop for both layers */
+  to { transform: translate3d(0, 480px, 0); }
+}
+
+/* Step transition */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.step-enter {
+  animation: fadeSlideIn 0.25s var(--ease-out) both;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin 0.9s linear infinite;
+}
+
+input::placeholder {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ny-snow::before,
+  .ny-snow::after,
+  .ny-garland span,
+  .ny-wiggle,
+  .ny-gift.is-open,
+  .step-enter,
+  .animate-spin {
+    animation: none;
+  }
+}

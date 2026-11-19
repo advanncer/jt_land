@@ -99,6 +99,10 @@ export default defineConfig({
           __dirname,
           "eng-adult/black-friday-50/index.html",
         ),
+        engAdultNewYear: resolve(
+          __dirname,
+          "eng-adult/new-year/index.html",
+        ),
       },
     },
   },

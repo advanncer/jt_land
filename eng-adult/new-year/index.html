@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <!-- Google Tag Manager (dataLayer starts now; gtm.js is injected by loadTrackers below) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+      // Deferred third-party loading: GTM + Meta Pixel scripts are injected on the first
+      // user interaction or 3.5 s after window load, whichever comes first. Events pushed
+      // before that (dataLayer, fbq queue incl. PageView) are kept and sent once loaded.
+      window.loadTrackers = function () {
+        if (window.__trackersLoaded) return;
+        window.__trackersLoaded = true;
+        var add = function (src) {
+          var j = document.createElement("script");
+          j.async = true;
+          j.src = src;
+          document.head.appendChild(j);
+        };
+        add("https://www.googletagmanager.com/gtm.js?id=GTM-P6BDRT25");
+        add("https://connect.facebook.net/en_US/fbevents.js");
+      };
+      ["pointerdown", "keydown", "touchstart", "scroll"].forEach(function (e) {
+        window.addEventListener(e, window.loadTrackers, { once: true, passive: true });
+      });
+      window.addEventListener("load", function () {
+        setTimeout(window.loadTrackers, 3500);
+      });
+    </script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0B2A1E" />
+    <!-- Preload the hero banner (LCP): V1 always shows the square banner, V2 switches at 767px -->
+    <script>
+      (function () {
+        var v1 = /-v1\/?$/.test(location.pathname);
+        var mob = v1 || matchMedia("(max-width: 767px)").matches;
+        var l = document.createElement("link");
+        l.rel = "preload";
+        l.as = "image";
+        l.type = "image/webp";
+        l.setAttribute("fetchpriority", "high");
+        if (mob) {
+          l.setAttribute("imagesrcset", "/new-year/banner-mobile-750.webp 750w, /new-year/banner-mobile.webp 1100w");
+          l.setAttribute("imagesizes", v1 ? "(min-width: 480px) 448px, 100vw" : "100vw");
+        } else {
+          l.setAttribute("imagesrcset", "/new-year/banner-desktop-1100.webp 1100w, /new-year/banner-desktop.webp 1672w");
+          l.setAttribute("imagesizes", "(min-width: 1024px) 640px, 100vw");
+        }
+        document.head.appendChild(l);
+      })();
+    </script>
+    <meta
+      name="description"
+      content="Подарунки від Діда Мороза в JustSchool: знижка до −50% на навчання англійської, безкоштовний пробний урок, розмовні клуби та 200 фраз англійською в PDF. До 23:59 31.12."
+    />
+    <meta property="og:title" content="🎅 Подарунки від Діда Мороза: англійська зі знижкою до −50%" />
+    <meta property="og:description" content="4 подарунки в мішку: знижка до −50%, пробний урок, розмовні клуби та 200 фраз англійською. До 23:59 31.12." />
+    <meta property="og:image" content="https://lp.justschool.me/new-year/banner-desktop.jpg" />
+    <meta property="og:type" content="website" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- Self-hosted fonts (SIL OFL, from Google Fonts): preloaded so text never swaps after first paint -->
+    <link rel="preload" href="/new-year/fonts/unbounded-900-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/new-year/fonts/montserrat-var-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/new-year/fonts/unbounded-900-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/new-year/fonts/montserrat-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      @font-face { font-family: "Unbounded"; font-style: normal; font-weight: 900; font-display: swap; src: url(/new-year/fonts/unbounded-900-cyrillic.woff2) format("woff2"); unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+      @font-face { font-family: "Unbounded"; font-style: normal; font-weight: 900; font-display: swap; src: url(/new-year/fonts/unbounded-900-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+      @font-face { font-family: "Montserrat"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(/new-year/fonts/montserrat-var-cyrillic.woff2) format("woff2"); unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+      @font-face { font-family: "Montserrat"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(/new-year/fonts/montserrat-var-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    </style>
+
+    <!-- Facebook Pixel Code (queue stub only; fbevents.js is injected by loadTrackers) -->
+    <script>
+      !function(f){if(f.fbq)return;var n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[]}(window);
+      fbq('init', '9067851526565677');
+      fbq('track', 'PageView');
+    </script>
+    <!-- End Facebook Pixel Code -->
+
+    <title>🎅 Подарунки від Діда Мороза: англійська до −50% | JustSchool</title>
+
+    <!-- JustSchool Splitter & Lead Attribution Tracker -->
+    <script src="https://lp.justschool.me/js-tracker.js" async></script>
+  </head>
+  <body class="min-h-screen antialiased" style="background:#0B2A1E">
+    <!-- Facebook Pixel Code (noscript) -->
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=9067851526565677&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P6BDRT25"
+      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <div id="root"></div>
+    <script type="module" src="./src/main.tsx"></script>
+  </body>
+</html>

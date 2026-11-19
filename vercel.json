@@ -368,6 +368,30 @@
     {
       "source": "/black-friday-50-v1/:path*",
       "destination": "/eng-adult/black-friday-50/index.html"
+    },
+    {
+      "source": "/new-year",
+      "destination": "/eng-adult/new-year/index.html"
+    },
+    {
+      "source": "/new-year/",
+      "destination": "/eng-adult/new-year/index.html"
+    },
+    {
+      "source": "/new-year-v1",
+      "destination": "/eng-adult/new-year/index.html"
+    },
+    {
+      "source": "/new-year-v1/",
+      "destination": "/eng-adult/new-year/index.html"
+    },
+    {
+      "source": "/eng-adult/new-year",
+      "destination": "/eng-adult/new-year/index.html"
+    },
+    {
+      "source": "/eng-adult/new-year-v1",
+      "destination": "/eng-adult/new-year/index.html"
     }
   ],
   "redirects": [
