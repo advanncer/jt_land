@@ -105,6 +105,40 @@
   // Expose global tracker helper
   window.justSchoolTrackLead = trackConversion;
 
+  // Helper to auto-enrich payload with split attributes and marketing params
+  function enrichPayload(payload) {
+    if (!payload || typeof payload !== "object") return false;
+    var modified = false;
+    if (splitId && splitVariant && !payload.split_id) {
+      payload.split_id = splitId;
+      payload.split_variant = splitVariant;
+      modified = true;
+    }
+    var paramKeys = [
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "utm_content",
+      "utm_term",
+      "campaign_id",
+      "adset_id",
+      "ad_id",
+      "fbclid",
+      "lead_type"
+    ];
+    for (var i = 0; i < paramKeys.length; i++) {
+      var k = paramKeys[i];
+      if (!payload[k]) {
+        var v = getParam(k);
+        if (v) {
+          payload[k] = v;
+          modified = true;
+        }
+      }
+    }
+    return modified;
+  }
+
   // 3. Auto-intercept XMLHttpRequest (Used by Good Promo jQuery AJAX -> n8n webhook)
   (function interceptXHR() {
     var origOpen = XMLHttpRequest.prototype.open;
@@ -125,10 +159,8 @@
             try { leadData = JSON.parse(body); } catch (e) {}
           }
           if (leadData) {
-            // Auto-enrich outgoing payload with split_id if missing
-            if (splitId && splitVariant && !leadData.split_id) {
-              leadData.split_id = splitId;
-              leadData.split_variant = splitVariant;
+            var changed = enrichPayload(leadData);
+            if (changed) {
               body = JSON.stringify(leadData);
             }
             trackConversion(leadData);
@@ -157,9 +189,8 @@
               var parsed = null;
               try { parsed = JSON.parse(init.body); } catch (e) {}
               if (parsed) {
-                if (splitId && splitVariant && !parsed.split_id) {
-                  parsed.split_id = splitId;
-                  parsed.split_variant = splitVariant;
+                var changed = enrichPayload(parsed);
+                if (changed) {
                   init.body = JSON.stringify(parsed);
                 }
                 // Only trigger external beacon tracker for external webhooks; /api/submit handles tracking natively
