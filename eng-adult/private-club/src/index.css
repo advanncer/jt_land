@@ -1,0 +1,277 @@
+@import "./ds/styles.css";
+/* Scan only this landing for classes (keeps the CSS bundle small) */
+@import "tailwindcss" source(none);
+@source "./";
+
+/* ─── Speakeasy / art-deco theme, layered on top of ds tokens ─── */
+:root {
+  --c-bg: #0F0E0D;
+  --c-card: #1A1816;
+  --c-line: #3A332B;
+  --c-velvet: #5A1426;
+  --c-brass: #C9A45C;
+  --c-brass-hover: #D9B76E;
+  --c-text: #F4EDE1;
+  --c-muted: #A89F92;
+  --c-silver: #C7CCD1;
+  --c-black: #2B2B2B;
+  --font-display-club: "Playfair Display", Georgia, "Times New Roman", serif;
+}
+
+html,
+body {
+  background-color: var(--c-bg);
+}
+body {
+  font-family: var(--font-core);
+  color: var(--c-text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.club-page {
+  background:
+    radial-gradient(60rem 26rem at 50% -10rem, rgba(201, 164, 92, 0.08), transparent 70%),
+    var(--c-bg);
+}
+
+.font-display {
+  font-family: var(--font-display-club);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.lux-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--c-brass);
+  color: var(--c-brass);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.lux-card {
+  background-color: var(--c-card);
+  border: 1px solid var(--c-line);
+}
+
+.brass-btn {
+  background-color: var(--c-brass);
+  color: var(--c-bg);
+  transition: background-color 0.15s, transform 0.1s;
+}
+.brass-btn:not(:disabled):hover {
+  background-color: var(--c-brass-hover);
+}
+.brass-btn:not(:disabled):active {
+  transform: scale(0.98);
+}
+.brass-btn:focus-visible,
+.lux-option:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 3px;
+}
+
+.lux-option {
+  background-color: var(--c-card);
+  border: 1px solid var(--c-line);
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.lux-option:hover,
+.lux-option.is-selected {
+  border-color: var(--c-brass);
+  background-color: #221F1B;
+}
+
+.lux-input {
+  border-color: var(--c-line);
+  color: #1A1816;
+}
+.lux-input:focus {
+  border-color: var(--c-brass);
+  box-shadow: 0 0 0 3px rgba(201, 164, 92, 0.25);
+}
+
+/* Art-deco divider: line ◆ line */
+.deco-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.deco-divider span {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c-brass));
+}
+.deco-divider span:last-child {
+  background: linear-gradient(90deg, var(--c-brass), transparent);
+}
+.deco-divider i {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--c-brass);
+  transform: rotate(45deg);
+}
+
+/* ─── Password plate ─── */
+.pw-plate {
+  display: inline-flex;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--c-brass);
+  background: var(--c-card);
+  perspective: 600px;
+}
+.pw-cell {
+  width: 2.6rem;
+  height: 3.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--c-line);
+  font-family: var(--font-display-club);
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: var(--c-muted);
+  background: var(--c-bg);
+}
+.pw-cell.is-open {
+  color: var(--c-brass);
+  border-color: var(--c-brass);
+}
+.pw-cell.is-flipping {
+  animation: pwFlip 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes pwFlip {
+  from { transform: rotateX(-90deg); opacity: 0; }
+  to { transform: rotateX(0); opacity: 1; }
+}
+.pw-plate.is-accepted .pw-cell {
+  background: var(--c-brass);
+  color: var(--c-bg);
+}
+.pw-plate {
+  position: relative;
+}
+/* Glow ring: transform + opacity only */
+.pw-plate.is-accepted::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 2px solid var(--c-brass);
+  box-shadow: 0 0 24px rgba(201, 164, 92, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  animation: pwGlow 1.6s ease-out both;
+}
+@keyframes pwGlow {
+  from { opacity: 0.9; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.12, 1.35); }
+}
+
+/* ─── Tier doors (password accepted / V2) ─── */
+.door--muted {
+  opacity: 0.4;
+}
+.door--active svg {
+  filter: drop-shadow(0 0 18px rgba(201, 164, 92, 0.45));
+}
+
+/* ─── Doors opening ─── */
+.door-stage {
+  position: relative;
+  width: 180px;
+  height: 270px;
+  perspective: 900px;
+  border: 1px solid var(--c-brass);
+  border-radius: 90px 90px 0 0;
+  overflow: hidden;
+}
+.door-light {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 60%, #FFE2A8 0%, #E8A65A 35%, #5A1426 80%);
+}
+.door-leaf {
+  position: absolute;
+  inset: 0;
+  border-radius: 90px 90px 0 0;
+  background: var(--c-velvet);
+  border: 2px solid var(--c-brass);
+  transform-origin: left center;
+  animation: doorOpen 1.4s cubic-bezier(0.6, 0, 0.2, 1) 0.3s both;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 60px 20px 18px;
+  backface-visibility: hidden;
+}
+.door-leaf--black {
+  background: var(--c-black);
+}
+.door-leaf--silver {
+  border-color: var(--c-silver);
+}
+.door-panel {
+  flex: 1;
+  border: 1px solid var(--c-brass);
+}
+.door-knob {
+  position: absolute;
+  right: 16px;
+  top: 58%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c-brass);
+}
+@keyframes doorOpen {
+  from { transform: rotateY(0); }
+  to { transform: rotateY(-100deg); }
+}
+.reveal {
+  animation: fadeUp 0.6s ease-out both;
+}
+.reveal-1 { animation-delay: 1.2s; }
+.reveal-2 { animation-delay: 1.5s; }
+.reveal-3 { animation-delay: 1.8s; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Step transition */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.step-enter {
+  animation: fadeSlideIn 0.25s ease-out both;
+}
+
+input::placeholder {
+  color: #8A8178;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Reduced motion: no animation, final state right away */
+@media (prefers-reduced-motion: reduce) {
+  .step-enter,
+  .pw-cell.is-flipping,
+  .pw-plate.is-accepted::after,
+  .reveal,
+  .door-leaf {
+    animation: none;
+  }
+  .door-leaf {
+    transform: rotateY(-100deg);
+  }
+  .brass-btn:not(:disabled):active {
+    transform: none;
+  }
+}

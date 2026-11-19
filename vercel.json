@@ -392,6 +392,30 @@
     {
       "source": "/eng-adult/new-year-v1",
       "destination": "/eng-adult/new-year/index.html"
+    },
+    {
+      "source": "/club",
+      "destination": "/eng-adult/private-club/index.html"
+    },
+    {
+      "source": "/club/",
+      "destination": "/eng-adult/private-club/index.html"
+    },
+    {
+      "source": "/club-v1",
+      "destination": "/eng-adult/private-club/index.html"
+    },
+    {
+      "source": "/club-v1/",
+      "destination": "/eng-adult/private-club/index.html"
+    },
+    {
+      "source": "/eng-adult/private-club",
+      "destination": "/eng-adult/private-club/index.html"
+    },
+    {
+      "source": "/eng-adult/private-club-v1",
+      "destination": "/eng-adult/private-club/index.html"
     }
   ],
   "redirects": [

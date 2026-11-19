@@ -103,6 +103,10 @@ export default defineConfig({
           __dirname,
           "eng-adult/new-year/index.html",
         ),
+        engAdultPrivateClub: resolve(
+          __dirname,
+          "eng-adult/private-club/index.html",
+        ),
       },
     },
   },
