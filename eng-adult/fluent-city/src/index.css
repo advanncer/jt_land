@@ -1,0 +1,452 @@
+@import "./ds/styles.css";
+/* Scan only this landing for classes (keeps the CSS bundle small) */
+@import "tailwindcss" source(none);
+@source "./";
+
+/* ─── Evening city: comic + game HUD, layered on top of ds tokens ─── */
+:root {
+  --g-bg: #111214;
+  --g-panel: rgba(28, 30, 34, 0.85);
+  --g-cta: #F56600;
+  --g-cta-hover: #FF7A1A;
+  --g-money: #57D163;
+  --g-mark: #FFD23F;
+  --g-accent: #2EC4C6;
+  --g-text: #FFFFFF;
+  --g-muted: #B8BCC4;
+  --font-game: "Russo One", "Arial Black", Impact, sans-serif;
+}
+
+html,
+body {
+  background-color: var(--g-bg);
+}
+body {
+  font-family: var(--font-core);
+  color: var(--g-text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.game-page {
+  background-color: var(--g-bg);
+}
+.font-game {
+  font-family: var(--font-game);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.text-outline {
+  -webkit-text-stroke: 1.5px #000;
+  paint-order: stroke fill;
+  text-shadow: 3px 3px 0 #000;
+}
+
+/* Halftone (raster) backgrounds */
+.halftone {
+  background-color: #16181c;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1.2px, transparent 1.4px);
+  background-size: 10px 10px;
+}
+.halftone-orange {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.16) 1.4px, transparent 1.6px);
+  background-size: 10px 10px;
+}
+
+/* HUD */
+.hud {
+  background: var(--g-panel);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-bottom: 2px solid #000;
+}
+.hud-panel {
+  background: var(--g-panel);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 2px solid #000;
+}
+.hud-btn {
+  background: #2a2d33;
+  border: 2px solid #000;
+  color: #fff;
+  box-shadow: 2px 2px 0 #000;
+}
+.hud-star.is-on {
+  animation: starPop 0.45s ease-out both;
+}
+@keyframes starPop {
+  0% { transform: scale(0.4) rotate(-30deg); }
+  70% { transform: scale(1.35) rotate(8deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+/* Comic elements */
+.comic-shadow { box-shadow: 4px 4px 0 #000; }
+.comic-shadow-lg { box-shadow: 8px 8px 0 #000; }
+.comic-btn {
+  background: var(--g-cta);
+  color: #fff;
+  border: 2px solid #000;
+  box-shadow: 4px 4px 0 #000;
+  transition: transform 0.08s, box-shadow 0.08s, background-color 0.15s;
+}
+.comic-btn:not(:disabled):hover { background: var(--g-cta-hover); }
+.comic-btn:not(:disabled):active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #000;
+}
+.comic-btn-ghost {
+  background: #1c1e22;
+  color: #fff;
+  border: 2px solid #000;
+  box-shadow: 4px 4px 0 var(--g-accent);
+}
+.comic-btn:focus-visible,
+.comic-btn-ghost:focus-visible,
+.game-option:focus-visible,
+.map-pin:focus-visible {
+  outline: 3px solid var(--g-mark);
+  outline-offset: 3px;
+}
+.comic-card {
+  background: #1c1e22;
+  border: 2px solid #000;
+  box-shadow: 4px 4px 0 #000;
+}
+.badge-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--g-mark);
+  color: #111214;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  font-family: var(--font-game);
+  font-size: 13px;
+  text-transform: uppercase;
+  border-radius: 8px;
+  width: fit-content;
+}
+.section-title {
+  font-family: var(--font-game);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #fff;
+  text-shadow: 3px 3px 0 #000;
+}
+
+.game-option {
+  background: #1c1e22;
+  border: 2px solid #000;
+  box-shadow: 4px 4px 0 #000;
+  transition: transform 0.08s, box-shadow 0.08s, background-color 0.15s;
+}
+.game-option:hover,
+.game-option.is-selected {
+  background: #262a31;
+  box-shadow: 4px 4px 0 var(--g-cta);
+}
+.game-option:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+/* Mission complete plate + flying bonus */
+.mission-plate {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  top: 38%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: var(--g-money);
+  color: #111214;
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0 #000;
+  border-radius: 12px;
+  font-size: 20px;
+  white-space: nowrap;
+  animation: plateIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes plateIn {
+  0% { transform: translate(-160%, -50%) skewX(-12deg); opacity: 0; }
+  25% { transform: translate(-50%, -50%) skewX(0); opacity: 1; }
+  80% { transform: translate(-50%, -50%); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0.95); opacity: 0; }
+}
+.fly-bonus {
+  position: fixed;
+  z-index: 61;
+  left: 50%;
+  top: 50%;
+  color: var(--g-money);
+  font-size: 28px;
+  -webkit-text-stroke: 1px #000;
+  paint-order: stroke fill;
+  text-shadow: 2px 2px 0 #000;
+  pointer-events: none;
+  animation: flyBonus 0.9s ease-in 0.15s both;
+}
+@keyframes flyBonus {
+  0% { transform: translate(-50%, 0) scale(1.2); opacity: 0; }
+  20% { transform: translate(-50%, 0) scale(1.2); opacity: 1; }
+  100% { transform: translate(min(40vw, 190px), -48vh) scale(0.5); opacity: 0; }
+}
+
+/* Minimap */
+.minimap {
+  position: relative;
+  border-radius: 50%;
+  border: 3px solid #000;
+  box-shadow: 3px 3px 0 #000, inset 0 0 0 2px rgba(255, 255, 255, 0.15);
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+.minimap--fixed {
+  position: fixed;
+  z-index: 30;
+  left: 14px;
+  bottom: 14px;
+}
+.map-mark {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: #7d818a;
+  border: 2px solid #000;
+}
+.map-mark.is-done { background: var(--g-money); }
+.map-mark.is-current { background: var(--g-mark); }
+.map-mark.is-current::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid var(--g-mark);
+  animation: pulse 1.2s ease-out infinite;
+}
+@keyframes pulse {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(2.6); opacity: 0; }
+}
+
+/* V2 city map pins */
+.map-pin {
+  position: absolute;
+  width: 40px;
+  height: 50px;
+  transform: translate(-50%, -100%);
+  transition: transform 0.15s;
+  cursor: pointer;
+}
+.map-pin img { width: 100%; height: 100%; }
+.map-pin:hover,
+.map-pin.is-active {
+  transform: translate(-50%, -100%) scale(1.25);
+  z-index: 2;
+}
+
+/* Loading screens */
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  animation: bootOut 0.25s ease-in 1.3s both;
+}
+@keyframes bootOut {
+  to { opacity: 0; }
+}
+.boot-bar {
+  width: 220px;
+  height: 10px;
+  border: 2px solid #fff;
+  overflow: hidden;
+}
+.boot-bar span {
+  display: block;
+  height: 100%;
+  background: var(--g-cta);
+  transform-origin: left center;
+  animation: bootFill 1.3s ease-out both;
+}
+.boot-bar--short span { animation-duration: 0.6s; }
+@keyframes bootFill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Phone (final mission) */
+.phone {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  background: #0b0c0e;
+  border: 3px solid #000;
+  border-radius: 36px;
+  box-shadow: 0 0 0 6px #2a2d33, 8px 8px 0 6px #000;
+  padding: 18px 14px 16px;
+  margin: 6px 0 12px;
+}
+.phone-notch {
+  width: 90px;
+  height: 18px;
+  background: #000;
+  border-radius: 0 0 12px 12px;
+  margin: -18px auto 10px;
+}
+.phone-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #2a2d33;
+}
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0;
+  min-height: 150px;
+}
+.bubble {
+  align-self: flex-start;
+  max-width: 88%;
+  background: #23262c;
+  color: #fff;
+  border-radius: 16px 16px 16px 4px;
+  padding: 9px 12px;
+  font-size: 14px;
+  line-height: 1.35;
+  animation: bubbleIn 0.3s ease-out both;
+}
+@keyframes bubbleIn {
+  from { transform: translateY(8px) scale(0.96); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.typing {
+  align-self: flex-start;
+  display: inline-flex;
+  gap: 4px;
+  background: #23262c;
+  border-radius: 16px;
+  padding: 12px 14px;
+}
+.typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--g-muted);
+  animation: typing 1s ease-in-out infinite;
+}
+.typing i:nth-child(2) { animation-delay: 0.15s; }
+.typing i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+.phone-form { animation: bubbleIn 0.3s ease-out both; }
+.phone-input {
+  border: 2px solid #000;
+  color: #111214;
+  font-weight: 600;
+}
+.phone-input:focus { box-shadow: 0 0 0 3px rgba(245, 102, 0, 0.45); }
+
+/* Comic speech bubbles (reviews) */
+.speech-bubble {
+  position: relative;
+  background: #fff;
+  color: #111214;
+  border: 2px solid #000;
+  border-radius: 18px;
+  box-shadow: 4px 4px 0 #000;
+  padding: 18px 20px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  left: 28px;
+  bottom: -14px;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  transform: skewX(-30deg) rotate(45deg);
+}
+
+/* Jackpot */
+.jackpot {
+  font-size: clamp(4rem, 20vw, 6.5rem);
+  line-height: 1;
+  -webkit-text-stroke: 2px #000;
+  paint-order: stroke fill;
+  text-shadow: 5px 5px 0 #000;
+  animation: jackpot 1.1s ease-in-out both;
+}
+@keyframes jackpot {
+  0% { transform: scale(0.3); opacity: 0; }
+  35% { transform: scale(1.15); opacity: 1; }
+  70% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.7); opacity: 0.35; }
+}
+.exchange { animation: fadeUp 0.4s ease-out 0.8s both; }
+.reward-in { animation: rewardIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.reward-in-1 { animation-delay: 1s; }
+.reward-in-2 { animation-delay: 1.2s; }
+.reward-in-3 { animation-delay: 1.4s; }
+.reward-in-4 { animation-delay: 1.7s; }
+@keyframes rewardIn {
+  from { transform: translateY(-30px) scale(0.9); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes fadeUp {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+/* Step transition */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.step-enter { animation: fadeSlideIn 0.25s ease-out both; }
+
+input::placeholder {
+  color: #6b7079;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Reduced motion: no animation, final state right away */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+  }
+  .map-mark.is-current::after,
+  .fly-bonus { display: none; }
+  .jackpot { animation: none !important; }
+  .mission-plate { animation: none !important; transform: translate(-50%, -50%); }
+}

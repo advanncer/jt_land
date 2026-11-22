@@ -107,6 +107,10 @@ export default defineConfig({
           __dirname,
           "eng-adult/private-club/index.html",
         ),
+        engAdultFluentCity: resolve(
+          __dirname,
+          "eng-adult/fluent-city/index.html",
+        ),
       },
     },
   },

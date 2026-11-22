@@ -416,6 +416,30 @@
     {
       "source": "/eng-adult/private-club-v1",
       "destination": "/eng-adult/private-club/index.html"
+    },
+    {
+      "source": "/fluent-city",
+      "destination": "/eng-adult/fluent-city/index.html"
+    },
+    {
+      "source": "/fluent-city/",
+      "destination": "/eng-adult/fluent-city/index.html"
+    },
+    {
+      "source": "/fluent-city-v1",
+      "destination": "/eng-adult/fluent-city/index.html"
+    },
+    {
+      "source": "/fluent-city-v1/",
+      "destination": "/eng-adult/fluent-city/index.html"
+    },
+    {
+      "source": "/eng-adult/fluent-city",
+      "destination": "/eng-adult/fluent-city/index.html"
+    },
+    {
+      "source": "/eng-adult/fluent-city-v1",
+      "destination": "/eng-adult/fluent-city/index.html"
     }
   ],
   "redirects": [
