@@ -145,7 +145,8 @@ export default function SplitterApp() {
   // Auth Handler
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput.trim() === "justschool2026" || passwordInput.trim() === "admin" || passwordInput.trim() === "justschool") {
+    const p = passwordInput.trim();
+    if (p === "Justschool2026" || p.toLowerCase() === "justschool2026") {
       setIsAuthenticated(true);
       localStorage.setItem("js_splitter_auth", "true");
       setAuthError("");
