@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  --mat-bg: #0b0f12;
+  --grid-fine: rgba(16, 185, 129, 0.05);
+  --grid-bold: rgba(16, 185, 129, 0.12);
+}
+
+.cutting-mat {
+  background-color: var(--mat-bg);
+  background-image:
+    linear-gradient(var(--grid-bold) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-bold) 1px, transparent 1px),
+    linear-gradient(var(--grid-fine) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-fine) 1px, transparent 1px);
+  background-size: 60px 60px, 60px 60px, 12px 12px, 12px 12px;
+  background-attachment: local;
+}
+
+.cutting-mat-light {
+  --mat-bg: #f1f5f2;
+  --grid-fine: rgba(16, 107, 74, 0.06);
+  --grid-bold: rgba(16, 107, 74, 0.14);
+}
+
+/* Checkerboard pattern for alpha transparency */
+.checker-bg {
+  background-image: conic-gradient(#1e293b 25%, #0f172a 0 50%, #1e293b 0 75%, #0f172a 0);
+  background-size: 14px 14px;
+}
+
+.checker-bg-light {
+  background-image: conic-gradient(#e2e8f0 25%, #ffffff 0 50%, #e2e8f0 0 75%, #ffffff 0);
+  background-size: 14px 14px;
+}
+
+/* Corner trim marks for print/design aesthetic */
+.trim-marker {
+  position: relative;
+}
+.trim-marker::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  pointer-events: none;
+  --m: rgba(100, 116, 139, 0.6);
+  background:
+    linear-gradient(var(--m), var(--m)) left 0 top 8px / 6px 1px no-repeat,
+    linear-gradient(var(--m), var(--m)) left 8px top 0 / 1px 6px no-repeat,
+    linear-gradient(var(--m), var(--m)) right 0 top 8px / 6px 1px no-repeat,
+    linear-gradient(var(--m), var(--m)) right 8px top 0 / 1px 6px no-repeat,
+    linear-gradient(var(--m), var(--m)) left 0 bottom 8px / 6px 1px no-repeat,
+    linear-gradient(var(--m), var(--m)) left 8px bottom 0 / 1px 6px no-repeat,
+    linear-gradient(var(--m), var(--m)) right 0 bottom 8px / 6px 1px no-repeat,
+    linear-gradient(var(--m), var(--m)) right 8px bottom 0 / 1px 6px no-repeat;
+  transition: all 0.2s ease;
+}
+.trim-marker:hover::before,
+.trim-marker.active::before {
+  --m: #10b981;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(51, 65, 85, 0.8);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 1);
+}

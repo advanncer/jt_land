@@ -30,6 +30,18 @@
   ],
   "rewrites": [
     {
+      "source": "/resizer",
+      "destination": "/resizer/index.html"
+    },
+    {
+      "source": "/resizer/",
+      "destination": "/resizer/index.html"
+    },
+    {
+      "source": "/resizer/:path*",
+      "destination": "/resizer/index.html"
+    },
+    {
       "source": "/splitter",
       "destination": "/splitter/index.html"
     },
