@@ -181,6 +181,14 @@ export default function App() {
   const [quality, setQuality] = useState<number>(92);
   const [nameMode, setNameMode] = useState<boolean>(false);
   const [zipStructure, setZipStructure] = useState<ZipStructure>("flat");
+  const [retinaGDN, setRetinaGDN] = useState<boolean>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LS_SETTINGS_KEY) || "{}");
+      return saved.retinaGDN !== undefined ? saved.retinaGDN : true;
+    } catch {
+      return true;
+    }
+  });
 
   // Overrides per item|format: itemId + "|" + fmtId
   const [overrides, setOverrides] = useState<Map<string, FormatOverride>>(new Map());
@@ -221,11 +229,12 @@ export default function App() {
       quality,
       nameMode,
       zipStructure,
+      retinaGDN,
     };
     try {
       localStorage.setItem(LS_SETTINGS_KEY, JSON.stringify(s));
     } catch {}
-  }, [selectedFormatIds, mode, pos, bg, output, quality, nameMode, zipStructure]);
+  }, [selectedFormatIds, mode, pos, bg, output, quality, nameMode, zipStructure, retinaGDN]);
 
   // ------------------ BACKEND STATS & PRESETS ------------------
   const [stats, setStats] = useState<{ totalAssetsRendered: number; totalHoursSaved: number }>({
@@ -368,7 +377,6 @@ export default function App() {
         setAuthError(data.error || "Невірний пароль доступу");
       }
     } catch {
-      // Offline fallback: check Justschool2026 locally
       if (pass.toLowerCase() === "justschool2026") {
         setIsAuthenticated(true);
         localStorage.setItem(LS_AUTH_KEY, "true");
@@ -403,10 +411,37 @@ export default function App() {
         outType,
         quality,
         own: !!(ov.mode || ov.pos || ov.bg),
+        retinaGDN,
       };
     },
-    [mode, pos, bg, output, quality, overrides]
+    [mode, pos, bg, output, quality, overrides, retinaGDN]
   );
+
+  // ------------------ UX SAFETY GUARD: DETECT SEVERE CROPS ------------------
+  const severeCropFormats = useMemo(() => {
+    if (mode !== "fill" && mode !== "smart_crop") return [];
+    const testItem = items[0] || {
+      id: 0,
+      file: null as any,
+      name: "",
+      base: "",
+      type: "png",
+      w: 1080,
+      h: 1080,
+      size: 0,
+      img: null as any,
+      url: "",
+      proxy: null as any,
+      hasAlpha: false,
+      edgeColor: "#fff",
+      saliencyCenter: { x: 0.5, y: 0.5 },
+    };
+
+    return selectedFormats.filter((f) => {
+      const L = layoutFor(testItem, f, mode, pos);
+      return L.crop > 0.15;
+    });
+  }, [mode, pos, selectedFormats, items]);
 
   // ------------------ FILE LOADING ------------------
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -502,7 +537,6 @@ export default function App() {
       }
       return prev.filter((i) => i.id !== id);
     });
-    // Clean overrides
     setOverrides((prev) => {
       const next = new Map(prev);
       for (const k of next.keys()) {
@@ -672,7 +706,6 @@ export default function App() {
         const arr = new Uint8Array(await blob.arrayBuffer());
         fileEntries.push({ name: fileName, data: arr });
 
-        // allow UI frame breathe
         await new Promise((r) => requestAnimationFrame(r));
       }
 
@@ -726,7 +759,6 @@ export default function App() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative overflow-hidden">
-        {/* Glow ambient backgrounds */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-600/15 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-teal-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -952,7 +984,14 @@ export default function App() {
                     }`}
                   >
                     <div className="flex items-center justify-between w-full mb-1">
-                      <span className="font-bold text-xs">{f.ratio}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-xs">{f.ratio}</span>
+                        {f.isRetinaCapable && retinaGDN && (
+                          <span className="text-[9px] font-bold px-1 rounded bg-teal-500/20 text-teal-300">
+                            2x
+                          </span>
+                        )}
+                      </div>
                       <div
                         className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
                           isChecked
@@ -968,7 +1007,7 @@ export default function App() {
                     <div>
                       <div className="text-[11px] font-semibold truncate">{f.name}</div>
                       <div className="text-[10px] opacity-70">
-                        {f.w} × {f.h}
+                        {f.isRetinaCapable && retinaGDN ? `${f.w * 2} × ${f.h * 2} px (HD)` : `${f.w} × ${f.h} px`}
                       </div>
                     </div>
                   </button>
@@ -992,31 +1031,69 @@ export default function App() {
 
           {/* Section: Adaptation Mode */}
           <div className="p-4 border-b border-slate-800/80 space-y-3">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">Режим адаптації</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">Режим адаптації</h2>
+              {mode === "fit" && (
+                <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" />
+                  Рекомендовано для реклами
+                </span>
+              )}
+            </div>
+
             <div className="grid grid-cols-4 gap-1.5 p-1 rounded-xl bg-slate-950/60 border border-slate-800">
               {(
                 [
-                  { id: "fit", label: "Fit", desc: "Без обрізання" },
-                  { id: "fill", label: "Fill", desc: "На весь кадр" },
-                  { id: "stretch", label: "Stretch", desc: "Розтягнути" },
-                  { id: "smart_crop", label: "AI Crop", desc: "Авто-фокус" },
-                ] as { id: AdaptationMode; label: string; desc: string }[]
+                  { id: "fit", label: "Fit", desc: "Без обрізання", rec: true },
+                  { id: "fill", label: "Fill", desc: "На весь кадр", rec: false },
+                  { id: "stretch", label: "Stretch", desc: "Розтягнути", rec: false },
+                  { id: "smart_crop", label: "AI Crop", desc: "Авто-фокус", rec: false },
+                ] as { id: AdaptationMode; label: string; desc: string; rec: boolean }[]
               ).map((m) => (
                 <button
                   key={m.id}
                   type="button"
                   onClick={() => setMode(m.id)}
-                  className={`py-2 px-1 rounded-lg text-xs font-bold transition-all text-center ${
+                  className={`py-2 px-1 rounded-lg text-xs font-bold transition-all text-center relative ${
                     mode === m.id
                       ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30"
                       : "text-slate-400 hover:text-white"
                   }`}
                 >
-                  <div>{m.label}</div>
+                  <div className="flex items-center justify-center gap-0.5">
+                    {m.label}
+                  </div>
                   <div className="text-[9px] font-normal opacity-70 truncate">{m.desc}</div>
                 </button>
               ))}
             </div>
+
+            {/* UX SAFETY GUARD CARD: Alerts when AI Crop / Fill will truncate critical ad content */}
+            {severeCropFormats.length > 0 && (
+              <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs space-y-2.5 animate-in fade-in">
+                <div className="flex items-start gap-2.5">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400 mt-0.5" />
+                  <div>
+                    <strong className="text-rose-200">Увага: ризик зрізання тексту та кнопок!</strong>
+                    <p className="text-[11px] text-rose-300/80 mt-1 leading-relaxed">
+                      У {severeCropFormats.length} форматах (Stories 9:16, горизонталки) режим Crop зрізає до 48% ширини/висоти. Заголовки, бейджі та CTA-кнопки по краях будуть обрізані навпіл.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("fit");
+                    setBg((prev) => ({ ...prev, kind: "extend" }));
+                    showToast("Увімкнено безпечний режим: Fit + Продовжити фон");
+                  }}
+                  className="w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/30 transition-colors"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Перемкнути на Fit + Продовжити фон (Безпечно)
+                </button>
+              </div>
+            )}
 
             {mode === "stretch" && (
               <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-2">
@@ -1026,11 +1103,11 @@ export default function App() {
                 </span>
               </div>
             )}
-            {mode === "smart_crop" && (
+            {mode === "smart_crop" && severeCropFormats.length === 0 && (
               <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-start gap-2">
                 <Sparkles className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
                 <span>
-                  <strong>AI Smart Crop:</strong> алгоритм аналізує контрастність та насиченість зображення, автоматично тримаючи фокус на обличчях та заголовках.
+                  <strong>AI Smart Crop:</strong> алгоритм тримає фокус на обличчях та ключовому об'єкті макета.
                 </span>
               </div>
             )}
@@ -1080,7 +1157,7 @@ export default function App() {
                 <p className="text-xs text-slate-400 leading-relaxed">
                   {mode === "fill"
                     ? "Визначає, яку частину креативу обов’язково тримати в кадрі при кадруванні."
-                    : "Вирівнювання зображення у випадках, коли залишаються порожні поля."}
+                    : "Вирівнювання зображення у випадках, коли залишаються порожні поля (для лідербордів зручно змістити вліво або вправо)."}
                 </p>
               </div>
             </div>
@@ -1144,7 +1221,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* Subpanel for Color */}
             {(bg.kind === "color" || bg.kind === "auto") && (
               <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
                 <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
@@ -1177,7 +1253,6 @@ export default function App() {
                       title={`${bc.name}: ${bc.label}`}
                     />
                   ))}
-                  {/* Custom Color Input */}
                   <div className="relative">
                     <input
                       type="color"
@@ -1275,7 +1350,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Campaign Badge */}
             <div className="pt-1">
               <label className="flex items-center justify-between text-xs font-semibold text-slate-300 mb-2 cursor-pointer">
                 <span>Бейдж кампанії</span>
@@ -1327,7 +1401,7 @@ export default function App() {
           </div>
 
           {/* Section: Export & Compression */}
-          <div className="p-4 border-b border-slate-800/80 space-y-3">
+          <div className="p-4 border-b border-slate-800/80 space-y-3.5">
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">Формат експорту та якість</h2>
 
             <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-slate-950/60 border border-slate-800">
@@ -1362,6 +1436,29 @@ export default function App() {
                 />
               </div>
             )}
+
+            {/* 2X RETINA FOR GDN TOGGLE */}
+            <div className="pt-2 border-t border-slate-800">
+              <label className="flex items-start gap-2.5 cursor-pointer text-xs text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={retinaGDN}
+                  onChange={(e) => setRetinaGDN(e.target.checked)}
+                  className="rounded border-slate-700 text-emerald-600 focus:ring-0 mt-0.5"
+                />
+                <div>
+                  <div className="font-semibold text-white flex items-center gap-1.5">
+                    <span>2x Retina HD для Google КМС</span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400">
+                      Рекомендовано
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-0.5 leading-normal">
+                    Експортує 320×50 як 640×100, 160×600 як 320×1200 з фільтром контурної різкості. Текст залишається чітким і не розмивається на смартфонах.
+                  </p>
+                </div>
+              </label>
+            </div>
 
             {/* ZIP Organization */}
             <div>
@@ -1504,7 +1601,7 @@ export default function App() {
                       <div>
                         <span>{f.ratio}</span>
                         <span className="text-[10px] font-normal opacity-60 ml-1.5">
-                          {f.w}×{f.h}
+                          {f.isRetinaCapable && retinaGDN ? `${f.w * 2}×${f.h * 2} HD` : `${f.w}×${f.h}`}
                         </span>
                       </div>
                       <span className="text-[9px] px-1 py-0.5 rounded bg-slate-800 text-slate-400 font-normal">
@@ -1566,6 +1663,8 @@ export default function App() {
                       {selectedFormats.map((f) => {
                         const cfg = getEffectiveConfig(item, f);
                         const flags = flagsFor(item, f, cfg);
+                        const L = layoutFor(item, f, cfg.mode, cfg.pos);
+                        const isSevereCrop = (cfg.mode === "fill" || cfg.mode === "smart_crop") && L.crop > 0.15;
 
                         return (
                           <div key={f.id} className="w-48 shrink-0 flex flex-col gap-2">
@@ -1576,7 +1675,9 @@ export default function App() {
                                 setViewerZoomMode("fit");
                               }}
                               className={`w-full aspect-[${f.w}/${f.h}] max-h-56 rounded-xl overflow-hidden border trim-marker cursor-pointer relative group transition-all ${
-                                cfg.own
+                                isSevereCrop
+                                  ? "border-rose-500 ring-2 ring-rose-500/30 shadow-md shadow-rose-500/10"
+                                  : cfg.own
                                   ? "border-emerald-500 shadow-md shadow-emerald-500/10"
                                   : isDark
                                   ? "border-slate-800 hover:border-slate-600 bg-slate-900"
@@ -1618,35 +1719,58 @@ export default function App() {
                             </div>
 
                             {/* Flags and Actions */}
-                            <div className="flex flex-wrap items-center justify-between gap-1 text-[10px]">
-                              <div className="flex flex-wrap gap-1">
-                                {flags.map((flg, idx) => (
-                                  <span
-                                    key={idx}
-                                    title={flg.title}
-                                    className={`px-1.5 py-0.5 rounded font-semibold ${
-                                      flg.cls === "bad"
-                                        ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
-                                        : flg.cls === "warn"
-                                        ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                                        : flg.cls === "own"
-                                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                                        : "bg-slate-800 text-slate-400"
-                                    }`}
-                                  >
-                                    {flg.text}
-                                  </span>
-                                ))}
+                            <div className="flex flex-col gap-1 text-[10px]">
+                              <div className="flex flex-wrap items-center justify-between gap-1">
+                                <div className="flex flex-wrap gap-1">
+                                  {flags.map((flg, idx) => (
+                                    <span
+                                      key={idx}
+                                      title={flg.title}
+                                      className={`px-1.5 py-0.5 rounded font-semibold ${
+                                        flg.cls === "bad"
+                                          ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
+                                          : flg.cls === "warn"
+                                          ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                                          : flg.cls === "own"
+                                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                          : "bg-slate-800 text-slate-400"
+                                      }`}
+                                    >
+                                      {flg.text}
+                                    </span>
+                                  ))}
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => downloadOne(item, f)}
+                                  className="text-slate-500 hover:text-emerald-400 p-1"
+                                  title={`Завантажити ${f.w}×${f.h}`}
+                                >
+                                  <Download className="w-3.5 h-3.5" />
+                                </button>
                               </div>
 
-                              <button
-                                type="button"
-                                onClick={() => downloadOne(item, f)}
-                                className="text-slate-500 hover:text-emerald-400 p-1"
-                                title={`Завантажити ${f.w}×${f.h}`}
-                              >
-                                <Download className="w-3.5 h-3.5" />
-                              </button>
+                              {/* Quick 1-click Fix for Severe Crop in Cell */}
+                              {isSevereCrop && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const ovKey = `${item.id}|${f.id}`;
+                                    setOverrides((prev) => {
+                                      const next = new Map(prev);
+                                      next.set(ovKey, { mode: "fit", bg: { kind: "extend", color: "#FFFFFF" } });
+                                      return next;
+                                    });
+                                    showToast(`Формат ${f.name} перемкнуто на безпечний Fit + Продовжити фон`);
+                                  }}
+                                  className="py-0.5 px-1.5 rounded bg-rose-500/20 hover:bg-emerald-600 hover:text-white border border-rose-500/30 text-[9px] font-semibold text-rose-300 transition-colors text-left flex items-center gap-1"
+                                  title="Натисніть, щоб врятувати текст і перемкнути на Fit + Продовжити фон"
+                                >
+                                  <CheckCircle2 className="w-2.5 h-2.5" />
+                                  Виправити на Fit + Фон
+                                </button>
+                              )}
                             </div>
                           </div>
                         );
@@ -1696,7 +1820,13 @@ export default function App() {
                   {viewerZoomMode === "fit" ? "100% пікселі" : "Вмістити в екран"}
                 </button>
                 <span className="w-px h-3 bg-slate-700" />
-                <span className="opacity-70 font-mono">{viewerItem.format.ratio} ({viewerItem.format.w} × {viewerItem.format.h})</span>
+                <span className="opacity-70 font-mono">
+                  {viewerItem.format.ratio} (
+                  {viewerItem.format.isRetinaCapable && retinaGDN
+                    ? `${viewerItem.format.w * 2} × ${viewerItem.format.h * 2} px 2x Retina HD`
+                    : `${viewerItem.format.w} × ${viewerItem.format.h} px`}
+                  )
+                </span>
               </div>
             </div>
 
@@ -1706,12 +1836,15 @@ export default function App() {
                 isDark ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-200"
               }`}
             >
-              <div className="space-y-6">
+              <div className="space-y-5">
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-bold text-sm tracking-tight text-white">{viewerItem.format.name}</h3>
                     <p className="text-xs text-slate-400 mt-0.5">
-                      {viewerItem.format.w} × {viewerItem.format.h} px • {viewerItem.format.ratio}
+                      {viewerItem.format.isRetinaCapable && retinaGDN
+                        ? `${viewerItem.format.w * 2} × ${viewerItem.format.h * 2} px (2x Retina HD)`
+                        : `${viewerItem.format.w} × ${viewerItem.format.h} px`}{" "}
+                      • {viewerItem.format.ratio}
                     </p>
                   </div>
                   <button
@@ -1723,6 +1856,43 @@ export default function App() {
                   </button>
                 </div>
 
+                {/* Severe Crop Alert inside Modal */}
+                {(() => {
+                  const currentCfg = getEffectiveConfig(viewerItem.item, viewerItem.format);
+                  const currentLayout = layoutFor(viewerItem.item, viewerItem.format, currentCfg.mode, currentCfg.pos);
+                  if ((currentCfg.mode === "fill" || currentCfg.mode === "smart_crop") && currentLayout.crop > 0.15) {
+                    return (
+                      <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs space-y-2">
+                        <div className="flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400 mt-0.5" />
+                          <span>
+                            <strong>Увага: зрізано {(currentLayout.crop * 100).toFixed(0)}% площі!</strong>
+                            <br />
+                            Текст та кнопки зрізані. Рекомендуємо увімкнути <strong>Fit + Продовжити фон</strong>.
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const ovKey = `${viewerItem.item.id}|${viewerItem.format.id}`;
+                            setOverrides((prev) => {
+                              const next = new Map(prev);
+                              next.set(ovKey, { mode: "fit", bg: { kind: "extend", color: "#FFFFFF" } });
+                              return next;
+                            });
+                            showToast("Перемкнуто на Fit + Продовжити фон");
+                          }}
+                          className="w-full py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] flex items-center justify-center gap-1.5"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          Виправити на Fit + Продовжити фон
+                        </button>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
                 {/* File info summary */}
                 <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs space-y-1.5 text-slate-400">
                   <div className="flex justify-between">
@@ -1733,6 +1903,12 @@ export default function App() {
                     <span>Розмір файлу:</span>
                     <span className="text-emerald-400 font-semibold">{viewerBlobSize}</span>
                   </div>
+                  {viewerItem.format.isRetinaCapable && (
+                    <div className="flex justify-between">
+                      <span>Режим КМС:</span>
+                      <span className="text-teal-400 font-medium">2x Retina HD (без розмиття)</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Safe Zones Selector */}
@@ -2000,7 +2176,7 @@ function ThumbnailCanvas({
 }
 
 // -------------------------------------------------------------
-// Component: ViewerStageCanvas (full-res viewer with safe zones)
+// Component: ViewerStageCanvas (full-res viewer with safe zones & Retina)
 // -------------------------------------------------------------
 function ViewerStageCanvas({
   item,
@@ -2043,13 +2219,17 @@ function ViewerStageCanvas({
       });
   }, [item, format, cfg, watermark, badge, canvasRef, onBlobCalculated]);
 
+  const retinaMult = (cfg.retinaGDN !== false && format.isRetinaCapable) ? 2 : 1;
+  const displayW = format.w * retinaMult;
+  const displayH = format.h * retinaMult;
+
   return (
     <div className="relative inline-block shadow-2xl">
       <canvas
         ref={canvasRef as React.RefObject<HTMLCanvasElement>}
         style={{
-          width: zoomMode === "100%" ? `${format.w}px` : "auto",
-          height: zoomMode === "100%" ? `${format.h}px` : "auto",
+          width: zoomMode === "100%" ? `${displayW}px` : "auto",
+          height: zoomMode === "100%" ? `${displayH}px` : "auto",
           maxWidth: zoomMode === "fit" ? "75vw" : "none",
           maxHeight: zoomMode === "fit" ? "75vh" : "none",
           objectFit: "contain",
@@ -2060,7 +2240,6 @@ function ViewerStageCanvas({
       {/* Safe Zones Overlay */}
       {safeZone !== "off" && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
-          {/* Top band */}
           <div
             className="absolute top-0 left-0 right-0 bg-rose-500/15 border-b border-dashed border-rose-500/60"
             style={{ height: "14%" }}
@@ -2070,7 +2249,6 @@ function ViewerStageCanvas({
             </span>
           </div>
 
-          {/* Bottom band */}
           <div
             className="absolute bottom-0 left-0 right-0 bg-rose-500/15 border-t border-dashed border-rose-500/60"
             style={{ height: safeZone === "reels" || safeZone === "tiktok" ? "35%" : "20%" }}
@@ -2080,7 +2258,6 @@ function ViewerStageCanvas({
             </span>
           </div>
 
-          {/* Right side interaction buttons */}
           {(safeZone === "reels" || safeZone === "tiktok") && (
             <div className="absolute right-3 bottom-[38%] flex flex-col gap-3 items-center opacity-60">
               <div className="w-8 h-8 rounded-full bg-white/30" />

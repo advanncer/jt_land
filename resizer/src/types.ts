@@ -8,6 +8,7 @@ export interface CreativeFormat {
   name: string;
   platform: PlatformCategory;
   desc: string;
+  isRetinaCapable?: boolean;
 }
 
 export type AdaptationMode = 'fit' | 'fill' | 'stretch' | 'smart_crop';
@@ -76,6 +77,7 @@ export interface EffectiveConfig {
   outType: 'png' | 'jpg' | 'webp';
   quality: number;
   own: boolean;
+  retinaGDN?: boolean;
 }
 
 export interface RenderFlag {

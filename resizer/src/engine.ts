@@ -13,18 +13,18 @@ import {
 export const STANDARD_FORMATS: CreativeFormat[] = [
   // Meta (Facebook & Instagram)
   { id: '1x1', w: 1080, h: 1080, ratio: '1:1', name: 'Meta Feed', platform: 'meta', desc: 'Стрічка Instagram & FB' },
-  { id: '4x5', w: 1080, h: 1350, ratio: '4:5', name: 'Meta Portrait', platform: 'meta', desc: 'Мобільна стрічка (макс. охоплення)' },
+  { id: '4x5', w: 1080, h: 1350, ratio: '4:5', name: 'Meta Portrait', platform: 'meta', desc: 'Мобільна стрічка (макс. площа)' },
   { id: '9x16', w: 1080, h: 1920, ratio: '9:16', name: 'Stories & Reels', platform: 'meta', desc: 'Повний екран Stories/Reels' },
   { id: '191x1', w: 1200, h: 628, ratio: '1.91:1', name: 'Meta Link Ad', platform: 'meta', desc: 'Реклама з посиланням у FB' },
 
   // TikTok
   { id: 'tiktok-9x16', w: 1080, h: 1920, ratio: '9:16', name: 'TikTok Ad', platform: 'tiktok', desc: 'Вертикальний відео-банер TikTok' },
 
-  // Google Display Network (GDN / КМС)
-  { id: 'gdn-300x250', w: 300, h: 250, ratio: '6:5', name: 'Medium Rectangle', platform: 'gdn', desc: 'Найпопулярніший банер GDN' },
-  { id: 'gdn-728x90', w: 728, h: 90, ratio: '8:1', name: 'Leaderboard', platform: 'gdn', desc: 'Горизонтальний банер шапки' },
-  { id: 'gdn-160x600', w: 160, h: 600, ratio: '1:3.75', name: 'Wide Skyscraper', platform: 'gdn', desc: 'Вертикальний бічний банер' },
-  { id: 'gdn-320x50', w: 320, h: 50, ratio: '32:5', name: 'Mobile Leaderboard', platform: 'gdn', desc: 'Мобільний екран додатків' },
+  // Google Display Network (GDN / КМС) - Supports 2x Retina
+  { id: 'gdn-300x250', w: 300, h: 250, ratio: '6:5', name: 'Medium Rectangle', platform: 'gdn', desc: 'Найпопулярніший банер GDN (600x500 HD)', isRetinaCapable: true },
+  { id: 'gdn-728x90', w: 728, h: 90, ratio: '8:1', name: 'Leaderboard', platform: 'gdn', desc: 'Горизонтальний банер шапки (1456x180 HD)', isRetinaCapable: true },
+  { id: 'gdn-160x600', w: 160, h: 600, ratio: '1:3.75', name: 'Wide Skyscraper', platform: 'gdn', desc: 'Вертикальний хмарочос (320x1200 HD)', isRetinaCapable: true },
+  { id: 'gdn-320x50', w: 320, h: 50, ratio: '32:5', name: 'Mobile Leaderboard', platform: 'gdn', desc: 'Мобільний банер у додатках (640x100 HD)', isRetinaCapable: true },
 
   // YouTube
   { id: 'yt-thumb', w: 1280, h: 720, ratio: '16:9', name: 'YouTube Cover', platform: 'youtube', desc: "Прев'ю відео (Thumbnail)" },
@@ -77,7 +77,7 @@ export function drawHQ(
       tc.imageSmoothingQuality = 'high';
       tc.drawImage(cur, cx, cy, cw, ch, 0, 0, nw, nh);
     }
-    if (cur !== src && 'width' in cur) cur.width = 0;
+    if (cur !== src && 'width' in cur) (cur as HTMLCanvasElement).width = 0;
     cur = t;
     cx = 0;
     cy = 0;
@@ -89,6 +89,32 @@ export function drawHQ(
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(cur, cx, cy, cw, ch, dx, dy, dw, dh);
   if (cur !== src && 'width' in cur) (cur as HTMLCanvasElement).width = 0;
+}
+
+// Unsharp Mask Filter: sharpens small downscaled text and borders to avoid blurriness
+export function applyUnsharpMask(ctx: CanvasRenderingContext2D, w: number, h: number, strength = 0.32) {
+  if (w < 4 || h < 4) return;
+  try {
+    const img = ctx.getImageData(0, 0, w, h);
+    const d = img.data;
+    const copy = new Uint8ClampedArray(d);
+
+    for (let y = 1; y < h - 1; y++) {
+      for (let x = 1; x < w - 1; x++) {
+        const i = (y * w + x) * 4;
+        for (let c = 0; c < 3; c++) {
+          const center = copy[i + c];
+          const up = copy[((y - 1) * w + x) * 4 + c];
+          const down = copy[((y + 1) * w + x) * 4 + c];
+          const left = copy[(y * w + (x - 1)) * 4 + c];
+          const right = copy[(y * w + (x + 1)) * 4 + c];
+          const laplacian = 4 * center - (up + down + left + right);
+          d[i + c] = clamp(Math.round(center + laplacian * strength), 0, 255);
+        }
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+  } catch {}
 }
 
 export function makeProxy(img: HTMLImageElement, w: number, h: number): HTMLCanvasElement {
@@ -161,7 +187,7 @@ export function edgeColor(proxy: HTMLCanvasElement): string {
   return ('#' + hx(best.r) + hx(best.g) + hx(best.b)).toUpperCase();
 }
 
-// Smart Subject Saliency detection: finds center of visual energy/contrast for AI-assisted cropping
+// Smart Subject Saliency detection
 export function detectSaliency(proxy: HTMLCanvasElement): { x: number; y: number } {
   const S = 64;
   const c = makeCanvas(S, S);
@@ -177,13 +203,11 @@ export function detectSaliency(proxy: HTMLCanvasElement): { x: number; y: number
   for (let y = 1; y < S - 1; y++) {
     for (let x = 1; x < S - 1; x++) {
       const idx = (y * S + x) * 4;
-      // Sobel gradient magnitude on luminance
-      const lum = (d[idx] * 0.299 + d[idx + 1] * 0.587 + d[idx + 2] * 0.114);
-      const lumRight = (d[idx + 4] * 0.299 + d[idx + 5] * 0.587 + d[idx + 6] * 0.114);
-      const lumDown = (d[idx + S * 4] * 0.299 + d[idx + S * 4 + 1] * 0.587 + d[idx + S * 4 + 2] * 0.114);
+      const lum = d[idx] * 0.299 + d[idx + 1] * 0.587 + d[idx + 2] * 0.114;
+      const lumRight = d[idx + 4] * 0.299 + d[idx + 5] * 0.587 + d[idx + 6] * 0.114;
+      const lumDown = d[idx + S * 4] * 0.299 + d[idx + S * 4 + 1] * 0.587 + d[idx + S * 4 + 2] * 0.114;
       const grad = Math.abs(lumRight - lum) + Math.abs(lumDown - lum);
 
-      // Color saturation bonus (people & faces often have distinct saturation)
       const maxC = Math.max(d[idx], d[idx + 1], d[idx + 2]);
       const minC = Math.min(d[idx], d[idx + 1], d[idx + 2]);
       const sat = maxC > 0 ? (maxC - minC) / maxC : 0;
@@ -436,14 +460,17 @@ export function paintBlur(ctx: CanvasRenderingContext2D, W: number, H: number, i
   }
 }
 
-// Layout calculations
+// Layout calculations with Retina multiplier and extreme banner positioning
 export function layoutFor(
   item: CreativeItem,
   f: CreativeFormat,
   mode: AdaptationMode,
-  pos: PositionAnchor
+  pos: PositionAnchor,
+  retinaMult = 1
 ) {
-  const sw = item.w, sh = item.h, tw = f.w, th = f.h;
+  const sw = item.w, sh = item.h;
+  const tw = f.w * retinaMult;
+  const th = f.h * retinaMult;
   let src = { x: 0, y: 0, w: sw, h: sh };
   let dst = { x: 0, y: 0, w: tw, h: th };
   let scale = 1, crop = 0, empty = 0, distortion = 0;
@@ -471,7 +498,7 @@ export function layoutFor(
     distortion = 1 - Math.min(a, b) / Math.max(a, b);
   }
 
-  return { src, dst, scale, crop, empty, distortion };
+  return { src, dst, scale, crop, empty, distortion, tw, th };
 }
 
 // Watermark and badge rendering
@@ -532,25 +559,22 @@ export function renderBadge(
     by = H - bh - margin;
   }
 
-  // Draw pill background
   ctx.fillStyle = badge.theme === 'coral' ? '#FF5C35' : badge.theme === 'yellow' ? '#EAB308' : badge.theme === 'dark' ? '#0F172A' : '#1E6B52';
   ctx.beginPath();
   const radius = bh / 2;
   ctx.roundRect(bx, by, bw, bh, radius);
   ctx.fill();
 
-  // Shadow
   ctx.shadowColor = 'rgba(0,0,0,0.25)';
   ctx.shadowBlur = 8;
 
-  // Text
   ctx.fillStyle = '#FFFFFF';
   ctx.textBaseline = 'middle';
   ctx.fillText(badge.text, bx + padX, by + bh / 2);
   ctx.restore();
 }
 
-// Master rendering function
+// Master rendering function with Retina 2x & Unsharp Sharpening
 export function renderInto(
   canvas: HTMLCanvasElement,
   item: CreativeItem,
@@ -562,8 +586,9 @@ export function renderInto(
   badge?: BadgeSetting,
   loadedLogos?: { white?: HTMLImageElement; black?: HTMLImageElement; sticker?: HTMLImageElement }
 ) {
-  const W = Math.max(1, Math.round(f.w * s));
-  const H = Math.max(1, Math.round(f.h * s));
+  const retinaMult = (cfg.retinaGDN !== false && f.isRetinaCapable && !useProxy) ? 2 : 1;
+  const W = Math.max(1, Math.round(f.w * retinaMult * s));
+  const H = Math.max(1, Math.round(f.h * retinaMult * s));
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext('2d');
@@ -586,7 +611,7 @@ export function renderInto(
     }
   }
 
-  const L = layoutFor(item, f, cfg.mode, cfg.pos);
+  const L = layoutFor(item, f, cfg.mode, cfg.pos, retinaMult);
   const source = useProxy ? item.proxy : item.img;
   const kx = useProxy ? item.proxy.width / item.w : 1;
   const ky = useProxy ? item.proxy.height / item.h : 1;
@@ -625,6 +650,11 @@ export function renderInto(
   if (badge) {
     renderBadge(ctx, W, H, badge);
   }
+
+  // Apply Unsharp Masking filter on small banners or high downscaling to keep text crisp!
+  if (f.h <= 120 || f.w <= 250 || L.scale < 0.45) {
+    applyUnsharpMask(ctx, W, H, 0.35);
+  }
 }
 
 export function renderFull(
@@ -651,9 +681,26 @@ export function encode(canvas: HTMLCanvasElement, type: 'png' | 'jpg' | 'webp', 
   });
 }
 
+// Flags calculation with UX Safety Guard indicators
 export function flagsFor(item: CreativeItem, f: CreativeFormat, cfg: EffectiveConfig): RenderFlag[] {
-  const L = layoutFor(item, f, cfg.mode, cfg.pos);
+  const retinaMult = (cfg.retinaGDN !== false && f.isRetinaCapable) ? 2 : 1;
+  const L = layoutFor(item, f, cfg.mode, cfg.pos, retinaMult);
   const out: RenderFlag[] = [];
+
+  // UX Guard: Warning if crop will cut critical text/graphics (> 15%)
+  if ((cfg.mode === 'fill' || cfg.mode === 'smart_crop') && L.crop > 0.15) {
+    out.push({
+      cls: 'bad',
+      text: `⚠️ Зрізано ${(L.crop * 100).toFixed(0)}% (ризик тексту)`,
+      title: 'Критична обрізка: заголовок чи кнопки на краях будуть зрізані! Рекомендується Fit + Продовжити фон',
+    });
+  } else if ((cfg.mode === 'fill' || cfg.mode === 'smart_crop') && L.crop > 0.005) {
+    out.push({
+      cls: '',
+      text: `Обрізано ${(L.crop * 100).toFixed(0)}%`,
+      title: 'Частина оригіналу за межами кадру',
+    });
+  }
 
   if (cfg.mode === 'stretch' && L.distortion > 0.01) {
     out.push({
@@ -662,20 +709,21 @@ export function flagsFor(item: CreativeItem, f: CreativeFormat, cfg: EffectiveCo
       title: 'Зміна природних пропорцій креативу',
     });
   }
-  if ((cfg.mode === 'fill' || cfg.mode === 'smart_crop') && L.crop > 0.005) {
+
+  if (cfg.mode === 'fit' && L.empty > 0.65) {
     out.push({
-      cls: '',
-      text: `Обрізано ${(L.crop * 100).toFixed(0)}%`,
-      title: 'Частина оригіналу за межами кадру',
+      cls: 'warn',
+      text: `⚠️ Дрібний текст (поля ${(L.empty * 100).toFixed(0)}%)`,
+      title: 'Вузький банер: макет сильно зменшено. Рекомендовано експортувати 2x Retina HD або кастомізувати розміщення',
     });
-  }
-  if (cfg.mode === 'fit' && L.empty > 0.005) {
+  } else if (cfg.mode === 'fit' && L.empty > 0.005) {
     out.push(
       cfg.bg.kind === 'extend'
         ? { cls: '', text: `Добудовано ${(L.empty * 100).toFixed(0)}%`, title: 'Штучно добудовані поля від країв' }
         : { cls: '', text: `Поля ${(L.empty * 100).toFixed(0)}%`, title: 'Вільні області кадру' }
     );
   }
+
   if (L.scale > 1.05) {
     out.push({
       cls: 'warn',
@@ -683,13 +731,23 @@ export function flagsFor(item: CreativeItem, f: CreativeFormat, cfg: EffectiveCo
       title: 'Оригінал менший за роздільну здатність формату',
     });
   }
-  if (cfg.mode === 'smart_crop') {
+
+  if (cfg.retinaGDN !== false && f.isRetinaCapable) {
+    out.push({
+      cls: 'own',
+      text: '2x HD',
+      title: `Google Ads 2x Retina: експортується у високій чіткості ${f.w * 2}×${f.h * 2} px`,
+    });
+  }
+
+  if (cfg.mode === 'smart_crop' && L.crop <= 0.15) {
     out.push({
       cls: 'own',
       text: 'AI Focus',
       title: 'Автоматичне центрування на головному об’єкті',
     });
   }
+
   if (cfg.own) {
     out.push({
       cls: 'own',
@@ -721,10 +779,14 @@ export function generateFileName(
   zipStructure: ZipStructure = 'flat'
 ): string {
   const ext = cfg.outType === 'jpg' ? 'jpg' : cfg.outType === 'webp' ? 'webp' : 'png';
-  const fileName = `${item.base}_${f.w}x${f.h}${namingMode ? '_' + cfg.mode : ''}.${ext}`;
+  const retinaMult = (cfg.retinaGDN !== false && f.isRetinaCapable) ? 2 : 1;
+  const w = f.w * retinaMult;
+  const h = f.h * retinaMult;
+  const hdSuffix = retinaMult > 1 ? '_2xHD' : '';
+  const fileName = `${item.base}_${w}x${h}${hdSuffix}${namingMode ? '_' + cfg.mode : ''}.${ext}`;
 
   if (zipStructure === 'by_format') {
-    return `${f.ratio.replace(':', 'x')}_${f.w}x${f.h}/${fileName}`;
+    return `${f.ratio.replace(':', 'x')}_${w}x${h}/${fileName}`;
   } else if (zipStructure === 'by_creative') {
     return `${item.base}/${fileName}`;
   }
@@ -762,7 +824,6 @@ export function buildZip(files: { name: string; data: Uint8Array }[]): Blob {
     const size = f.data.length;
     const crc = crc32(f.data);
 
-    // Info-ZIP Unicode Path extra field
     const extra = new Uint8Array(9 + name.length);
     const ev = new DataView(extra.buffer);
     ev.setUint16(0, 0x7075, true);
@@ -774,7 +835,7 @@ export function buildZip(files: { name: string; data: Uint8Array }[]): Blob {
     const lh = new DataView(new ArrayBuffer(30));
     lh.setUint32(0, 0x04034b50, true);
     lh.setUint16(4, 20, true);
-    lh.setUint16(6, 0x0800, true); // UTF-8 filename flag
+    lh.setUint16(6, 0x0800, true);
     lh.setUint16(8, 0, true);
     lh.setUint16(10, time, true);
     lh.setUint16(12, date, true);
