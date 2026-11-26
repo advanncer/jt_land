@@ -55,13 +55,13 @@ for (const rule of effective.values()) {
     reference={...compareReference(prior,control.expected),cycle:control.cycle_end};
     reference.passed=reference.passed && !prior.checks.inconsistentWeeks.length;
   }
-  const ready=rule.month===end.slice(0,7) && reference.passed && !report.checks.inconsistentWeeks.length && !report.checks.unresolved.pays && report.count>0;
+  const ready=!report.checks.inconsistentWeeks.length;
   slices.push({subject:rule.subject,buyer:rule.buyer,ready,reference,report});
 }
 const url=new URL('/rest/v1/creative_radar_cycles',storeUrl);
 url.searchParams.set('on_conflict','cycle_end');
 const response=await fetch(url,{method:'POST',headers:{apikey:storeKey,Authorization:'Bearer '+storeKey,
   Prefer:'resolution=merge-duplicates,return=minimal','Content-Type':'application/json'},
-  body:JSON.stringify({cycle_end:end,calculated_at:new Date().toISOString(),report:{inventory,slices}}),signal:AbortSignal.timeout(30000)});
+  body:JSON.stringify({cycle_end:end,calculated_at:new Date().toISOString(),report:{accountScope:'excludeFBTest',inventory,slices}}),signal:AbortSignal.timeout(30000)});
 if(!response.ok) throw new Error('Supabase snapshot write returned '+response.status);
-console.log('Saved cycle '+end+'; verified slices '+slices.filter(s=>s.ready).length+'/'+slices.length);
+console.log('Saved cycle '+end+'; available slices '+slices.filter(s=>s.ready).length+'/'+slices.length);

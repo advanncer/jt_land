@@ -5,6 +5,8 @@ FROM (
   FROM `justschool-473216.marketing_funnel.fb_google_tiktok`
   WHERE DATE(ad_date) BETWEEN DATE_SUB(@cycle_end, INTERVAL 34 DAY) AND @cycle_end
     AND source = 'Facebook' AND total_spend > 0
+    AND account_id <> '26890470997250492'
+    AND NOT REGEXP_CONTAINS(IFNULL(campaign_name, ''), r'(?i)(^|[_ -])fb[_ -]*test([_ -]|$)')
     AND (subject IN ('Math','Programming') OR subject = 'English')
 )
 GROUP BY subject, student_type, buyer

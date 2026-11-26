@@ -6,6 +6,8 @@ WITH period AS (
     CAST(ad_id AS STRING) AS ad_id, total_spend AS spend
   FROM `justschool-473216.marketing_funnel.fb_google_tiktok`, period
   WHERE source = 'Facebook' AND subject = @subject AND student_type = @student_type
+    AND account_id <> '26890470997250492'
+    AND NOT REGEXP_CONTAINS(IFNULL(campaign_name, ''), r'(?i)(^|[_ -])fb[_ -]*test([_ -]|$)')
     AND DATE(ad_date) <= end_day
 ), catalog AS (
   SELECT DISTINCT campaign, creative, ad_key

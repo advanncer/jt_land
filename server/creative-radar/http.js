@@ -70,6 +70,7 @@ export async function serve(req,res,{password,key,url,serviceKey}) {
     if(!data.length) return res.status(404).json({error:'no_cycle'});
     const row=data[0],snapshot=row.report, subject=req.query.subject||'adult', buyer=req.query.buyer||'Julia';
     if(!['adult','child','math','prog'].includes(subject)||typeof buyer!=='string'||buyer.length>96) return res.status(400).json({error:'filter'});
+    if(snapshot.accountScope!=='excludeFBTest') return res.status(503).json({error:'refresh_pending'});
     const slice=snapshot.slices.find(s=>s.subject===subject&&s.buyer===buyer);
     const summary={end:row.cycle_end,updated:row.calculated_at,expected,inventory:snapshot.inventory,ready:slice?.ready||false,reference:slice?.reference||null};
     if(action==='dashboard') {
