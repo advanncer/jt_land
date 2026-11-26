@@ -29,6 +29,9 @@
     }
   ],
   "rewrites": [
+    { "source": "/creative-radar", "destination": "/creative-radar/index.html" },
+    { "source": "/creative-radar/", "destination": "/creative-radar/index.html" },
+    { "source": "/creative-radar/:path*", "destination": "/creative-radar/index.html" },
     {
       "source": "/resizer",
       "destination": "/resizer/index.html"

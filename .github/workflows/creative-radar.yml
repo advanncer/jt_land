@@ -1,0 +1,33 @@
+name: Refresh Creative Radar
+on:
+  schedule:
+    - cron: '25 8 * * 1'
+  workflow_dispatch:
+    inputs:
+      cycle_end:
+        description: 'Optional completed Sunday (YYYY-MM-DD, Europe/Kyiv)'
+        required: false
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: creative-radar-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/creative-radar/refresh.mjs "$CYCLE_END"
+        env:
+          CYCLE_END: ${{ inputs.cycle_end }}
+          GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CREATIVE_RADAR_RULES_JSON: ${{ vars.CREATIVE_RADAR_RULES_JSON }}
+          CREATIVE_RADAR_REFERENCES_JSON: ${{ secrets.CREATIVE_RADAR_REFERENCES_JSON }}
