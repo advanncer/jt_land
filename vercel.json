@@ -452,6 +452,18 @@
     {
       "source": "/eng-adult/fluent-city-v1",
       "destination": "/eng-adult/fluent-city/index.html"
+    },
+    {
+      "source": "/adults",
+      "destination": "/eng-adult/adults-offer/index.html"
+    },
+    {
+      "source": "/adults/",
+      "destination": "/eng-adult/adults-offer/index.html"
+    },
+    {
+      "source": "/eng-adult/adults-offer",
+      "destination": "/eng-adult/adults-offer/index.html"
     }
   ],
   "redirects": [

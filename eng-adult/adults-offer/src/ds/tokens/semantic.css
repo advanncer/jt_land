@@ -1,0 +1,50 @@
+/* Semantic aliases. Prefer these in product code. */
+:root{
+  /* brand */
+  --brand:var(--orange-500);
+  --brand-hover:var(--orange-600);
+  --brand-active:var(--orange-700);
+  --brand-subtle:var(--orange-25);
+  --brand-accent:var(--hot-orange-500);
+
+  /* text */
+  --text-strong:var(--base-950);
+  --text-body:var(--base-900);
+  --text-secondary:var(--base-700);
+  --text-muted:var(--base-600);
+  --text-disabled:var(--base-500);
+  --text-on-brand:var(--base-50);
+  --text-inverse:var(--base-50);
+  --text-link:var(--orange-600);
+  --text-link-hover:var(--orange-700);
+
+  /* surfaces */
+  --surface-page:var(--base-50);
+  --surface-page-warm:var(--orange-25);
+  --surface-card:var(--base-50);
+  --surface-sunken:var(--base-100);
+  --surface-raised:var(--base-50);
+  --surface-inverse:var(--base-900);
+  --surface-brand:var(--orange-500);
+  --surface-brand-subtle:var(--orange-25);
+
+  /* borders */
+  --border-subtle:var(--base-200);
+  --border-default:var(--base-300);
+  --border-strong:var(--base-400);
+  --border-brand:var(--orange-500);
+
+  /* semantic status */
+  --success:var(--green-700);
+  --success-surface:var(--green-50);
+  --success-border:var(--green-300);
+  --warning:var(--yellow-600);
+  --warning-surface:var(--yellow-50);
+  --warning-border:var(--yellow-300);
+  --danger:var(--hot-orange-600);
+  --danger-surface:var(--hot-orange-50);
+  --danger-border:var(--hot-orange-200);
+  --info:var(--violet-950);
+  --info-surface:var(--violet-50);
+  --info-border:var(--violet-300);
+}

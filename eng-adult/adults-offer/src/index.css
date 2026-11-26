@@ -1,0 +1,171 @@
+@import "./ds/styles.css";
+/* Scan only this landing for classes (keeps the CSS bundle small) */
+@import "tailwindcss" source(none);
+@source "./";
+
+:root {
+  --accent: #D42A1E; /* single accent token — change here only */
+  --bg: #F4F4F2;
+  --ink: #111111;
+  --grey: #5C5C5C;
+  --font-display-offer: "Fira Sans Extra Condensed", "Arial Narrow", sans-serif;
+}
+
+html,
+body {
+  background: var(--bg);
+}
+body {
+  font-family: var(--font-core);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.display {
+  font-family: var(--font-display-offer);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+.hero-h1 {
+  font-size: clamp(3.6rem, 19.5vw, 4.75rem); /* 76px at 390px */
+  line-height: 0.86;
+  text-transform: uppercase;
+}
+
+/* Marquee (CSS only) */
+.marquee {
+  height: 34px;
+  background: var(--accent);
+  color: #fff;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 18s linear infinite;
+}
+.marquee-group {
+  display: flex;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.marquee-group > span {
+  display: inline-flex;
+}
+.marquee-group i {
+  font-style: normal;
+  padding: 0 12px;
+  opacity: 0.8;
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* Tickets */
+.ticket {
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ticket--dark {
+  background: var(--ink);
+  color: #fff;
+}
+.ticket--light {
+  background: #fff;
+  border: 2px solid var(--ink);
+}
+.ticket-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.ticket-price {
+  font-size: 2.1rem;
+  line-height: 0.95;
+  white-space: nowrap;
+}
+.ticket-note {
+  font-size: 12px;
+  line-height: 1.25;
+  opacity: 0.75;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #E1E1DD;
+}
+
+.cta {
+  height: 57px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+  font-size: 17px;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+}
+.cta:not(:disabled):hover { filter: brightness(1.08); }
+.cta:not(:disabled):active { transform: scale(0.98); }
+.cta:disabled { opacity: 0.45; cursor: not-allowed; }
+.cta:focus-visible,
+.opt:focus-visible,
+.day-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.opt {
+  background: #fff;
+  border: 2px solid #E1E1DD;
+  transition: border-color 0.15s;
+}
+.opt:hover,
+.opt.is-selected { border-color: var(--ink); }
+
+.day-btn {
+  background: #fff;
+  border: 2px solid #E1E1DD;
+  color: var(--ink);
+}
+.day-btn.is-on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.field {
+  width: 100%;
+  height: 56px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 2px solid #E1E1DD;
+  background: #fff;
+  font-weight: 600;
+  outline: none;
+}
+.field:focus { border-color: var(--ink); }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.step-enter { animation: fadeSlideIn 0.2s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+  .step-enter { animation: none; }
+  .cta, .opt { transition: none; }
+}

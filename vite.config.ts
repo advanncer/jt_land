@@ -112,6 +112,10 @@ export default defineConfig({
           __dirname,
           "eng-adult/fluent-city/index.html",
         ),
+        engAdultAdultsOffer: resolve(
+          __dirname,
+          "eng-adult/adults-offer/index.html",
+        ),
       },
     },
   },
