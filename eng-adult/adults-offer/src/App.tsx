@@ -220,7 +220,8 @@ export default function App() {
     <div className="min-h-[100dvh] page">
       <div className="mx-auto w-full max-w-[480px] min-h-[100dvh] flex flex-col">
         {/* Marquee */}
-        <div className="marquee" aria-label={MARQUEE.join(' · ')}>
+        <div className="marquee">
+          <span className="sr-only">{MARQUEE.join(' · ')}</span>
           <div className="marquee-track" aria-hidden="true">
             {[0, 1].map((k) => (
               <span key={k} className="marquee-group">
