@@ -13,7 +13,10 @@ export default async function handler(req,res) {
     const session=(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('js_creative_radar='))||'';
     const upstream=await fetch(url,{method:req.method,redirect:'error',headers:{Cookie:session,'Content-Type':'application/json'},
       body:req.method==='POST'?typeof req.body==='string'?req.body:JSON.stringify(req.body||{}):undefined,signal:AbortSignal.timeout(14000)});
-    for(const h of ['content-type','set-cookie','allow','vary']) {const value=upstream.headers.get(h);if(value)res.setHeader(h,value);}
+    const cookies=upstream.headers.getSetCookie?.() || [upstream.headers.get('set-cookie') || ''];
+    const teamCookie=cookies.flatMap(h=>h.split(/,(?=\s*[A-Za-z0-9_-]+=)/)).map(h=>h.trim()).find(h=>h.startsWith('js_creative_radar='));
+    if(teamCookie) res.setHeader('Set-Cookie',teamCookie);
+    for(const h of ['content-type','allow','vary']) {const value=upstream.headers.get(h);if(value)res.setHeader(h,value);}
     return res.status(upstream.status).end(await upstream.text());
   }catch{return res.status(503).json({error:'store_unavailable'});}
 }
