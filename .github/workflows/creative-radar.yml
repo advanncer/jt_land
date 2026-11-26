@@ -1,5 +1,12 @@
 name: Refresh Creative Radar
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/creative-radar.yml"
+      - "scripts/creative-radar/**"
+      - "sql/creative-radar/facts.sql"
+      - "server/creative-radar/report.js"
   schedule:
     - cron: '25 8 * * 1'
   workflow_dispatch:
