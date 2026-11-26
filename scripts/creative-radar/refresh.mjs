@@ -11,11 +11,18 @@ const end=process.argv[2]||currentEnd();
 if(!validEnd(end)||end>currentEnd()) throw new Error('cycle_end must be a completed Sunday in Kyiv');
 const baselineRules=[{subject:'adult',buyer:'Julia',marker:'EngAdult',month:'2026-11',cmc:4500,minPays:3,minSpend:400,lateDays:10}];
 const rules=JSON.parse(process.env.CREATIVE_RADAR_RULES_JSON||'null')??baselineRules;
-const references=JSON.parse(process.env.CREATIVE_RADAR_REFERENCES_JSON||'[]');
+
 const factSQL=await readFile(new URL('facts.sql',root),'utf8');
 const inventorySQL=await readFile(new URL('inventory.sql',root),'utf8');
 const storeUrl=process.env.SUPABASE_URL,storeKey=process.env.SUPABASE_SERVICE_ROLE_KEY;
 if(!storeUrl||!storeKey) throw new Error('Supabase environment missing');
+async function storedReferences() {
+  const endpoint=new URL('/rest/v1/creative_radar_settings?name=eq.references&select=value',storeUrl);
+  const response=await fetch(endpoint,{headers:{apikey:storeKey,Authorization:'Bearer '+storeKey}});
+  if(!response.ok) throw new Error('Reference configuration unavailable');
+  return (await response.json())[0]?.value||[];
+}
+const references=process.env.CREATIVE_RADAR_REFERENCES_JSON?JSON.parse(process.env.CREATIVE_RADAR_REFERENCES_JSON):await storedReferences();
 const cache=new Map();
 async function facts(subject,cycle_end) {
   const id=subject+'/'+cycle_end;
